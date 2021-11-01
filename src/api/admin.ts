@@ -1,5 +1,5 @@
 import { ApiEntity, ApiPage, pageable, Pageable, request } from "./request";
-import { User } from "./ums";
+import { Role, User } from "./ums";
 
 export const adminListUsers = (page: Pageable, search?: string) =>
   request
@@ -30,5 +30,22 @@ export const adminUpdateUser = (userId: string, user: UpdateUser) =>
 
 export const adminDeleteUser = (userId: string) =>
   request
-    .delete<ApiEntity<User>>(`/api/admin/users/${userId}`)
+    .delete<ApiEntity>(`/api/admin/users/${userId}`)
+    .then((response) => response.data);
+
+export const adminListRoles = () =>
+  request
+    .get<ApiEntity<Role[]>>(`/api/admin/roles`)
+    .then((response) => response.data);
+
+export type UpdateRole = Partial<Omit<Role, "name" | "createdTime">>;
+
+export const adminUpdateRole = (roleName: string, role: UpdateRole) =>
+  request
+    .put<ApiEntity<Role>>(`/api/admin/roles/${roleName}`, role)
+    .then((response) => response.data);
+
+export const adminDeleteRole = (roleName: string) =>
+  request
+    .delete<ApiEntity>(`/api/admin/roles/${roleName}`)
     .then((response) => response.data);

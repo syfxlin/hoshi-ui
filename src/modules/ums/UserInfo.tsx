@@ -2,12 +2,12 @@ import React from "react";
 import { User, userByUsername } from "../../api/ums";
 import { useLocation, useParams } from "react-router-dom";
 import Async from "../../components/Async";
-import Main from "../../layout/Main";
+import Main from "../../components/Main";
 import { Card, Col, Container, Grid } from "@mantine/core";
 import UserCard from "./UserCard";
 import FollowList from "./FollowList";
 import useSWR from "swr";
-import Header from "../../layout/header/Header";
+import Header from "../../components/header/Header";
 import { css } from "@emotion/react";
 
 type Params = {

@@ -6,7 +6,7 @@ import { css } from "@emotion/react";
 import Box from "../layout/Box";
 import { Badge } from "@mantine/core";
 
-type Props = Assign<
+type SidebarItemProps = Assign<
   LinkProps,
   {
     icon?: React.ReactNode;
@@ -14,7 +14,12 @@ type Props = Assign<
   }
 >;
 
-const SidebarItem: React.FC<Props> = ({ icon, badge, children, ...props }) => {
+const SidebarItem: React.FC<SidebarItemProps> = ({
+  icon,
+  badge,
+  children,
+  ...props
+}) => {
   const th = useTh();
   return (
     <Link

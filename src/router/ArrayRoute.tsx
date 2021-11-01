@@ -7,12 +7,12 @@ import { RouteProps } from "react-router";
 import { Location } from "history";
 import { AuthorizeRoute } from "./AuthorizeRoute";
 
-type Props = {
+type ArrayRouteProps = {
   routes: RouteDefinition[];
   sw?: boolean | undefined;
 };
 
-const ArrayRoute: React.FC<Props> = ({ routes, sw }) => {
+const ArrayRoute: React.FC<ArrayRouteProps> = ({ routes, sw }) => {
   const Root = sw ? Switch : React.Fragment;
   return (
     <Root>

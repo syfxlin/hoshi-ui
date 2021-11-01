@@ -11,4 +11,8 @@ export const panels: (match: match) => RouteDefinition[] = ({ path }) => [
     path: `${path}/users`,
     component: loadable(() => import("./panels/Users")),
   },
+  {
+    path: `${path}/roles`,
+    component: loadable(() => import("./panels/Roles")),
+  },
 ];

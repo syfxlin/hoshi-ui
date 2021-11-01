@@ -3,7 +3,7 @@ import { Loadable } from "recoil";
 import AuthorizeView from "./AuthorizeView";
 import { Role, User } from "../api/ums";
 
-type Props = {
+type RoleViewProps = {
   loading?:
     | React.ReactNode
     | ((
@@ -33,7 +33,7 @@ type Props = {
   roles?: string[];
 };
 
-const RoleView: React.FC<Props> = ({
+const RoleView: React.FC<RoleViewProps> = ({
   loading,
   children,
   roles: rs,

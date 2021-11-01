@@ -1,32 +1,15 @@
 import React from "react";
-import Main from "../layout/Main";
+import Main from "../components/Main";
 import AlertBox from "../components/AlertBox";
 import { Button } from "@mantine/core";
 import { useHistory } from "react-router-dom";
 
-type Props = {
+type BlockProps = {
   roles?: string[];
   message?: React.ReactNode;
-  type?: "success" | "info" | "warning" | "error";
-  closable?: boolean;
-  closeText?: React.ReactNode;
-  description?: React.ReactNode;
-  onClose?: React.MouseEventHandler<HTMLButtonElement>;
-  afterClose?: () => void;
-  showIcon?: boolean;
-  role?: string;
-  style?: React.CSSProperties;
-  prefixCls?: string;
-  className?: string;
-  banner?: boolean;
-  icon?: React.ReactNode;
-  action?: React.ReactNode;
-  onMouseEnter?: React.MouseEventHandler<HTMLDivElement>;
-  onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;
-  onClick?: React.MouseEventHandler<HTMLDivElement>;
 };
 
-const Block: React.FC<Props> = (props) => {
+const Block: React.FC<BlockProps> = (props) => {
   const history = useHistory();
   const description =
     props.roles && props.roles.length > 0

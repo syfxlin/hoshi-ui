@@ -8,8 +8,8 @@ import {
   sendResetPasswordCode,
 } from "../../api/ums";
 import { history } from "../../store/history";
-import Header from "../../layout/header/Header";
-import Main from "../../layout/Main";
+import Header from "../../components/header/Header";
+import Main from "../../components/Main";
 import FluidCenter from "../../components/layout/FluidCenter";
 import { Card, LinkGroup, Submit, Title } from "./form";
 import { ActionIcon, PasswordInput, TextInput, Tooltip } from "@mantine/core";

@@ -3,7 +3,7 @@ import { useAuth } from "../store/auth";
 import { Loadable } from "recoil";
 import { User } from "../api/ums";
 
-type Props = {
+type AuthorizeViewProps = {
   loading?:
     | React.ReactNode
     | ((
@@ -19,7 +19,11 @@ type Props = {
       ) => React.ReactNode);
 };
 
-const AuthorizeView: React.FC<Props> = ({ loading, children, ...props }) => {
+const AuthorizeView: React.FC<AuthorizeViewProps> = ({
+  loading,
+  children,
+  ...props
+}) => {
   const [auth] = useAuth();
   if (auth.state === "loading") {
     return (

@@ -51,7 +51,7 @@ export const root: RouteDefinition[] = [
     render: () => <Redirect to="/dashboard/home" />,
   },
   {
-    path: "/dashboard/:panel",
+    path: "/dashboard",
     component: loadable(() => import("../modules/note/Dashboard")),
     authorize: "USER",
   },

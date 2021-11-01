@@ -1,10 +1,10 @@
 import React from "react";
 import { useLogout, User } from "../../api/ums";
-import { BLink } from "../../components/Link";
+import { BLink } from "../Link";
 import AuthorizeView from "../../router/AuthorizeView";
 import { Avatar, Divider, Menu, Text } from "@mantine/core";
 import { Logout } from "@icon-park/react";
-import Stack from "../../components/layout/Stack";
+import Stack from "../layout/Stack";
 import { css } from "@emotion/react";
 
 const AuthButton: React.FC = () => {

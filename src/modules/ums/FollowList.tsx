@@ -4,7 +4,7 @@ import {
   followByUserId,
   User,
 } from "../../api/ums";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Flex from "../../components/layout/Flex";
 import { BLink, Link } from "../../components/Link";
 import { Handbag, Left, LinkTwo, Local } from "@icon-park/react";
@@ -26,12 +26,12 @@ import useLoading from "../../utils/use-loading";
 import { css } from "@emotion/react";
 import { useTh } from "../../theme/hooks/use-th";
 
-type Props = {
+type FollowListProps = {
   user: User;
   type: "followers" | "following";
 };
 
-const FollowList: React.FC<Props> = ({ user, type }) => {
+const FollowList: React.FC<FollowListProps> = ({ user, type }) => {
   const th = useTh();
   const toast = useToast();
   const [page, setPage] = useState(1);
@@ -39,7 +39,7 @@ const FollowList: React.FC<Props> = ({ user, type }) => {
     ["followByUserId", type, user.id, page],
     (key, type, userId, page) => followByUserId(type, userId, page)
   );
-  const data = query.data?.data;
+  const data = useMemo(() => query.data?.data, [query.data]);
   return (
     <>
       <Flex align="center">

@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import { css } from "@emotion/react";
-import Box, { BoxProps } from "../components/layout/Box";
+import Box, { BoxProps } from "./layout/Box";
 import { UIComponent } from "../utils/types";
 
 const Main: UIComponent<"div", BoxProps> = forwardRef(

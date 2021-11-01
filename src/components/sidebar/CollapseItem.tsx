@@ -5,13 +5,18 @@ import { css } from "@emotion/react";
 import { useTh } from "../../theme/hooks/use-th";
 import Box from "../layout/Box";
 
-type Props = {
+type CollapseItemProps = {
   title: string;
   open?: boolean;
   onChange?: (opened: boolean) => void;
 };
 
-const CollapseItem: React.FC<Props> = ({ children, title, open, onChange }) => {
+const CollapseItem: React.FC<CollapseItemProps> = ({
+  children,
+  title,
+  open,
+  onChange,
+}) => {
   const th = useTh();
   const [opened, setOpen] = useState(open ?? false);
   return (

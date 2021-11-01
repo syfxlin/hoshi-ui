@@ -6,9 +6,9 @@ import { Card, LinkGroup, Submit, Title } from "./form";
 import useForm from "../../utils/use-form";
 import { LoginData, useLogin } from "../../api/ums";
 import useToast from "../../utils/use-toast";
-import Main from "../../layout/Main";
+import Main from "../../components/Main";
 import { VStack } from "../../components/layout/Stack";
-import Header from "../../layout/header/Header";
+import Header from "../../components/header/Header";
 
 const Login: React.FC = () => {
   const toast = useToast();

@@ -1,6 +1,6 @@
 import React from "react";
 import AuthorizeView from "../router/AuthorizeView";
-import Main from "../layout/Main";
+import Main from "../components/Main";
 import { Redirect } from "react-router-dom";
 
 const Index: React.FC = () => {

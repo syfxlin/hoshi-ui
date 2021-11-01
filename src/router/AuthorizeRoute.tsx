@@ -5,11 +5,11 @@ import LoadingBox from "../components/LoadingBox";
 import RoleView from "./RoleView";
 import Block from "./Block";
 
-type Props = RouteProps & {
+type AuthorizeRouteProps = RouteProps & {
   roles?: string[];
 };
 
-export const AuthorizeRoute: React.FC<Props> = (props) => {
+export const AuthorizeRoute: React.FC<AuthorizeRouteProps> = (props) => {
   return (
     <Route
       {...props}

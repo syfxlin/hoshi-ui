@@ -2,8 +2,17 @@ import React from "react";
 import { useTh } from "../../theme/hooks/use-th";
 import Box from "../layout/Box";
 import { css } from "@emotion/react";
+import SidebarItem from "./SidebarItem";
+import CollapseItem from "./CollapseItem";
+import SidebarMenu from "./SidebarMenu";
 
-const Sidebar: React.FC = ({ children }) => {
+type SidebarComponent = React.FC & {
+  Item: typeof SidebarItem;
+  Collapse: typeof CollapseItem;
+  Menu: typeof SidebarMenu;
+};
+
+const Sidebar: SidebarComponent = ({ children }) => {
   const th = useTh();
   return (
     <Box
@@ -19,5 +28,9 @@ const Sidebar: React.FC = ({ children }) => {
     </Box>
   );
 };
+
+Sidebar.Item = SidebarItem;
+Sidebar.Collapse = CollapseItem;
+Sidebar.Menu = SidebarMenu;
 
 export default Sidebar;

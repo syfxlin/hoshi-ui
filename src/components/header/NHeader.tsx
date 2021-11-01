@@ -1,6 +1,6 @@
 import React from "react";
 import { useTh } from "../../theme/hooks/use-th";
-import Box from "../../components/layout/Box";
+import Box from "../layout/Box";
 import { css } from "@emotion/react";
 
 const NHeader: React.FC = ({ children }) => {

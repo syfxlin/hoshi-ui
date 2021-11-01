@@ -4,9 +4,9 @@ import { Redirect, Route } from "react-router-dom";
 import LoadingBox from "../components/LoadingBox";
 import AuthorizeView from "./AuthorizeView";
 
-type Props = RouteProps;
+type AnonymousRouteProps = RouteProps;
 
-export const AnonymousRoute: React.FC<Props> = (props) => {
+export const AnonymousRoute: React.FC<AnonymousRouteProps> = (props) => {
   return (
     <Route
       {...props}

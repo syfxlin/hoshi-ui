@@ -2,12 +2,12 @@ import React from "react";
 import { css } from "@emotion/react";
 import icon from "../../assets/icon.png";
 import AuthButton from "./AuthButton";
-import { Link } from "../../components/Link";
+import { Link } from "../Link";
 import ColorModeButton from "./ColorModeButton";
-import { HStack } from "../../components/layout/Stack";
+import { HStack } from "../layout/Stack";
 import { useTh } from "../../theme/hooks/use-th";
 import { Image } from "@mantine/core";
-import Box from "../../components/layout/Box";
+import Box from "../layout/Box";
 
 const Header: React.FC = ({ children }) => {
   const th = useTh();

@@ -15,11 +15,11 @@ import useLoading from "../../utils/use-loading";
 import useToast from "../../utils/use-toast";
 import { useTh } from "../../theme/hooks/use-th";
 
-type Props = {
+type UserCardProps = {
   user: User;
 };
 
-const UserCard: React.FC<Props> = ({ user }) => {
+const UserCard: React.FC<UserCardProps> = ({ user }) => {
   const th = useTh();
   const toast = useToast();
   const loading = useLoading();
