@@ -33,6 +33,11 @@ export const adminDeleteUser = (userId: string) =>
     .delete<ApiEntity>(`/api/admin/users/${userId}`)
     .then((response) => response.data);
 
+export const adminUpdateUserRole = (userId: string, roles: string[]) =>
+  request
+    .put(`/api/admin/users/${userId}/role`, { roles })
+    .then((response) => response.data);
+
 export const adminListRoles = () =>
   request
     .get<ApiEntity<Role[]>>(`/api/admin/roles`)

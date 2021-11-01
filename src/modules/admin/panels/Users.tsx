@@ -3,6 +3,7 @@ import {
   Badge,
   Button,
   Modal,
+  MultiSelect,
   Pagination,
   PasswordInput,
   TextInput,
@@ -15,8 +16,10 @@ import { useTh } from "../../../theme/hooks/use-th";
 import useSWR from "swr";
 import {
   adminDeleteUser,
+  adminListRoles,
   adminListUsers,
   adminUpdateUser,
+  adminUpdateUserRole,
   UpdateUser,
 } from "../../../api/admin";
 import { User } from "../../../api/ums";
@@ -49,6 +52,7 @@ const Users: React.FC = () => {
     })
   );
   const data = useMemo(() => query.data?.data, [query.data]);
+  const roles = useSWR(["adminListRoles"], () => adminListRoles());
   // edit form
   const edit = useForm({
     initial: {
@@ -57,6 +61,12 @@ const Users: React.FC = () => {
       password: "",
       nickname: "",
       email: "",
+    },
+  });
+  const assignRole = useForm<{ id: string; roles: string[] }>({
+    initial: {
+      id: "",
+      roles: [],
     },
   });
   // users table
@@ -99,13 +109,13 @@ const Users: React.FC = () => {
         title: "状态",
         dataKey: "status",
         width: 200,
+        resizable: true,
+        sortable: true,
         cellRenderer: ({ cellData }) => (
           <Badge variant="dot" color={cellData ? "green" : "red"}>
             {cellData ? "启用" : "禁用"}
           </Badge>
         ),
-        resizable: true,
-        sortable: true,
       },
       {
         key: "createdTime",
@@ -114,6 +124,7 @@ const Users: React.FC = () => {
         width: 200,
         resizable: true,
         sortable: true,
+        cellRenderer: ({ cellData }) => new Date(cellData).toLocaleString(),
       },
       {
         key: "operate",
@@ -164,6 +175,17 @@ const Users: React.FC = () => {
                     </Button>
                     <Button
                       size="xs"
+                      onClick={() =>
+                        assignRole.setValues({
+                          id: rowData.id,
+                          roles: rowData.roles.map((role) => role.name),
+                        })
+                      }
+                    >
+                      分配权限
+                    </Button>
+                    <Button
+                      size="xs"
                       disabled={!!user && user.id === rowData.id}
                       color="red"
                       onClick={() => {
@@ -196,7 +218,7 @@ const Users: React.FC = () => {
         },
       },
     ],
-    [toast, query, edit]
+    [toast, query, edit, assignRole]
   );
   return (
     <AppShell.Container
@@ -320,6 +342,46 @@ const Users: React.FC = () => {
               error={edit.errors.password}
             />
             <Submit loading={edit.loading}>提交</Submit>
+          </VStack>
+        </form>
+      </Modal>
+      <Modal
+        opened={assignRole.values.id !== ""}
+        onClose={() => assignRole.reset()}
+        title={`分配权限: ${assignRole.values.id}`}
+      >
+        <form
+          onSubmit={assignRole.onSubmit((values) => {
+            assignRole.setLoading(true);
+            adminUpdateUserRole(values.id, values.roles)
+              .then(
+                toast.api.success({
+                  title: "修改成功",
+                })
+              )
+              .then(() => query.mutate())
+              .then(() => assignRole.reset())
+              .catch(
+                toast.api.error({
+                  title: "修改失败",
+                })
+              )
+              .finally(() => assignRole.setLoading(false));
+          })}
+        >
+          <VStack>
+            <MultiSelect
+              label="权限"
+              placeholder="选择权限"
+              searchable
+              data={
+                roles.data?.data?.map((role) => role.name) ??
+                assignRole.values.roles
+              }
+              value={assignRole.values.roles}
+              onChange={(value) => assignRole.setValue("roles", value)}
+            />
+            <Submit loading={assignRole.loading}>提交</Submit>
           </VStack>
         </form>
       </Modal>

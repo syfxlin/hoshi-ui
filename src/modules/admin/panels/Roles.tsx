@@ -128,12 +128,12 @@ const Roles: React.FC = () => {
         title: "状态",
         dataKey: "status",
         width: 200,
+        resizable: true,
         cellRenderer: ({ cellData }) => (
           <Badge variant="dot" color={cellData ? "green" : "red"}>
             {cellData ? "启用" : "禁用"}
           </Badge>
         ),
-        resizable: true,
       },
       {
         key: "createdTime",
@@ -141,6 +141,7 @@ const Roles: React.FC = () => {
         dataKey: "createdTime",
         width: 200,
         resizable: true,
+        cellRenderer: ({ cellData }) => new Date(cellData).toLocaleString(),
       },
       {
         key: "operate",
