@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import useForm from "../../utils/use-form";
 import { register, RegisterData, sendRegisterCode } from "../../api/ums";
 import FluidCenter from "../../components/layout/FluidCenter";
@@ -63,20 +63,25 @@ const Register: React.FC = () => {
         })
       );
   };
-  const onSubmit = (data: RegisterData) => {
-    register(data)
-      .then(
-        toast.api.success({
-          title: "注册成功",
-        })
-      )
-      .then(() => history.push("/login"))
-      .catch(
-        toast.api.error({
-          title: "注册失败",
-        })
-      );
-  };
+  const onSubmit = useCallback(
+    (data: RegisterData) => {
+      form.setLoading(true);
+      register(data)
+        .then(
+          toast.api.success({
+            title: "注册成功",
+          })
+        )
+        .then(() => history.push("/login"))
+        .catch(
+          toast.api.error({
+            title: "注册失败",
+          })
+        )
+        .finally(() => form.setLoading(false));
+    },
+    [register]
+  );
   return (
     <>
       <Header />
@@ -152,7 +157,7 @@ const Register: React.FC = () => {
                     </ActionIcon>
                   }
                 />
-                <Submit>注册</Submit>
+                <Submit loading={form.loading}>注册</Submit>
               </VStack>
             </form>
             <LinkGroup>
