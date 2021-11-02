@@ -2,10 +2,12 @@ import React, { useMemo, useState } from "react";
 import {
   Badge,
   Button,
+  Loader,
   Modal,
   MultiSelect,
   Pagination,
   PasswordInput,
+  Switch,
   TextInput,
 } from "@mantine/core";
 import { css } from "@emotion/react";
@@ -15,6 +17,7 @@ import Box from "../../../components/layout/Box";
 import { useTh } from "../../../theme/hooks/use-th";
 import useSWR from "swr";
 import {
+  adminAddUser,
   adminDeleteUser,
   adminListRoles,
   adminListUsers,
@@ -34,6 +37,9 @@ import useForm from "../../../utils/use-form";
 import { Submit } from "../../ums/form";
 import AppShell from "../../../components/app-shell/AppShell";
 import Panel from "../Panel";
+import { wrap } from "../../../utils/react";
+import { Search } from "@icon-park/react";
+import { useDebouncedValue } from "@mantine/hooks";
 
 const Users: React.FC = () => {
   const th = useTh();
@@ -41,15 +47,22 @@ const Users: React.FC = () => {
   // query params
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<Record<React.Key, SortOrder>>({});
+  const [search, setSearch] = useState("");
+  const [debounced] = useDebouncedValue(search, 1000);
   // query & data
-  const query = useSWR(["adminListUsers", page, sort], (key, page, sort) =>
-    adminListUsers({
-      page,
-      sort: Object.entries(sort).map(([property, direction]) => ({
-        property,
-        direction,
-      })) as any,
-    })
+  const query = useSWR(
+    ["adminListUsers", page, sort, debounced],
+    (key, page, sort, search) =>
+      adminListUsers(
+        {
+          page,
+          sort: Object.entries(sort).map(([property, direction]) => ({
+            property,
+            direction,
+          })) as any,
+        },
+        search === "" ? undefined : search
+      )
   );
   const data = useMemo(() => query.data?.data, [query.data]);
   const roles = useSWR(["adminListRoles"], () => adminListRoles());
@@ -67,6 +80,25 @@ const Users: React.FC = () => {
     initial: {
       id: "",
       roles: [],
+    },
+  });
+  const add = useForm({
+    initial: {
+      opened: false,
+      username: "",
+      password: "",
+      email: "",
+      nickname: "",
+      status: true,
+    },
+    validate: {
+      username: (value) => value.length > 0 || "用户名/邮箱必须不为空",
+      password: (value) => value.length > 0 || "密码必须不为空",
+      email: (value) =>
+        /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(
+          value
+        ) || "请输入正确的邮箱",
+      nickname: (value) => value.length > 0 || "昵称必须不为空",
     },
   });
   // users table
@@ -111,11 +143,11 @@ const Users: React.FC = () => {
         width: 200,
         resizable: true,
         sortable: true,
-        cellRenderer: ({ cellData }) => (
+        cellRenderer: wrap(({ cellData }) => (
           <Badge variant="dot" color={cellData ? "green" : "red"}>
             {cellData ? "启用" : "禁用"}
           </Badge>
-        ),
+        )),
       },
       {
         key: "createdTime",
@@ -124,15 +156,17 @@ const Users: React.FC = () => {
         width: 200,
         resizable: true,
         sortable: true,
-        cellRenderer: ({ cellData }) => new Date(cellData).toLocaleString(),
+        cellRenderer: wrap(({ cellData }) => (
+          <>{new Date(cellData).toLocaleString()}</>
+        )),
       },
       {
         key: "operate",
         title: "操作",
-        width: 200,
+        width: 270,
         frozen: "right",
         resizable: true,
-        cellRenderer: ({ rowData }) => {
+        cellRenderer: wrap(({ rowData }) => {
           return (
             <AuthorizeView>
               {(user) => {
@@ -215,7 +249,7 @@ const Users: React.FC = () => {
               }}
             </AuthorizeView>
           );
-        },
+        }),
       },
     ],
     [toast, query, edit, assignRole]
@@ -232,6 +266,24 @@ const Users: React.FC = () => {
       }
     >
       <Panel title="用户列表">
+        <HStack
+          spacing={2}
+          css={css`
+            margin-top: ${th.spacing(4)};
+          `}
+        >
+          <TextInput
+            aria-label="搜索"
+            placeholder="搜索"
+            icon={<Search />}
+            value={search}
+            onChange={(e) => setSearch(e.currentTarget.value)}
+            rightSection={
+              !query.error && !query.data ? <Loader size="xs" /> : undefined
+            }
+          />
+          <Button onClick={() => add.setValue("opened", true)}>新增</Button>
+        </HStack>
         <Box
           css={css`
             flex: 1;
@@ -382,6 +434,72 @@ const Users: React.FC = () => {
               onChange={(value) => assignRole.setValue("roles", value)}
             />
             <Submit loading={assignRole.loading}>提交</Submit>
+          </VStack>
+        </form>
+      </Modal>
+      <Modal
+        opened={add.values.opened}
+        onClose={() => add.reset()}
+        title="新增用户"
+      >
+        <form
+          onSubmit={add.onSubmit(({ opened, ...user }) => {
+            add.setLoading(true);
+            adminAddUser(user)
+              .then(
+                toast.api.success({
+                  title: "新增成功",
+                })
+              )
+              .then(() => query.mutate())
+              .then(() => add.reset())
+              .catch(
+                toast.api.error({
+                  title: "新增失败",
+                })
+              )
+              .finally(() => add.setLoading(false));
+          })}
+        >
+          <VStack>
+            <TextInput
+              required
+              label="用户名"
+              placeholder="用户名"
+              value={add.values.username}
+              onChange={(e) => add.setValue("username", e.currentTarget.value)}
+              error={add.errors.username}
+            />
+            <TextInput
+              required
+              label="昵称"
+              placeholder="昵称"
+              value={add.values.nickname}
+              onChange={(e) => add.setValue("nickname", e.currentTarget.value)}
+              error={add.errors.nickname}
+            />
+            <TextInput
+              required
+              label="邮箱"
+              placeholder="邮箱"
+              value={add.values.email}
+              onChange={(e) => add.setValue("email", e.currentTarget.value)}
+              error={add.errors.email}
+            />
+            <PasswordInput
+              required
+              label="密码"
+              placeholder="密码"
+              value={add.values.password}
+              onChange={(e) => add.setValue("password", e.currentTarget.value)}
+              error={add.errors.password}
+            />
+            <Switch
+              label="状态"
+              checked={add.values.status}
+              onChange={(e) => add.setValue("status", e.currentTarget.checked)}
+            />
+            <Submit loading={add.loading}>提交</Submit>
           </VStack>
         </form>
       </Modal>

@@ -89,6 +89,12 @@ const GlobalStyles: React.FC = () => {
             }
           }
         }
+
+        .i-icon {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
       `}
     />
   );

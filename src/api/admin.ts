@@ -38,6 +38,14 @@ export const adminUpdateUserRole = (userId: string, roles: string[]) =>
     .put(`/api/admin/users/${userId}/role`, { roles })
     .then((response) => response.data);
 
+export type AddUser = Omit<
+  User,
+  "id" | "createdTime" | "roles" | "info" | "followingCount" | "followersCount"
+>;
+
+export const adminAddUser = (user: AddUser) =>
+  request.post(`/api/admin/users`, user).then((response) => response.data);
+
 export const adminListRoles = () =>
   request
     .get<ApiEntity<Role[]>>(`/api/admin/roles`)

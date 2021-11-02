@@ -1,16 +1,34 @@
 import React, { useState } from "react";
 
-export type UseForm<T extends Record<string, any>> = {
+export type UseFormProps<T extends Record<string, any>> = {
   initial: T;
   validate?: {
     [K in keyof T]?: (value: T[K]) => string | true;
   };
 };
 
+export type UseForm<T extends Record<string, any>> = {
+  values: T;
+  errors: Partial<Record<keyof T, string>>;
+  validate: () => boolean;
+  reset: () => void;
+  resetErrors: () => void;
+  setValues: React.Dispatch<React.SetStateAction<T>>;
+  setErrors: React.Dispatch<
+    React.SetStateAction<Partial<Record<keyof T, string>>>
+  >;
+  setValue: <K extends keyof T, V extends T[K]>(key: K, value: V) => void;
+  onSubmit: (
+    handleSubmit: (values: T) => void
+  ) => (event?: React.FormEvent) => void;
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
 const useForm = <T extends Record<string, any>>({
   initial,
   validate,
-}: UseForm<T>) => {
+}: UseFormProps<T>): UseForm<T> => {
   const [values, setValues] = useState<T>(initial);
   const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
   const [loading, setLoading] = useState(false);

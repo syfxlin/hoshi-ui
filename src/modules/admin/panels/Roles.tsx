@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useTh } from "../../../theme/hooks/use-th";
 import useToast from "../../../utils/use-toast";
-import useSWR, { SWRResponse } from "swr";
+import useSWR from "swr";
 import {
   adminDeleteRole,
   adminListRoles,
@@ -17,81 +17,9 @@ import ColorModeButton from "../../../components/header/ColorModeButton";
 import Panel from "../Panel";
 import Box from "../../../components/layout/Box";
 import { css } from "@emotion/react";
-import { ApiEntity } from "../../../api/request";
 import useForm from "../../../utils/use-form";
 import { Submit } from "../../ums/form";
-
-type RoleOperate = {
-  data: Role;
-  query: SWRResponse<ApiEntity<Role[]>, any>;
-  edit: any;
-};
-
-const RoleOperate: React.FC<RoleOperate> = ({ data, query, edit }) => {
-  const toast = useToast();
-  const [forceDelete, setForceDelete] = useState(false);
-  return (
-    <HStack spacing={1}>
-      <Button
-        size="xs"
-        disabled={["USER", "ADMIN"].includes(data.name)}
-        onClick={() => {
-          adminUpdateRole(data.name, { status: !data.status })
-            .then(
-              toast.api.success({
-                title: "操作成功",
-              })
-            )
-            .then(() => query.mutate())
-            .catch(
-              toast.api.error({
-                title: "操作失败",
-              })
-            );
-        }}
-      >
-        {data.status ? "禁用" : "启用"}
-      </Button>
-      <Button
-        size="xs"
-        onClick={() =>
-          edit.setValues({
-            name: data.name,
-            description: data.description,
-          })
-        }
-      >
-        编辑
-      </Button>
-      <Button
-        size="xs"
-        color="red"
-        disabled={["USER", "ADMIN"].includes(data.name)}
-        onClick={() => {
-          if (!forceDelete) {
-            setForceDelete(true);
-            setTimeout(() => setForceDelete(false), 5000);
-          } else {
-            adminDeleteRole(data.name)
-              .then(
-                toast.api.success({
-                  title: "删除成功",
-                })
-              )
-              .then(() => query.mutate())
-              .catch(
-                toast.api.error({
-                  title: "删除失败",
-                })
-              );
-          }
-        }}
-      >
-        {forceDelete ? "确认删除？" : "删除"}
-      </Button>
-    </HStack>
-  );
-};
+import { wrap } from "../../../utils/react";
 
 const Roles: React.FC = () => {
   const th = useTh();
@@ -129,11 +57,11 @@ const Roles: React.FC = () => {
         dataKey: "status",
         width: 200,
         resizable: true,
-        cellRenderer: ({ cellData }) => (
+        cellRenderer: wrap(({ cellData }) => (
           <Badge variant="dot" color={cellData ? "green" : "red"}>
             {cellData ? "启用" : "禁用"}
           </Badge>
-        ),
+        )),
       },
       {
         key: "createdTime",
@@ -141,7 +69,9 @@ const Roles: React.FC = () => {
         dataKey: "createdTime",
         width: 200,
         resizable: true,
-        cellRenderer: ({ cellData }) => new Date(cellData).toLocaleString(),
+        cellRenderer: wrap(({ cellData }) => (
+          <>{new Date(cellData).toLocaleString()}</>
+        )),
       },
       {
         key: "operate",
@@ -149,9 +79,70 @@ const Roles: React.FC = () => {
         width: 200,
         frozen: "right",
         resizable: true,
-        cellRenderer: ({ rowData }) => (
-          <RoleOperate data={rowData} query={query} edit={edit} />
-        ),
+        cellRenderer: wrap(({ rowData }) => {
+          const [forceDelete, setForceDelete] = useState(false);
+          return (
+            <HStack spacing={1}>
+              <Button
+                size="xs"
+                disabled={["USER", "ADMIN"].includes(rowData.name)}
+                onClick={() => {
+                  adminUpdateRole(rowData.name, { status: !rowData.status })
+                    .then(
+                      toast.api.success({
+                        title: "操作成功",
+                      })
+                    )
+                    .then(() => query.mutate())
+                    .catch(
+                      toast.api.error({
+                        title: "操作失败",
+                      })
+                    );
+                }}
+              >
+                {rowData.status ? "禁用" : "启用"}
+              </Button>
+              <Button
+                size="xs"
+                onClick={() =>
+                  edit.setValues({
+                    name: rowData.name,
+                    description: rowData.description ?? "",
+                  })
+                }
+              >
+                编辑
+              </Button>
+              <Button
+                size="xs"
+                color="red"
+                disabled={["USER", "ADMIN"].includes(rowData.name)}
+                onClick={() => {
+                  if (!forceDelete) {
+                    setForceDelete(true);
+                    setTimeout(() => setForceDelete(false), 5000);
+                  } else {
+                    adminDeleteRole(rowData.name)
+                      .then(
+                        toast.api.success({
+                          title: "删除成功",
+                        })
+                      )
+                      .then(() => query.mutate())
+                      .catch(
+                        toast.api.error({
+                          title: "删除失败",
+                        })
+                      );
+                  }
+                }}
+              >
+                {forceDelete ? "确认删除？" : "删除"}
+              </Button>
+            </HStack>
+          );
+        }),
       },
     ],
     [query, edit]
