@@ -1,7 +1,7 @@
 import React, { Children, forwardRef, isValidElement } from "react";
 import Flex, { FlexProps } from "./Flex";
-import { css, CSSObject } from "@emotion/react";
-import { Assign, UIComponent } from "../../utils/types";
+import { css } from "@emotion/react";
+import { Assign, Styles, UIComponent } from "../../utils/types";
 import { useTh } from "../../theme/hooks/use-th";
 
 export type StackProps = Assign<
@@ -10,29 +10,22 @@ export type StackProps = Assign<
     direction?: "column" | "column-reverse" | "row" | "row-reverse";
     divider?: React.ReactNode;
     spacing?: string | number;
-    childStyles?: Record<number, CSSObject>;
+    styles?: Styles<"spacing" | "divider">;
   }
 >;
 
 const Stack: UIComponent<"div", StackProps> = forwardRef(
   (
-    {
-      direction = "row",
-      divider,
-      spacing = 4,
-      children,
-      childStyles,
-      ...props
-    },
+    { direction = "row", divider, spacing = 4, styles, children, ...props },
     ref
   ) => {
     const th = useTh();
     const marginType = (
       {
-        column: "marginTop",
-        row: "marginLeft",
-        "column-reverse": "marginBottom",
-        "row-reverse": "marginRight",
+        column: "margin-top",
+        row: "margin-left",
+        "column-reverse": "margin-bottom",
+        "row-reverse": "margin-right",
       } as const
     )[direction];
     return (
@@ -46,18 +39,19 @@ const Stack: UIComponent<"div", StackProps> = forwardRef(
               <React.Fragment key={`stack-item-${index}`}>
                 {!isFirst && divider && (
                   <div
-                    css={css({
-                      [marginType]: margin,
-                    })}
+                    css={css`
+                      ${marginType}: ${margin};
+                      ${styles?.divider}
+                    `}
                   >
                     {divider}
                   </div>
                 )}
                 <div
-                  css={css({
-                    [marginType]: isFirst ? undefined : margin,
-                    ...(childStyles?.[index] || {}),
-                  })}
+                  css={css`
+                    ${marginType}: ${isFirst ? undefined : margin};
+                    ${styles?.spacing}
+                  `}
                 >
                   {child}
                 </div>

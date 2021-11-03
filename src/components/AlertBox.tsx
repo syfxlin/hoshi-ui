@@ -3,7 +3,7 @@ import FluidCenter, { FluidCenterProps } from "./layout/FluidCenter";
 import { Alert, AlertProps, MantineColor } from "@mantine/core";
 import { CloseOne } from "@icon-park/react";
 import { css } from "@emotion/react";
-import { UIComponent } from "../utils/types";
+import { Styles, UIComponent } from "../utils/types";
 
 export interface AlertBoxProps
   extends Omit<FluidCenterProps, "title" | "color"> {
@@ -11,10 +11,11 @@ export interface AlertBoxProps
   icon?: React.ReactNode;
   title?: React.ReactNode;
   alertProps?: AlertProps;
+  styles?: Styles<"alert">;
 }
 
 const AlertBox: UIComponent<"div", AlertBoxProps> = forwardRef(
-  ({ children, color, icon, title, alertProps, ...props }, ref) => {
+  ({ children, color, icon, title, alertProps, styles, ...props }, ref) => {
     return (
       <FluidCenter {...props} ref={ref}>
         <Alert
@@ -26,6 +27,7 @@ const AlertBox: UIComponent<"div", AlertBoxProps> = forwardRef(
             max-width: 25rem;
             margin-left: 20px;
             margin-right: 20px;
+            ${styles?.alert}
           `}
         >
           {children}

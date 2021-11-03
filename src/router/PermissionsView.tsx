@@ -30,24 +30,29 @@ type RoleViewProps = {
    * 加 - 标记（-USER）：只要有一个匹配则标记为阻止
    * 阻止优先于允许，只要有一个阻止则全部阻止
    */
-  roles?: string[];
+  permissions?: string[];
 };
 
-const RoleView: React.FC<RoleViewProps> = ({
+const PermissionsView: React.FC<RoleViewProps> = ({
   loading,
   children,
-  roles: rs,
+  permissions,
   ...props
 }) => {
   const matcher = useCallback(
     (roles: Role[]) => {
-      if (!rs || rs.length === 0) {
+      if (!permissions || permissions.length === 0) {
         return true;
       }
       const set = new Set(
-        roles.filter((role) => role.status).map((role) => role.name)
+        roles
+          .filter((role) => role.status)
+          .reduce(
+            (arr, role) => [...arr, `ROLE_${role.name}`, ...role.permissions],
+            [] as string[]
+          )
       );
-      return !!rs.reduce((a: null | boolean, role) => {
+      return !!permissions.reduce((a: null | boolean, role) => {
         if (a === false) {
           return false;
         }
@@ -63,7 +68,7 @@ const RoleView: React.FC<RoleViewProps> = ({
         return a;
       }, null);
     },
-    [rs]
+    [permissions]
   );
   return (
     <AuthorizeView loading={loading}>
@@ -84,4 +89,4 @@ const RoleView: React.FC<RoleViewProps> = ({
   );
 };
 
-export default RoleView;
+export default PermissionsView;

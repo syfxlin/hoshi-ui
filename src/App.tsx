@@ -8,7 +8,7 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <Router history={history}>
-        <ArrayRoute routes={root} sw />
+        <ArrayRoute routes={root} />
       </Router>
     </div>
   );

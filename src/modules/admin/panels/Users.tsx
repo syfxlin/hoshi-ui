@@ -35,11 +35,12 @@ import useToast from "../../../utils/use-toast";
 import AuthorizeView from "../../../router/AuthorizeView";
 import useForm from "../../../utils/use-form";
 import { Submit } from "../../ums/form";
-import AppShell from "../../../components/app-shell/AppShell";
-import Panel from "../Panel";
+import Panel from "../../../components/Panel";
 import { wrap } from "../../../utils/react";
 import { Search } from "@icon-park/react";
 import { useDebouncedValue } from "@mantine/hooks";
+import AppShellContainer from "../../../components/app-shell/AppShellContainer";
+import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 
 const Users: React.FC = () => {
   const th = useTh();
@@ -216,7 +217,7 @@ const Users: React.FC = () => {
                         })
                       }
                     >
-                      分配权限
+                      分配角色
                     </Button>
                     <Button
                       size="xs"
@@ -255,23 +256,15 @@ const Users: React.FC = () => {
     [toast, query, edit, assignRole]
   );
   return (
-    <AppShell.Container
-      header={
-        <>
-          <div />
-          <HStack spacing="xs" align="center">
-            <ColorModeButton />
-          </HStack>
-        </>
-      }
-    >
+    <AppShellContainer>
+      <AppShellHeader>
+        <div />
+        <HStack spacing="xs" align="center">
+          <ColorModeButton />
+        </HStack>
+      </AppShellHeader>
       <Panel title="用户列表">
-        <HStack
-          spacing={2}
-          css={css`
-            margin-top: ${th.spacing(4)};
-          `}
-        >
+        <HStack spacing={2}>
           <TextInput
             aria-label="搜索"
             placeholder="搜索"
@@ -400,7 +393,7 @@ const Users: React.FC = () => {
       <Modal
         opened={assignRole.values.id !== ""}
         onClose={() => assignRole.reset()}
-        title={`分配权限: ${assignRole.values.id}`}
+        title={`分配角色: ${assignRole.values.id}`}
       >
         <form
           onSubmit={assignRole.onSubmit((values) => {
@@ -423,8 +416,8 @@ const Users: React.FC = () => {
         >
           <VStack>
             <MultiSelect
-              label="权限"
-              placeholder="选择权限"
+              label="角色"
+              placeholder="选择角色"
               searchable
               data={
                 roles.data?.data?.map((role) => role.name) ??
@@ -503,7 +496,7 @@ const Users: React.FC = () => {
           </VStack>
         </form>
       </Modal>
-    </AppShell.Container>
+    </AppShellContainer>
   );
 };
 

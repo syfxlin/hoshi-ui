@@ -4,7 +4,7 @@ import React from "react";
 import { useTh } from "../../theme/hooks/use-th";
 import { css } from "@emotion/react";
 import Box from "../layout/Box";
-import { Badge } from "@mantine/core";
+import { Badge, ThemeIcon } from "@mantine/core";
 
 type SidebarItemProps = Assign<
   LinkProps,
@@ -51,14 +51,11 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
           color: ${th.color("black", "white")};
           background-color: ${th.color("gray.3", "gray.7")};
         }
-
-        & > span {
-          display: flex;
-          margin-top: 1px;
-        }
       `}
     >
-      {icon}
+      <ThemeIcon variant="light" size="sm">
+        {icon}
+      </ThemeIcon>
       <Box
         css={css`
           margin-left: ${th.spacing(2)};

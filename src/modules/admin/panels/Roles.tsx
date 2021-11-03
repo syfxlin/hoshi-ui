@@ -10,16 +10,18 @@ import {
 } from "../../../api/admin";
 import BaseTable, { AutoResizer, ColumnShape } from "react-base-table";
 import { Role } from "../../../api/ums";
-import { Badge, Button, Modal, TextInput } from "@mantine/core";
-import AppShell from "../../../components/app-shell/AppShell";
+import { Badge, Button, Modal, MultiSelect, TextInput } from "@mantine/core";
 import { HStack, VStack } from "../../../components/layout/Stack";
 import ColorModeButton from "../../../components/header/ColorModeButton";
-import Panel from "../Panel";
+import Panel from "../../../components/Panel";
 import Box from "../../../components/layout/Box";
 import { css } from "@emotion/react";
 import useForm from "../../../utils/use-form";
 import { Submit } from "../../ums/form";
 import { wrap } from "../../../utils/react";
+import { permissions } from "../../../api/permissions";
+import AppShellContainer from "../../../components/app-shell/AppShellContainer";
+import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 
 const Roles: React.FC = () => {
   const th = useTh();
@@ -28,10 +30,15 @@ const Roles: React.FC = () => {
   const query = useSWR(["adminListRoles"], () => adminListRoles());
   const data = useMemo(() => query.data?.data, [query.data]);
   // edit form
-  const edit = useForm({
+  const edit = useForm<{
+    name: string;
+    description: string;
+    permissions: string[];
+  }>({
     initial: {
       name: "",
       description: "",
+      permissions: [],
     },
   });
   // roles table
@@ -50,6 +57,28 @@ const Roles: React.FC = () => {
         dataKey: "description",
         width: 200,
         resizable: true,
+      },
+      {
+        key: "permissions",
+        title: "权限",
+        dataKey: "permissions",
+        width: 200,
+        resizable: true,
+        cellRenderer: wrap(({ cellData }) => (
+          <Box
+            css={css`
+              overflow-x: auto;
+              white-space: nowrap;
+            `}
+          >
+            {cellData
+              .map(
+                (p: string) =>
+                  permissions.find((v) => v.value === p)?.label ?? p
+              )
+              .join(", ")}
+          </Box>
+        )),
       },
       {
         key: "status",
@@ -109,6 +138,7 @@ const Roles: React.FC = () => {
                   edit.setValues({
                     name: rowData.name,
                     description: rowData.description ?? "",
+                    permissions: rowData.permissions ?? [],
                   })
                 }
               >
@@ -148,21 +178,17 @@ const Roles: React.FC = () => {
     [query, edit]
   );
   return (
-    <AppShell.Container
-      header={
-        <>
-          <div />
-          <HStack spacing="xs" align="center">
-            <ColorModeButton />
-          </HStack>
-        </>
-      }
-    >
-      <Panel title="权限列表">
+    <AppShellContainer>
+      <AppShellHeader>
+        <div />
+        <HStack spacing="xs" align="center">
+          <ColorModeButton />
+        </HStack>
+      </AppShellHeader>
+      <Panel title="角色列表">
         <Box
           css={css`
             flex: 1;
-            margin-top: ${th.spacing(4)};
             margin-bottom: ${th.spacing(4)};
           `}
         >
@@ -183,7 +209,7 @@ const Roles: React.FC = () => {
       <Modal
         opened={edit.values.name !== ""}
         onClose={() => edit.reset()}
-        title={`编辑权限: ${edit.values.name}`}
+        title={`编辑角色: ${edit.values.name}`}
       >
         <form
           onSubmit={edit.onSubmit((values) => {
@@ -191,6 +217,7 @@ const Roles: React.FC = () => {
             if (values.description !== "") {
               role.description = values.description;
             }
+            role.permissions = values.permissions;
             edit.setLoading(true);
             adminUpdateRole(values.name, role)
               .then(
@@ -218,11 +245,17 @@ const Roles: React.FC = () => {
               }
               error={edit.errors.description}
             />
+            <MultiSelect
+              data={permissions}
+              value={edit.values.permissions}
+              onChange={(value) => edit.setValue("permissions", value)}
+              error={edit.errors.permissions}
+            />
             <Submit loading={edit.loading}>提交</Submit>
           </VStack>
         </form>
       </Modal>
-    </AppShell.Container>
+    </AppShellContainer>
   );
 };
 

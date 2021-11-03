@@ -11,9 +11,9 @@ const Box: UIComponent<"div", BoxProps> = forwardRef(
       <As
         {...props}
         ref={ref}
-        css={css({
-          boxSizing: "border-box",
-        })}
+        css={css`
+          box-sizing: border-box;
+        `}
       />
     );
   }

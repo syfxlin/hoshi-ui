@@ -3,7 +3,7 @@ import { css } from "@emotion/react";
 import Box, { BoxProps } from "./layout/Box";
 import { UIComponent } from "../utils/types";
 
-const Main: UIComponent<"div", BoxProps> = forwardRef(
+const Main: UIComponent<"main", BoxProps> = forwardRef(
   ({ children, ...props }, ref) => {
     return (
       <Box

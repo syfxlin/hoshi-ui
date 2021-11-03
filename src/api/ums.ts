@@ -7,6 +7,7 @@ export type Role = {
   name: string;
   createdTime: string;
   status: boolean;
+  permissions: string[];
   description?: string;
 };
 

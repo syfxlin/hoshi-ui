@@ -1,41 +1,24 @@
-import React from "react";
-import { useTh } from "../../theme/hooks/use-th";
-import Box from "../layout/Box";
+import React, { forwardRef } from "react";
+import Box, { BoxProps } from "../layout/Box";
 import { css } from "@emotion/react";
+import { UIComponent } from "../../utils/types";
 
-type AppShellContainerProps = {
-  header: React.ReactNode;
-};
-
-const AppShellContainer: React.FC<AppShellContainerProps> = ({
-  header,
-  children,
-}) => {
-  const th = useTh();
-  return (
-    <Box
-      css={css`
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-      `}
-    >
+const AppShellContainer: UIComponent<"div", BoxProps> = forwardRef(
+  ({ children }, ref) => {
+    return (
       <Box
-        as="header"
+        ref={ref}
         css={css`
-          height: 60px;
+          width: 100%;
           display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding-left: ${th.spacing(4)};
-          padding-right: ${th.spacing(4)};
+          flex-direction: column;
+          overflow-y: auto;
         `}
       >
-        {header}
+        {children}
       </Box>
-      {children}
-    </Box>
-  );
-};
+    );
+  }
+);
 
 export default AppShellContainer;

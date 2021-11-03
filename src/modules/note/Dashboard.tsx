@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import AppShell from "../../components/app-shell/AppShell";
-import loadable from "@loadable/component";
 import {
   Facebook,
   Github,
@@ -14,6 +13,10 @@ import TreeRoot from "./TreeRoot";
 import { useLogout } from "../../api/ums";
 import { Divider, Menu, Text } from "@mantine/core";
 import Sidebar from "../../components/sidebar/Sidebar";
+import { panels } from "./router";
+import ArrayRoute from "../../router/ArrayRoute";
+import SidebarMenu from "../../components/sidebar/SidebarMenu";
+import SidebarItem from "../../components/sidebar/SidebarItem";
 
 const Dashboard: React.FC = () => {
   const logout = useLogout();
@@ -83,47 +86,42 @@ const Dashboard: React.FC = () => {
     },
   ]);
   return (
-    <AppShell
-      router={({ path }) => [
-        {
-          path: `${path}/home`,
-          component: loadable(() => import("../admin/panels/Home")),
-        },
-        {
-          path: `${path}/users`,
-          component: loadable(() => import("../admin/panels/Users")),
-        },
-      ]}
-    >
-      <Sidebar.Menu>
-        <Menu.Label>Application</Menu.Label>
-        <Menu.Item icon={<Facebook />}>Settings</Menu.Item>
-        <Menu.Item icon={<Facebook />}>Messages</Menu.Item>
-        <Menu.Item icon={<Github />}>Gallery</Menu.Item>
-        <Menu.Item
-          icon={<Gitlab />}
-          rightSection={
-            <Text size="xs" color="gray">
-              ⌘K
-            </Text>
-          }
-        >
-          Search
-        </Menu.Item>
-        <Divider />
-        <Menu.Label>Danger zone</Menu.Label>
-        <Menu.Item icon={<Twitter />}>Transfer my data</Menu.Item>,
-        <Menu.Item color="red" icon={<Logout />} onClick={logout}>
-          登出
-        </Menu.Item>
-      </Sidebar.Menu>
-      <Sidebar.Item to="/dashboard/home" icon={<Home />}>
-        主页
-      </Sidebar.Item>
-      <Sidebar.Item to="/dashboard/search" icon={<Search />}>
-        搜索
-      </Sidebar.Item>
-      <TreeRoot tree={tree} onDrop={(data) => setTree(data)} rootId={0} />
+    <AppShell>
+      <Sidebar>
+        <SidebarMenu>
+          <Menu.Label>Application</Menu.Label>
+          <Menu.Item icon={<Facebook />}>Settings</Menu.Item>
+          <Menu.Item icon={<Facebook />}>Messages</Menu.Item>
+          <Menu.Item icon={<Github />}>Gallery</Menu.Item>
+          <Menu.Item
+            icon={<Gitlab />}
+            rightSection={
+              <Text size="xs" color="gray">
+                ⌘K
+              </Text>
+            }
+          >
+            Search
+          </Menu.Item>
+          <Divider />
+          <Menu.Label>Danger zone</Menu.Label>
+          <Menu.Item icon={<Twitter />}>Transfer my data</Menu.Item>,
+          <Menu.Item color="red" icon={<Logout />} onClick={logout}>
+            登出
+          </Menu.Item>
+        </SidebarMenu>
+        <SidebarItem to="/dashboard/home" icon={<Home />}>
+          主页
+        </SidebarItem>
+        <SidebarItem to="/dashboard/search" icon={<Search />}>
+          搜索
+        </SidebarItem>
+        <SidebarItem to="/settings" icon={<Search />}>
+          设置
+        </SidebarItem>
+        <TreeRoot tree={tree} onDrop={(data) => setTree(data)} rootId={0} />
+      </Sidebar>
+      <ArrayRoute routes={panels} />
     </AppShell>
   );
 };

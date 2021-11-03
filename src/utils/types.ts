@@ -1,4 +1,5 @@
 import React from "react";
+import { SerializedStyles } from "@emotion/serialize";
 
 export type AnyRecord = Record<string | number, any>;
 export type Assign<T1 = {}, T2 = {}> = Omit<T1, keyof T2> & T2;
@@ -18,3 +19,7 @@ export interface UIComponent<
     >
   ): React.ReactElement | null;
 }
+
+export type Styles<K extends string> = {
+  [P in K]?: SerializedStyles;
+};

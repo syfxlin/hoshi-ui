@@ -1,33 +1,19 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import Main from "../Main";
 import SplitPane from "react-split-pane";
-import Sidebar from "../sidebar/Sidebar";
-import { match } from "react-router";
-import { RouteDefinition } from "../../router";
-import ArrayRoute from "../../router/ArrayRoute";
-import { useRouteMatch } from "react-router-dom";
-import AppShellContainer from "./AppShellContainer";
+import { UIComponent } from "../../utils/types";
+import { BoxProps } from "../layout/Box";
 
-type AppShellProps = {
-  router: (match: match) => RouteDefinition[];
-};
-
-type AppShellComponent = React.FC<AppShellProps> & {
-  Container: typeof AppShellContainer;
-};
-
-const AppShell: AppShellComponent = ({ children, router }) => {
-  const match = useRouteMatch();
-  return (
-    <Main>
-      <SplitPane split="vertical" defaultSize={260}>
-        <Sidebar>{children}</Sidebar>
-        <ArrayRoute routes={router(match)} sw />
-      </SplitPane>
-    </Main>
-  );
-};
-
-AppShell.Container = AppShellContainer;
+const AppShell: UIComponent<"main", BoxProps> = forwardRef(
+  ({ children, ...props }, ref) => {
+    return (
+      <Main {...props} ref={ref}>
+        <SplitPane split="vertical" defaultSize={260}>
+          {children}
+        </SplitPane>
+      </Main>
+    );
+  }
+);
 
 export default AppShell;

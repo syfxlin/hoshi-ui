@@ -39,7 +39,6 @@ export const root: RouteDefinition[] = [
   {
     path: "/reset-password",
     component: loadable(() => import("../modules/ums/ResetPassword")),
-    authorize: "anonymous",
   },
   {
     path: "/users/:username",
@@ -53,7 +52,7 @@ export const root: RouteDefinition[] = [
   {
     path: "/dashboard",
     component: loadable(() => import("../modules/note/Dashboard")),
-    authorize: "USER",
+    authorize: ["ROLE_USER"],
   },
   {
     path: "/admin",
@@ -63,6 +62,11 @@ export const root: RouteDefinition[] = [
   {
     path: "/admin",
     component: loadable(() => import("../modules/admin/Admin")),
-    authorize: "ADMIN",
+    authorize: ["USER_MANAGER", "ROLE_MANAGER"],
+  },
+  {
+    path: "/settings",
+    component: loadable(() => import("../modules/note/Settings")),
+    authorize: ["ROLE_USER"],
   },
 ];

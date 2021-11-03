@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Collapse, UnstyledButton } from "@mantine/core";
+import { Collapse, ThemeIcon, UnstyledButton } from "@mantine/core";
 import { Down, Right } from "@icon-park/react";
 import { css } from "@emotion/react";
 import { useTh } from "../../theme/hooks/use-th";
@@ -11,7 +11,7 @@ type CollapseItemProps = {
   onChange?: (opened: boolean) => void;
 };
 
-const CollapseItem: React.FC<CollapseItemProps> = ({
+const SidebarCollapse: React.FC<CollapseItemProps> = ({
   children,
   title,
   open,
@@ -51,14 +51,11 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
             color: ${th.color("black", "white")};
             background-color: ${th.color("gray.3", "gray.7")};
           }
-
-          & > span {
-            display: flex;
-            margin-top: 1px;
-          }
         `}
       >
-        {opened ? <Down /> : <Right />}
+        <ThemeIcon variant="light" size="sm">
+          {opened ? <Down /> : <Right />}
+        </ThemeIcon>
         <Box
           css={css`
             margin-left: ${th.spacing(2)};
@@ -81,4 +78,4 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
   );
 };
 
-export default CollapseItem;
+export default SidebarCollapse;

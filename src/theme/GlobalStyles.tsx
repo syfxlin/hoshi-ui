@@ -15,7 +15,7 @@ const GlobalStyles: React.FC = () => {
 
         body {
           font-family: ${th.font("sans") || "sans-serif"};
-          background-color: ${th.color("gray.0", "dark.7")};
+          background-color: ${th.color("white", "dark.7")};
           color: ${th.color("black", "dark.0")};
           line-height: ${th.lineHeight("md")};
         }
