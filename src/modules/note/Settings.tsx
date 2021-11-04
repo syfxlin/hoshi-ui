@@ -23,6 +23,9 @@ const Settings: React.FC = () => {
         <SidebarItem to="/settings/safety" icon={<Search />}>
           账号安全
         </SidebarItem>
+        <SidebarItem to="/settings/tokens" icon={<Search />}>
+          API 令牌
+        </SidebarItem>
       </Sidebar>
       <ArrayRoute routes={settings} />
     </AppShell>

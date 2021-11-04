@@ -198,3 +198,18 @@ export const excludeLogged = (sessionId: LoggedView["sessionId"]) =>
   request
     .delete<ApiEntity>(`/api/users/exclude/${sessionId}`)
     .then((response) => response.data);
+
+export type Token = {
+  token: string;
+  name: string;
+};
+
+export const listTokens = () =>
+  request
+    .get<ApiEntity<Token[]>>(`/api/tokens`)
+    .then((response) => response.data);
+
+export const revokeToken = (token: Token["token"]) =>
+  request
+    .delete<ApiEntity>(`/api/tokens/${token}`)
+    .then((response) => response.data);

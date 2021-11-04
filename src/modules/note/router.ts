@@ -19,4 +19,8 @@ export const settings: (match: match) => RouteDefinition[] = ({ path }) => [
     path: `${path}/safety`,
     component: loadable(() => import("./settings/Safety")),
   },
+  {
+    path: `${path}/tokens`,
+    component: loadable(() => import("./settings/Tokens")),
+  },
 ];
