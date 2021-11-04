@@ -1,10 +1,10 @@
-import React, { useCallback } from "react";
+import React from "react";
 import FluidCenter from "../../components/layout/FluidCenter";
 import { PasswordInput, TextInput } from "@mantine/core";
 import { BLink } from "../../components/Link";
 import { Card, LinkGroup, Submit, Title } from "./form";
 import useForm from "../../utils/use-form";
-import { LoginData, useLogin } from "../../api/ums";
+import { useLogin } from "../../api/ums";
 import useToast from "../../utils/use-toast";
 import Main from "../../components/Main";
 import { VStack } from "../../components/layout/Stack";
@@ -23,20 +23,16 @@ const Login: React.FC = () => {
       username: (value) => value.length > 0 || "用户名/邮箱必须不为空",
       password: (value) => value.length > 0 || "密码必须不为空",
     },
-  });
-  const onSubmit = useCallback(
-    (data: LoginData) => {
-      form.setLoading(true);
-      login(data)
-        .catch(
+    handleSubmit: (values, loading) => {
+      loading(
+        login(values).catch(
           toast.api.error({
             title: "登录失败",
           })
         )
-        .finally(() => form.setLoading(false));
+      );
     },
-    [login]
-  );
+  });
   return (
     <>
       <Header />
@@ -44,7 +40,7 @@ const Login: React.FC = () => {
         <FluidCenter>
           <Card>
             <Title>Hoshi-Note</Title>
-            <form onSubmit={form.onSubmit(onSubmit)}>
+            <form onSubmit={form.onSubmit}>
               <VStack>
                 <TextInput
                   required

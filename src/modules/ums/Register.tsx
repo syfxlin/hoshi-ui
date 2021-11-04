@@ -1,6 +1,6 @@
-import React, { useCallback } from "react";
+import React from "react";
 import useForm from "../../utils/use-form";
-import { register, RegisterData, sendRegisterCode } from "../../api/ums";
+import { register, sendRegisterCode } from "../../api/ums";
 import FluidCenter from "../../components/layout/FluidCenter";
 import { Card, LinkGroup, Submit, Title } from "./form";
 import { ActionIcon, PasswordInput, TextInput, Tooltip } from "@mantine/core";
@@ -33,6 +33,22 @@ const Register: React.FC = () => {
         ) || "请输入正确的邮箱",
       nickname: (value) => value.length > 0 || "昵称必须不为空",
     },
+    handleSubmit: (values, loading) => {
+      loading(
+        register(values)
+          .then(
+            toast.api.success({
+              title: "注册成功",
+            })
+          )
+          .then(() => history.push("/login"))
+          .catch(
+            toast.api.error({
+              title: "注册失败",
+            })
+          )
+      );
+    },
   });
   const [timeout, setTimeout] = useCountDown();
   const sendValidCode = () => {
@@ -63,25 +79,6 @@ const Register: React.FC = () => {
         })
       );
   };
-  const onSubmit = useCallback(
-    (data: RegisterData) => {
-      form.setLoading(true);
-      register(data)
-        .then(
-          toast.api.success({
-            title: "注册成功",
-          })
-        )
-        .then(() => history.push("/login"))
-        .catch(
-          toast.api.error({
-            title: "注册失败",
-          })
-        )
-        .finally(() => form.setLoading(false));
-    },
-    [register]
-  );
   return (
     <>
       <Header />
@@ -89,7 +86,7 @@ const Register: React.FC = () => {
         <FluidCenter>
           <Card>
             <Title>Hoshi-Note</Title>
-            <form onSubmit={form.onSubmit(onSubmit)}>
+            <form onSubmit={form.onSubmit}>
               <VStack>
                 <TextInput
                   required

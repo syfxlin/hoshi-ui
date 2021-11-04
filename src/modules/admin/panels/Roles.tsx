@@ -40,6 +40,28 @@ const Roles: React.FC = () => {
       description: "",
       permissions: [],
     },
+    handleSubmit: (values, loading) => {
+      const role: UpdateRole = {};
+      if (values.description !== "") {
+        role.description = values.description;
+      }
+      role.permissions = values.permissions;
+      loading(
+        adminUpdateRole(values.name, role)
+          .then(
+            toast.api.success({
+              title: "修改成功",
+            })
+          )
+          .then(() => query.mutate())
+          .then(() => edit.reset())
+          .catch(
+            toast.api.error({
+              title: "修改失败",
+            })
+          )
+      );
+    },
   });
   // roles table
   const columns = useMemo<ColumnShape<Role>[]>(
@@ -211,30 +233,7 @@ const Roles: React.FC = () => {
         onClose={() => edit.reset()}
         title={`编辑角色: ${edit.values.name}`}
       >
-        <form
-          onSubmit={edit.onSubmit((values) => {
-            const role: UpdateRole = {};
-            if (values.description !== "") {
-              role.description = values.description;
-            }
-            role.permissions = values.permissions;
-            edit.setLoading(true);
-            adminUpdateRole(values.name, role)
-              .then(
-                toast.api.success({
-                  title: "修改成功",
-                })
-              )
-              .then(() => query.mutate())
-              .then(() => edit.reset())
-              .catch(
-                toast.api.error({
-                  title: "修改失败",
-                })
-              )
-              .finally(() => edit.setLoading(false));
-          })}
-        >
+        <form onSubmit={edit.onSubmit}>
           <VStack>
             <TextInput
               label="描述"

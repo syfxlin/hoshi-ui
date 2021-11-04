@@ -2,11 +2,7 @@ import React from "react";
 import useForm from "../../utils/use-form";
 import useToast from "../../utils/use-toast";
 import useCountDown from "../../utils/use-count-down";
-import {
-  resetPassword,
-  ResetPasswordData,
-  sendResetPasswordCode,
-} from "../../api/ums";
+import { resetPassword, sendResetPasswordCode } from "../../api/ums";
 import { history } from "../../store/history";
 import Header from "../../components/header/Header";
 import Main from "../../components/Main";
@@ -32,6 +28,22 @@ const ResetPassword: React.FC = () => {
         /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(
           value
         ) || "请输入正确的邮箱",
+    },
+    handleSubmit: (values, loading) => {
+      loading(
+        resetPassword(values)
+          .then(
+            toast.api.success({
+              title: "重置密码成功",
+            })
+          )
+          .then(() => history.push("/login"))
+          .catch(
+            toast.api.error({
+              title: "重置密码失败",
+            })
+          )
+      );
     },
   });
   const [timeout, setTimeout] = useCountDown();
@@ -63,20 +75,6 @@ const ResetPassword: React.FC = () => {
         })
       );
   };
-  const onSubmit = (data: ResetPasswordData) => {
-    resetPassword(data)
-      .then(
-        toast.api.success({
-          title: "重置密码成功",
-        })
-      )
-      .then(() => history.push("/login"))
-      .catch(
-        toast.api.error({
-          title: "重置密码失败",
-        })
-      );
-  };
   return (
     <>
       <Header />
@@ -84,7 +82,7 @@ const ResetPassword: React.FC = () => {
         <FluidCenter>
           <Card>
             <Title>Hoshi-Note</Title>
-            <form onSubmit={form.onSubmit(onSubmit)}>
+            <form onSubmit={form.onSubmit}>
               <VStack>
                 <TextInput
                   required

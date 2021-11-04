@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 
-export type UseFormProps<T extends Record<string, any>> = {
+export type UseFormProps<T> = {
   initial: T;
+  handleSubmit: (values: T, loading: UseForm<T>["wrapLoading"]) => void;
   validate?: {
     [K in keyof T]?: (value: T[K]) => string | true;
   };
 };
 
-export type UseForm<T extends Record<string, any>> = {
+export type UseForm<T> = {
   values: T;
   errors: Partial<Record<keyof T, string>>;
   validate: () => boolean;
@@ -18,16 +19,16 @@ export type UseForm<T extends Record<string, any>> = {
     React.SetStateAction<Partial<Record<keyof T, string>>>
   >;
   setValue: <K extends keyof T, V extends T[K]>(key: K, value: V) => void;
-  onSubmit: (
-    handleSubmit: (values: T) => void
-  ) => (event?: React.FormEvent) => void;
+  onSubmit: (event?: React.FormEvent) => void;
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  wrapLoading: (p: Promise<any>) => void;
 };
 
 const useForm = <T extends Record<string, any>>({
   initial,
   validate,
+  handleSubmit,
 }: UseFormProps<T>): UseForm<T> => {
   const [values, setValues] = useState<T>(initial);
   const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
@@ -65,11 +66,17 @@ const useForm = <T extends Record<string, any>>({
     setErrors((errors) => ({ ...errors, [key]: error }));
   };
 
-  const onSubmit =
-    (handleSubmit: (values: T) => void) => (event?: React.FormEvent) => {
-      event && event.preventDefault();
-      valid() && handleSubmit(values);
-    };
+  const wrapLoading = (p: Promise<any>) => {
+    setLoading(true);
+    p.finally(() => setLoading(false));
+  };
+
+  const onSubmit = (event?: React.FormEvent) => {
+    event && event.preventDefault();
+    if (valid()) {
+      handleSubmit(values, wrapLoading);
+    }
+  };
 
   return {
     values,
@@ -83,6 +90,7 @@ const useForm = <T extends Record<string, any>>({
     onSubmit,
     loading,
     setLoading,
+    wrapLoading,
   };
 };
 

@@ -29,7 +29,8 @@
     "react-router-dom": "^5.3.0",
     "react-split-pane": "^0.1.92",
     "recoil": "^0.4.1",
-    "swr": "^1.0.1"
+    "swr": "^1.0.1",
+    "ua-parser-js": "^1.0.2"
   },
   "devDependencies": {
     "@emotion/babel-plugin": "^11.3.0",
@@ -39,6 +40,7 @@
     "@types/react": "^17.0.33",
     "@types/react-dom": "^17.0.10",
     "@types/react-router-dom": "^5.3.2",
+    "@types/ua-parser-js": "^0.7.36",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
     "@vitejs/plugin-react": "^1.0.7",

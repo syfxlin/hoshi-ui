@@ -44,7 +44,7 @@ const SidebarControl = forwardRef<HTMLButtonElement, SidebarControlProps>(
                 `}
                 styles={{
                   spacing: css`
-                    &:nth-child(2) {
+                    &:nth-of-type(2) {
                       flex-grow: 1;
                       min-width: 0;
                     }

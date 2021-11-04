@@ -13,7 +13,7 @@ import TreeRoot from "./TreeRoot";
 import { useLogout } from "../../api/ums";
 import { Divider, Menu, Text } from "@mantine/core";
 import Sidebar from "../../components/sidebar/Sidebar";
-import { panels } from "./router";
+import { dashboard } from "./router";
 import ArrayRoute from "../../router/ArrayRoute";
 import SidebarMenu from "../../components/sidebar/SidebarMenu";
 import SidebarItem from "../../components/sidebar/SidebarItem";
@@ -121,7 +121,7 @@ const Dashboard: React.FC = () => {
         </SidebarItem>
         <TreeRoot tree={tree} onDrop={(data) => setTree(data)} rootId={0} />
       </Sidebar>
-      <ArrayRoute routes={panels} />
+      <ArrayRoute routes={dashboard} />
     </AppShell>
   );
 };

@@ -23,19 +23,19 @@ export type UpdateUser = Partial<
   >
 >;
 
-export const adminUpdateUser = (userId: string, user: UpdateUser) =>
+export const adminUpdateUser = (userId: User["id"], user: UpdateUser) =>
   request
     .put<ApiEntity<User>>(`/api/admin/users/${userId}`, user)
     .then((response) => response.data);
 
-export const adminDeleteUser = (userId: string) =>
+export const adminDeleteUser = (userId: User["id"]) =>
   request
     .delete<ApiEntity>(`/api/admin/users/${userId}`)
     .then((response) => response.data);
 
-export const adminUpdateUserRole = (userId: string, roles: string[]) =>
+export const adminUpdateUserRole = (userId: User["id"], roles: string[]) =>
   request
-    .put(`/api/admin/users/${userId}/role`, { roles })
+    .put<ApiEntity<User>>(`/api/admin/users/${userId}/role`, { roles })
     .then((response) => response.data);
 
 export type AddUser = Omit<
@@ -44,7 +44,9 @@ export type AddUser = Omit<
 >;
 
 export const adminAddUser = (user: AddUser) =>
-  request.post(`/api/admin/users`, user).then((response) => response.data);
+  request
+    .post<ApiEntity<User>>(`/api/admin/users`, user)
+    .then((response) => response.data);
 
 export const adminListRoles = () =>
   request
@@ -53,12 +55,12 @@ export const adminListRoles = () =>
 
 export type UpdateRole = Partial<Omit<Role, "name" | "createdTime">>;
 
-export const adminUpdateRole = (roleName: string, role: UpdateRole) =>
+export const adminUpdateRole = (roleName: Role["name"], role: UpdateRole) =>
   request
     .put<ApiEntity<Role>>(`/api/admin/roles/${roleName}`, role)
     .then((response) => response.data);
 
-export const adminDeleteRole = (roleName: string) =>
+export const adminDeleteRole = (roleName: Role["name"]) =>
   request
     .delete<ApiEntity>(`/api/admin/roles/${roleName}`)
     .then((response) => response.data);

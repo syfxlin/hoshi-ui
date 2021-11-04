@@ -76,11 +76,58 @@ const Users: React.FC = () => {
       nickname: "",
       email: "",
     },
+    handleSubmit: (values, loading) => {
+      const user: UpdateUser = {};
+      if (values.username !== "") {
+        user.username = values.username;
+      }
+      if (values.password !== "") {
+        user.password = values.password;
+      }
+      if (values.nickname !== "") {
+        user.nickname = values.nickname;
+      }
+      if (values.email !== "") {
+        user.email = values.email;
+      }
+      loading(
+        adminUpdateUser(values.id, user)
+          .then(
+            toast.api.success({
+              title: "修改成功",
+            })
+          )
+          .then(() => query.mutate())
+          .then(() => edit.reset())
+          .catch(
+            toast.api.error({
+              title: "修改失败",
+            })
+          )
+      );
+    },
   });
   const assignRole = useForm<{ id: string; roles: string[] }>({
     initial: {
       id: "",
       roles: [],
+    },
+    handleSubmit: (values, loading) => {
+      loading(
+        adminUpdateUserRole(values.id, values.roles)
+          .then(
+            toast.api.success({
+              title: "修改成功",
+            })
+          )
+          .then(() => query.mutate())
+          .then(() => assignRole.reset())
+          .catch(
+            toast.api.error({
+              title: "修改失败",
+            })
+          )
+      );
     },
   });
   const add = useForm({
@@ -100,6 +147,23 @@ const Users: React.FC = () => {
           value
         ) || "请输入正确的邮箱",
       nickname: (value) => value.length > 0 || "昵称必须不为空",
+    },
+    handleSubmit: ({ opened, ...user }, loading) => {
+      loading(
+        adminAddUser(user)
+          .then(
+            toast.api.success({
+              title: "新增成功",
+            })
+          )
+          .then(() => query.mutate())
+          .then(() => add.reset())
+          .catch(
+            toast.api.error({
+              title: "新增失败",
+            })
+          )
+      );
     },
   });
   // users table
@@ -325,38 +389,7 @@ const Users: React.FC = () => {
         onClose={() => edit.reset()}
         title={`编辑用户: ${edit.values.id}`}
       >
-        <form
-          onSubmit={edit.onSubmit((values) => {
-            const user: UpdateUser = {};
-            if (values.username !== "") {
-              user.username = values.username;
-            }
-            if (values.password !== "") {
-              user.password = values.password;
-            }
-            if (values.nickname !== "") {
-              user.nickname = values.nickname;
-            }
-            if (values.email !== "") {
-              user.email = values.email;
-            }
-            edit.setLoading(true);
-            adminUpdateUser(values.id, user)
-              .then(
-                toast.api.success({
-                  title: "修改成功",
-                })
-              )
-              .then(() => query.mutate())
-              .then(() => edit.reset())
-              .catch(
-                toast.api.error({
-                  title: "修改失败",
-                })
-              )
-              .finally(() => edit.setLoading(false));
-          })}
-        >
+        <form onSubmit={edit.onSubmit}>
           <VStack>
             <TextInput
               label="用户名"
@@ -395,25 +428,7 @@ const Users: React.FC = () => {
         onClose={() => assignRole.reset()}
         title={`分配角色: ${assignRole.values.id}`}
       >
-        <form
-          onSubmit={assignRole.onSubmit((values) => {
-            assignRole.setLoading(true);
-            adminUpdateUserRole(values.id, values.roles)
-              .then(
-                toast.api.success({
-                  title: "修改成功",
-                })
-              )
-              .then(() => query.mutate())
-              .then(() => assignRole.reset())
-              .catch(
-                toast.api.error({
-                  title: "修改失败",
-                })
-              )
-              .finally(() => assignRole.setLoading(false));
-          })}
-        >
+        <form onSubmit={assignRole.onSubmit}>
           <VStack>
             <MultiSelect
               label="角色"
@@ -435,25 +450,7 @@ const Users: React.FC = () => {
         onClose={() => add.reset()}
         title="新增用户"
       >
-        <form
-          onSubmit={add.onSubmit(({ opened, ...user }) => {
-            add.setLoading(true);
-            adminAddUser(user)
-              .then(
-                toast.api.success({
-                  title: "新增成功",
-                })
-              )
-              .then(() => query.mutate())
-              .then(() => add.reset())
-              .catch(
-                toast.api.error({
-                  title: "新增失败",
-                })
-              )
-              .finally(() => add.setLoading(false));
-          })}
-        >
+        <form onSubmit={add.onSubmit}>
           <VStack>
             <TextInput
               required

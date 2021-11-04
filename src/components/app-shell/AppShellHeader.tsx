@@ -14,6 +14,7 @@ const AppShellHeader: UIComponent<"header", BoxProps> = forwardRef(
         ref={ref}
         css={css`
           height: 60px;
+          flex: 0 0 60px;
           display: flex;
           align-items: center;
           justify-content: space-between;
