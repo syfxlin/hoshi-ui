@@ -17,7 +17,6 @@ import {
 import {
   Avatar,
   Button,
-  Divider,
   Input,
   InputWrapper,
   PasswordInput,
@@ -27,6 +26,7 @@ import Form from "../../../components/form/Form";
 import VerifyCodeInput from "../../../components/form/VerifyCodeInput";
 import { Link } from "../../../components/Link";
 import { Dropzone } from "@mantine/dropzone";
+import SubTitle from "../SubTitle";
 
 const Info: React.FC = () => {
   return (
@@ -136,7 +136,8 @@ const Info: React.FC = () => {
               },
             });
             return (
-              <VStack spacing={4} divider={<Divider />}>
+              <VStack spacing={4}>
+                <SubTitle>用户名/昵称</SubTitle>
                 <Form onSubmit={name.onSubmit}>
                   <TextInput
                     label="用户名"
@@ -160,6 +161,7 @@ const Info: React.FC = () => {
                     更新
                   </Button>
                 </Form>
+                <SubTitle>邮箱</SubTitle>
                 <Form onSubmit={email.onSubmit}>
                   <TextInput
                     label="邮箱"
@@ -191,6 +193,7 @@ const Info: React.FC = () => {
                     更新
                   </Button>
                 </Form>
+                <SubTitle>密码</SubTitle>
                 <Form onSubmit={password.onSubmit}>
                   <PasswordInput
                     label={
@@ -221,6 +224,7 @@ const Info: React.FC = () => {
                     更新
                   </Button>
                 </Form>
+                <SubTitle>个人信息</SubTitle>
                 <Form onSubmit={info.onSubmit}>
                   <InputWrapper label="头像" error={info.errors.avatar}>
                     <HStack>

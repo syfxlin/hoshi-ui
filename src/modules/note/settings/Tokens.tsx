@@ -11,11 +11,14 @@ import { Button, Divider, Text } from "@mantine/core";
 import { css } from "@emotion/react";
 import useToast from "../../../utils/use-toast";
 import useLoading from "../../../utils/use-loading";
+import SubTitle from "../SubTitle";
+import { useTh } from "../../../theme/hooks/use-th";
 
 const Tokens: React.FC = () => {
   const query = useSWR(["listTokens"], () => listTokens());
   const toast = useToast();
   const loading = useLoading();
+  const th = useTh();
   return (
     <AppShellContainer>
       <AppShellHeader>
@@ -26,7 +29,13 @@ const Tokens: React.FC = () => {
       </AppShellHeader>
       <Panel title="API 令牌">
         <Async query={query}>
-          <VStack divider={<Divider />}>
+          <SubTitle>令牌</SubTitle>
+          <VStack
+            divider={<Divider />}
+            css={css`
+              margin-top: ${th.spacing(4)};
+            `}
+          >
             {query.data?.data?.map((token) => {
               const onRevoke = () => {
                 loading.wrap(

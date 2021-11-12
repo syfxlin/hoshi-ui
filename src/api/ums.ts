@@ -54,14 +54,17 @@ export type ResetPasswordView = {
   password: User["password"];
 };
 
-export const userMe = () => request.get<ApiEntity<User>>("/api/users");
+export const userMe = () => request.get<ApiEntity<User>>("/hoshi-ums/users");
 
 export const login = async ({ username, password }: LoginView) => {
   const data = new URLSearchParams({
     username,
     password,
   });
-  const response = await request.post<ApiEntity<User>>("/login", data);
+  const response = await request.post<ApiEntity<User>>(
+    "/hoshi-ums/login",
+    data
+  );
   const t =
     response.headers["X-Auth-Token"] ?? response.headers["x-auth-token"];
   token.set(t);
@@ -78,7 +81,7 @@ export const useLogin = () => {
 };
 
 export const logout = async () => {
-  const response = await request.post("/logout");
+  const response = await request.post("/hoshi-ums/logout");
   token.remove();
   return response.data;
 };
@@ -94,27 +97,27 @@ export const useLogout = () => {
 
 export const sendRegisterCode = (email: User["email"]) =>
   request
-    .post<ApiEntity>(`/register/${email}`)
+    .post<ApiEntity>(`/hoshi-ums/register/${email}`)
     .then((response) => response.data);
 
 export const register = (data: RegisterView) =>
   request
-    .post<ApiEntity<User>>("/register", data)
+    .post<ApiEntity<User>>("/hoshi-ums/register", data)
     .then((response) => response.data);
 
 export const sendResetPasswordCode = (email: User["email"]) =>
   request
-    .post<ApiEntity>(`/reset-password/${email}`)
+    .post<ApiEntity>(`/hoshi-ums/reset-password/${email}`)
     .then((response) => response.data);
 
 export const resetPassword = (data: ResetPasswordView) =>
   request
-    .put<ApiEntity>(`/reset-password`, data)
+    .put<ApiEntity>(`/hoshi-ums/reset-password`, data)
     .then((response) => response.data);
 
 export const userByUsername = (username: User["username"]) =>
   request
-    .get<ApiEntity<User>>(`/api/users/${username}`)
+    .get<ApiEntity<User>>(`/hoshi-ums/users/${username}`)
     .then((response) => response.data);
 
 export const followByUserId = (
@@ -124,18 +127,18 @@ export const followByUserId = (
 ) =>
   request
     .get<ApiEntity<ApiPage<User>>>(
-      `/api/follows/${userId}/${type}?page=${page - 1}`
+      `/hoshi-ums/follows/${userId}/${type}?page=${page - 1}`
     )
     .then((response) => response.data);
 
 export const addFollowing = (userId: User["id"]) =>
   request
-    .post<ApiEntity>(`/api/follows/${userId}`)
+    .post<ApiEntity>(`/hoshi-ums/follows/${userId}`)
     .then((response) => response.data);
 
 export const deleteFollowing = (userId: User["id"]) =>
   request
-    .delete<ApiEntity>(`/api/follows/${userId}`)
+    .delete<ApiEntity>(`/hoshi-ums/follows/${userId}`)
     .then((response) => response.data);
 
 export type UpdateName = {
@@ -145,12 +148,12 @@ export type UpdateName = {
 
 export const updateName = (name: UpdateName) =>
   request
-    .put<ApiEntity<User>>(`/api/users/name`, name)
+    .put<ApiEntity<User>>(`/hoshi-ums/users/name`, name)
     .then((response) => response.data);
 
 export const sendUpdateEmailCode = (email: User["email"]) =>
   request
-    .post<ApiEntity>(`/api/users/email/${email}`)
+    .post<ApiEntity>(`/hoshi-ums/users/email/${email}`)
     .then((response) => response.data);
 
 export type UpdateEmail = {
@@ -160,7 +163,7 @@ export type UpdateEmail = {
 
 export const updateEmail = (email: UpdateEmail) =>
   request
-    .put<ApiEntity<User>>(`/api/users/email`, email)
+    .put<ApiEntity<User>>(`/hoshi-ums/users/email`, email)
     .then((response) => response.data);
 
 export type UpdatePassword = {
@@ -170,14 +173,14 @@ export type UpdatePassword = {
 
 export const updatePassword = (password: UpdatePassword) =>
   request
-    .put<ApiEntity<User>>(`/api/users/password`, password)
+    .put<ApiEntity<User>>(`/hoshi-ums/users/password`, password)
     .then((response) => response.data);
 
 export type UpdateUserInfo = Partial<UserInfo>;
 
 export const updateUserInfo = (info: UpdateUserInfo) =>
   request
-    .put<ApiEntity<UserInfo>>(`/api/users/info`, info)
+    .put<ApiEntity<UserInfo>>(`/hoshi-ums/users/info`, info)
     .then((response) => response.data);
 
 export type LoggedView = {
@@ -191,12 +194,12 @@ export type LoggedView = {
 
 export const listLogged = () =>
   request
-    .get<ApiEntity<LoggedView[]>>(`/api/users/logged`)
+    .get<ApiEntity<LoggedView[]>>(`/hoshi-ums/users/logged`)
     .then((response) => response.data);
 
 export const excludeLogged = (sessionId: LoggedView["sessionId"]) =>
   request
-    .delete<ApiEntity>(`/api/users/exclude/${sessionId}`)
+    .delete<ApiEntity>(`/hoshi-ums/users/exclude/${sessionId}`)
     .then((response) => response.data);
 
 export type Token = {
@@ -206,10 +209,10 @@ export type Token = {
 
 export const listTokens = () =>
   request
-    .get<ApiEntity<Token[]>>(`/api/tokens`)
+    .get<ApiEntity<Token[]>>(`/hoshi-ums/tokens`)
     .then((response) => response.data);
 
 export const revokeToken = (token: Token["token"]) =>
   request
-    .delete<ApiEntity>(`/api/tokens/${token}`)
+    .delete<ApiEntity>(`/hoshi-ums/tokens/${token}`)
     .then((response) => response.data);

@@ -21,11 +21,14 @@ import UAParser from "ua-parser-js";
 import { css } from "@emotion/react";
 import useLoading from "../../../utils/use-loading";
 import useToast from "../../../utils/use-toast";
+import SubTitle from "../SubTitle";
+import { useTh } from "../../../theme/hooks/use-th";
 
 const Safety: React.FC = () => {
   const query = useSWR(["listLogged"], () => listLogged());
   const loading = useLoading();
   const toast = useToast();
+  const th = useTh();
   return (
     <AppShellContainer>
       <AppShellHeader>
@@ -36,7 +39,13 @@ const Safety: React.FC = () => {
       </AppShellHeader>
       <Panel title="账号安全">
         <Async query={query}>
-          <VStack divider={<Divider />}>
+          <SubTitle>已登录的设备</SubTitle>
+          <VStack
+            divider={<Divider />}
+            css={css`
+              margin-top: ${th.spacing(4)};
+            `}
+          >
             {query.data?.data?.map((logged) => {
               const ua = UAParser(logged.userAgent);
               const icons = {
