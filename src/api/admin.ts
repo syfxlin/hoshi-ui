@@ -53,6 +53,13 @@ export const adminListRoles = () =>
     .get<ApiEntity<Role[]>>(`/hoshi-ums/admin/roles`)
     .then((response) => response.data);
 
+export type AddRole = Omit<Role, "createdTime">;
+
+export const adminAddRole = (role: AddRole) =>
+  request
+    .post<ApiEntity<Role>>(`/hoshi-ums/admin/roles`, role)
+    .then((response) => response.data);
+
 export type UpdateRole = Partial<Omit<Role, "name" | "createdTime">>;
 
 export const adminUpdateRole = (roleName: Role["name"], role: UpdateRole) =>

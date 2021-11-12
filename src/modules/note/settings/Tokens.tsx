@@ -5,25 +5,57 @@ import ColorModeButton from "../../../components/header/ColorModeButton";
 import Panel from "../../../components/Panel";
 import AppShellContainer from "../../../components/app-shell/AppShellContainer";
 import useSWR from "swr";
-import { listTokens, revokeToken } from "../../../api/ums";
+import { addToken, listTokens, revokeToken } from "../../../api/ums";
 import Async from "../../../components/Async";
-import { Button, Divider, Text } from "@mantine/core";
+import { Button, Divider, Modal, Text, TextInput } from "@mantine/core";
 import { css } from "@emotion/react";
 import useToast from "../../../utils/use-toast";
 import useLoading from "../../../utils/use-loading";
 import SubTitle from "../SubTitle";
 import { useTh } from "../../../theme/hooks/use-th";
+import useForm from "../../../utils/use-form";
+import { Submit } from "../../ums/form";
+import Form from "../../../components/form/Form";
 
 const Tokens: React.FC = () => {
   const query = useSWR(["listTokens"], () => listTokens());
   const toast = useToast();
-  const loading = useLoading();
   const th = useTh();
+  const loading = useLoading();
+  const add = useForm({
+    initial: {
+      opened: false,
+      name: "",
+    },
+    validate: {
+      name: (value) => value.length > 0 || "令牌名称必须不为空",
+    },
+    handleSubmit: (values, loading) => {
+      loading(
+        addToken(values.name)
+          .then(
+            toast.api.success({
+              title: "新增成功",
+            })
+          )
+          .then(() => query.mutate())
+          .then(() => add.reset())
+          .catch(
+            toast.api.error({
+              title: "新增失败",
+            })
+          )
+      );
+    },
+  });
   return (
     <AppShellContainer>
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">
+          <Button size="xs" onClick={() => add.setValue("opened", true)}>
+            新增令牌
+          </Button>
           <ColorModeButton />
         </HStack>
       </AppShellHeader>
@@ -86,6 +118,22 @@ const Tokens: React.FC = () => {
           </VStack>
         </Async>
       </Panel>
+      <Modal
+        opened={add.values.opened}
+        onClose={() => add.reset()}
+        title="新增令牌"
+      >
+        <Form onSubmit={add.onSubmit}>
+          <TextInput
+            label="令牌名称"
+            placeholder="令牌名称"
+            value={add.values.name}
+            onChange={(e) => add.setValue("name", e.currentTarget.value)}
+            error={add.errors.name}
+          />
+          <Submit loading={add.loading}>提交</Submit>
+        </Form>
+      </Modal>
     </AppShellContainer>
   );
 };

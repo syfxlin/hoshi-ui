@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { css } from "@emotion/react";
 import ColorModeButton from "../../../components/header/ColorModeButton";
-import { HStack, VStack } from "../../../components/layout/Stack";
+import { HStack } from "../../../components/layout/Stack";
 import Box from "../../../components/layout/Box";
 import { useTh } from "../../../theme/hooks/use-th";
 import useSWR from "swr";
@@ -41,6 +41,7 @@ import { Search } from "@icon-park/react";
 import { useDebouncedValue } from "@mantine/hooks";
 import AppShellContainer from "../../../components/app-shell/AppShellContainer";
 import AppShellHeader from "../../../components/app-shell/AppShellHeader";
+import Form from "../../../components/form/Form";
 
 const Users: React.FC = () => {
   const th = useTh();
@@ -324,6 +325,9 @@ const Users: React.FC = () => {
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">
+          <Button size="xs" onClick={() => add.setValue("opened", true)}>
+            新增用户
+          </Button>
           <ColorModeButton />
         </HStack>
       </AppShellHeader>
@@ -385,113 +389,107 @@ const Users: React.FC = () => {
         )}
       </Panel>
       <Modal
+        opened={add.values.opened}
+        onClose={() => add.reset()}
+        title="新增用户"
+      >
+        <Form onSubmit={add.onSubmit}>
+          <TextInput
+            required
+            label="用户名"
+            placeholder="用户名"
+            value={add.values.username}
+            onChange={(e) => add.setValue("username", e.currentTarget.value)}
+            error={add.errors.username}
+          />
+          <TextInput
+            required
+            label="昵称"
+            placeholder="昵称"
+            value={add.values.nickname}
+            onChange={(e) => add.setValue("nickname", e.currentTarget.value)}
+            error={add.errors.nickname}
+          />
+          <TextInput
+            required
+            label="邮箱"
+            placeholder="邮箱"
+            value={add.values.email}
+            onChange={(e) => add.setValue("email", e.currentTarget.value)}
+            error={add.errors.email}
+          />
+          <PasswordInput
+            required
+            label="密码"
+            placeholder="密码"
+            value={add.values.password}
+            onChange={(e) => add.setValue("password", e.currentTarget.value)}
+            error={add.errors.password}
+          />
+          <Switch
+            label="状态"
+            checked={add.values.status}
+            onChange={(e) => add.setValue("status", e.currentTarget.checked)}
+          />
+          <Submit loading={add.loading}>提交</Submit>
+        </Form>
+      </Modal>
+      <Modal
         opened={edit.values.id !== ""}
         onClose={() => edit.reset()}
         title={`编辑用户: ${edit.values.id}`}
       >
-        <form onSubmit={edit.onSubmit}>
-          <VStack>
-            <TextInput
-              label="用户名"
-              placeholder="用户名"
-              value={edit.values.username}
-              onChange={(e) => edit.setValue("username", e.currentTarget.value)}
-              error={edit.errors.username}
-            />
-            <TextInput
-              label="昵称"
-              placeholder="昵称"
-              value={edit.values.nickname}
-              onChange={(e) => edit.setValue("nickname", e.currentTarget.value)}
-              error={edit.errors.nickname}
-            />
-            <TextInput
-              label="邮箱"
-              placeholder="邮箱"
-              value={edit.values.email}
-              onChange={(e) => edit.setValue("email", e.currentTarget.value)}
-              error={edit.errors.email}
-            />
-            <PasswordInput
-              label="密码"
-              placeholder="密码"
-              value={edit.values.password}
-              onChange={(e) => edit.setValue("password", e.currentTarget.value)}
-              error={edit.errors.password}
-            />
-            <Submit loading={edit.loading}>提交</Submit>
-          </VStack>
-        </form>
+        <Form onSubmit={edit.onSubmit}>
+          <TextInput
+            label="用户名"
+            placeholder="用户名"
+            value={edit.values.username}
+            onChange={(e) => edit.setValue("username", e.currentTarget.value)}
+            error={edit.errors.username}
+          />
+          <TextInput
+            label="昵称"
+            placeholder="昵称"
+            value={edit.values.nickname}
+            onChange={(e) => edit.setValue("nickname", e.currentTarget.value)}
+            error={edit.errors.nickname}
+          />
+          <TextInput
+            label="邮箱"
+            placeholder="邮箱"
+            value={edit.values.email}
+            onChange={(e) => edit.setValue("email", e.currentTarget.value)}
+            error={edit.errors.email}
+          />
+          <PasswordInput
+            label="密码"
+            placeholder="密码"
+            value={edit.values.password}
+            onChange={(e) => edit.setValue("password", e.currentTarget.value)}
+            error={edit.errors.password}
+          />
+          <Submit loading={edit.loading}>提交</Submit>
+        </Form>
       </Modal>
       <Modal
         opened={assignRole.values.id !== ""}
         onClose={() => assignRole.reset()}
         title={`分配角色: ${assignRole.values.id}`}
       >
-        <form onSubmit={assignRole.onSubmit}>
-          <VStack>
-            <MultiSelect
-              label="角色"
-              placeholder="选择角色"
-              searchable
-              data={
-                roles.data?.data?.map((role) => role.name) ??
-                assignRole.values.roles
-              }
-              value={assignRole.values.roles}
-              onChange={(value) => assignRole.setValue("roles", value)}
-            />
-            <Submit loading={assignRole.loading}>提交</Submit>
-          </VStack>
-        </form>
-      </Modal>
-      <Modal
-        opened={add.values.opened}
-        onClose={() => add.reset()}
-        title="新增用户"
-      >
-        <form onSubmit={add.onSubmit}>
-          <VStack>
-            <TextInput
-              required
-              label="用户名"
-              placeholder="用户名"
-              value={add.values.username}
-              onChange={(e) => add.setValue("username", e.currentTarget.value)}
-              error={add.errors.username}
-            />
-            <TextInput
-              required
-              label="昵称"
-              placeholder="昵称"
-              value={add.values.nickname}
-              onChange={(e) => add.setValue("nickname", e.currentTarget.value)}
-              error={add.errors.nickname}
-            />
-            <TextInput
-              required
-              label="邮箱"
-              placeholder="邮箱"
-              value={add.values.email}
-              onChange={(e) => add.setValue("email", e.currentTarget.value)}
-              error={add.errors.email}
-            />
-            <PasswordInput
-              required
-              label="密码"
-              placeholder="密码"
-              value={add.values.password}
-              onChange={(e) => add.setValue("password", e.currentTarget.value)}
-              error={add.errors.password}
-            />
-            <Switch
-              label="状态"
-              checked={add.values.status}
-              onChange={(e) => add.setValue("status", e.currentTarget.checked)}
-            />
-            <Submit loading={add.loading}>提交</Submit>
-          </VStack>
-        </form>
+        <Form onSubmit={assignRole.onSubmit}>
+          <MultiSelect
+            label="角色"
+            placeholder="选择角色"
+            searchable
+            data={
+              roles.data?.data?.map((role) => role.name) ??
+              assignRole.values.roles
+            }
+            value={assignRole.values.roles}
+            onChange={(value) => assignRole.setValue("roles", value)}
+          />
+          <Submit loading={assignRole.loading}>提交</Submit>
+        </Form>
       </Modal>
     </AppShellContainer>
   );

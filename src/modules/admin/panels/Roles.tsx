@@ -3,6 +3,8 @@ import { useTh } from "../../../theme/hooks/use-th";
 import useToast from "../../../utils/use-toast";
 import useSWR from "swr";
 import {
+  AddRole,
+  adminAddRole,
   adminDeleteRole,
   adminListRoles,
   adminUpdateRole,
@@ -10,8 +12,15 @@ import {
 } from "../../../api/admin";
 import BaseTable, { AutoResizer, ColumnShape } from "react-base-table";
 import { Role } from "../../../api/ums";
-import { Badge, Button, Modal, MultiSelect, TextInput } from "@mantine/core";
-import { HStack, VStack } from "../../../components/layout/Stack";
+import {
+  Badge,
+  Button,
+  Modal,
+  MultiSelect,
+  Switch,
+  TextInput,
+} from "@mantine/core";
+import { HStack } from "../../../components/layout/Stack";
 import ColorModeButton from "../../../components/header/ColorModeButton";
 import Panel from "../../../components/Panel";
 import Box from "../../../components/layout/Box";
@@ -22,6 +31,7 @@ import { wrap } from "../../../utils/react";
 import { permissions } from "../../../api/permissions";
 import AppShellContainer from "../../../components/app-shell/AppShellContainer";
 import AppShellHeader from "../../../components/app-shell/AppShellHeader";
+import Form from "../../../components/form/Form";
 
 const Roles: React.FC = () => {
   const th = useTh();
@@ -29,12 +39,41 @@ const Roles: React.FC = () => {
   // query & data
   const query = useSWR(["adminListRoles"], () => adminListRoles());
   const data = useMemo(() => query.data?.data, [query.data]);
-  // edit form
-  const edit = useForm<{
-    name: string;
-    description: string;
-    permissions: string[];
-  }>({
+  // form
+  const add = useForm<{ opened: boolean } & AddRole>({
+    initial: {
+      opened: false,
+      name: "",
+      description: "",
+      status: true,
+      permissions: [],
+    },
+    validate: {
+      name: (value) => value.length > 0 || "角色名称必须不为空",
+    },
+    handleSubmit: ({ opened, ...role }, loading) => {
+      loading(
+        adminAddRole(role)
+          .then(
+            toast.api.success({
+              title: "新增成功",
+            })
+          )
+          .then(() => query.mutate())
+          .then(() => add.reset())
+          .catch(
+            toast.api.error({
+              title: "新增失败",
+            })
+          )
+      );
+    },
+  });
+  const edit = useForm<
+    {
+      name: string;
+    } & UpdateRole
+  >({
     initial: {
       name: "",
       description: "",
@@ -204,6 +243,9 @@ const Roles: React.FC = () => {
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">
+          <Button size="xs" onClick={() => add.setValue("opened", true)}>
+            新增角色
+          </Button>
           <ColorModeButton />
         </HStack>
       </AppShellHeader>
@@ -229,30 +271,64 @@ const Roles: React.FC = () => {
         </Box>
       </Panel>
       <Modal
+        opened={add.values.opened}
+        onClose={() => add.reset()}
+        title="新增角色"
+      >
+        <Form onSubmit={add.onSubmit}>
+          <TextInput
+            label="名称"
+            placeholder="名称"
+            value={add.values.name}
+            onChange={(e) => add.setValue("name", e.currentTarget.value)}
+            error={add.errors.name}
+          />
+          <TextInput
+            label="描述"
+            placeholder="描述"
+            value={add.values.description}
+            onChange={(e) => add.setValue("description", e.currentTarget.value)}
+            error={add.errors.description}
+          />
+          <MultiSelect
+            label="权限"
+            data={permissions}
+            value={add.values.permissions}
+            onChange={(value) => add.setValue("permissions", value)}
+            error={add.errors.permissions}
+          />
+          <Switch
+            label="状态"
+            checked={add.values.status}
+            onChange={(e) => add.setValue("status", e.currentTarget.checked)}
+          />
+          <Submit loading={add.loading}>提交</Submit>
+        </Form>
+      </Modal>
+      <Modal
         opened={edit.values.name !== ""}
         onClose={() => edit.reset()}
         title={`编辑角色: ${edit.values.name}`}
       >
-        <form onSubmit={edit.onSubmit}>
-          <VStack>
-            <TextInput
-              label="描述"
-              placeholder="描述"
-              value={edit.values.description}
-              onChange={(e) =>
-                edit.setValue("description", e.currentTarget.value)
-              }
-              error={edit.errors.description}
-            />
-            <MultiSelect
-              data={permissions}
-              value={edit.values.permissions}
-              onChange={(value) => edit.setValue("permissions", value)}
-              error={edit.errors.permissions}
-            />
-            <Submit loading={edit.loading}>提交</Submit>
-          </VStack>
-        </form>
+        <Form onSubmit={edit.onSubmit}>
+          <TextInput
+            label="描述"
+            placeholder="描述"
+            value={edit.values.description}
+            onChange={(e) =>
+              edit.setValue("description", e.currentTarget.value)
+            }
+            error={edit.errors.description}
+          />
+          <MultiSelect
+            label="权限"
+            data={permissions}
+            value={edit.values.permissions}
+            onChange={(value) => edit.setValue("permissions", value)}
+            error={edit.errors.permissions}
+          />
+          <Submit loading={edit.loading}>提交</Submit>
+        </Form>
       </Modal>
     </AppShellContainer>
   );

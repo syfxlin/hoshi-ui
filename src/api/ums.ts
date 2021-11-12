@@ -216,3 +216,8 @@ export const revokeToken = (token: Token["token"]) =>
   request
     .delete<ApiEntity>(`/hoshi-ums/tokens/${token}`)
     .then((response) => response.data);
+
+export const addToken = (name: string) =>
+  request
+    .post<ApiEntity<Token>>(`/hoshi-ums/tokens/${name}`)
+    .then((response) => response.data);

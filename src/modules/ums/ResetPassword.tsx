@@ -11,7 +11,7 @@ import { Card, LinkGroup, Submit, Title } from "./form";
 import { ActionIcon, PasswordInput, TextInput, Tooltip } from "@mantine/core";
 import { TwoDimensionalCode } from "@icon-park/react";
 import { BLink } from "../../components/Link";
-import { VStack } from "../../components/layout/Stack";
+import Form from "../../components/form/Form";
 
 const ResetPassword: React.FC = () => {
   const toast = useToast();
@@ -82,57 +82,53 @@ const ResetPassword: React.FC = () => {
         <FluidCenter>
           <Card>
             <Title>Hoshi-Note</Title>
-            <form onSubmit={form.onSubmit}>
-              <VStack>
-                <TextInput
-                  required
-                  label="邮箱"
-                  placeholder="你的邮箱"
-                  value={form.values.email}
-                  onChange={(e) =>
-                    form.setValue("email", e.currentTarget.value)
-                  }
-                  error={form.errors.email}
-                />
-                <PasswordInput
-                  required
-                  label="密码"
-                  placeholder="你的密码（新密码）"
-                  value={form.values.password}
-                  onChange={(e) =>
-                    form.setValue("password", e.currentTarget.value)
-                  }
-                  error={form.errors.password}
-                />
-                <TextInput
-                  required
-                  label="验证码"
-                  placeholder={
-                    timeout === 0
-                      ? "点击右侧图标获取验证码"
-                      : `重新发送 (${timeout} 秒)`
-                  }
-                  value={form.values.code}
-                  onChange={(e) => form.setValue("code", e.currentTarget.value)}
-                  error={form.errors.code}
-                  rightSection={
-                    <ActionIcon onClick={() => sendValidCode()}>
-                      <Tooltip
-                        label={
-                          timeout === 0
-                            ? "点击发送验证码"
-                            : `重新发送 (${timeout} 秒)`
-                        }
-                        withArrow
-                      >
-                        <TwoDimensionalCode />
-                      </Tooltip>
-                    </ActionIcon>
-                  }
-                />
-                <Submit>重置密码</Submit>
-              </VStack>
-            </form>
+            <Form onSubmit={form.onSubmit}>
+              <TextInput
+                required
+                label="邮箱"
+                placeholder="你的邮箱"
+                value={form.values.email}
+                onChange={(e) => form.setValue("email", e.currentTarget.value)}
+                error={form.errors.email}
+              />
+              <PasswordInput
+                required
+                label="密码"
+                placeholder="你的密码（新密码）"
+                value={form.values.password}
+                onChange={(e) =>
+                  form.setValue("password", e.currentTarget.value)
+                }
+                error={form.errors.password}
+              />
+              <TextInput
+                required
+                label="验证码"
+                placeholder={
+                  timeout === 0
+                    ? "点击右侧图标获取验证码"
+                    : `重新发送 (${timeout} 秒)`
+                }
+                value={form.values.code}
+                onChange={(e) => form.setValue("code", e.currentTarget.value)}
+                error={form.errors.code}
+                rightSection={
+                  <ActionIcon onClick={() => sendValidCode()}>
+                    <Tooltip
+                      label={
+                        timeout === 0
+                          ? "点击发送验证码"
+                          : `重新发送 (${timeout} 秒)`
+                      }
+                      withArrow
+                    >
+                      <TwoDimensionalCode />
+                    </Tooltip>
+                  </ActionIcon>
+                }
+              />
+              <Submit>重置密码</Submit>
+            </Form>
             <LinkGroup>
               <BLink variant="link" to="/login">
                 登录

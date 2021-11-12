@@ -11,7 +11,7 @@ import Main from "../../components/Main";
 import Header from "../../components/header/Header";
 import { history } from "../../store/history";
 import useCountDown from "../../utils/use-count-down";
-import { VStack } from "../../components/layout/Stack";
+import Form from "../../components/form/Form";
 
 const Register: React.FC = () => {
   const toast = useToast();
@@ -86,77 +86,73 @@ const Register: React.FC = () => {
         <FluidCenter>
           <Card>
             <Title>Hoshi-Note</Title>
-            <form onSubmit={form.onSubmit}>
-              <VStack>
-                <TextInput
-                  required
-                  label="昵称"
-                  placeholder="你的昵称"
-                  value={form.values.nickname}
-                  onChange={(e) =>
-                    form.setValue("nickname", e.currentTarget.value)
-                  }
-                  error={form.errors.nickname}
-                />
-                <TextInput
-                  required
-                  label="邮箱"
-                  placeholder="你的邮箱"
-                  value={form.values.email}
-                  onChange={(e) =>
-                    form.setValue("email", e.currentTarget.value)
-                  }
-                  error={form.errors.email}
-                />
-                <TextInput
-                  required
-                  label="用户名"
-                  placeholder="你的用户名"
-                  value={form.values.username}
-                  onChange={(e) =>
-                    form.setValue("username", e.currentTarget.value)
-                  }
-                  error={form.errors.username}
-                />
-                <PasswordInput
-                  required
-                  label="密码"
-                  placeholder="你的密码"
-                  value={form.values.password}
-                  onChange={(e) =>
-                    form.setValue("password", e.currentTarget.value)
-                  }
-                  error={form.errors.password}
-                />
-                <TextInput
-                  required
-                  label="验证码"
-                  placeholder={
-                    timeout === 0
-                      ? "点击右侧图标获取验证码"
-                      : `重新发送 (${timeout} 秒)`
-                  }
-                  value={form.values.code}
-                  onChange={(e) => form.setValue("code", e.currentTarget.value)}
-                  error={form.errors.code}
-                  rightSection={
-                    <ActionIcon onClick={() => sendValidCode()}>
-                      <Tooltip
-                        label={
-                          timeout === 0
-                            ? "点击发送验证码"
-                            : `重新发送 (${timeout} 秒)`
-                        }
-                        withArrow
-                      >
-                        <TwoDimensionalCode />
-                      </Tooltip>
-                    </ActionIcon>
-                  }
-                />
-                <Submit loading={form.loading}>注册</Submit>
-              </VStack>
-            </form>
+            <Form onSubmit={form.onSubmit}>
+              <TextInput
+                required
+                label="昵称"
+                placeholder="你的昵称"
+                value={form.values.nickname}
+                onChange={(e) =>
+                  form.setValue("nickname", e.currentTarget.value)
+                }
+                error={form.errors.nickname}
+              />
+              <TextInput
+                required
+                label="邮箱"
+                placeholder="你的邮箱"
+                value={form.values.email}
+                onChange={(e) => form.setValue("email", e.currentTarget.value)}
+                error={form.errors.email}
+              />
+              <TextInput
+                required
+                label="用户名"
+                placeholder="你的用户名"
+                value={form.values.username}
+                onChange={(e) =>
+                  form.setValue("username", e.currentTarget.value)
+                }
+                error={form.errors.username}
+              />
+              <PasswordInput
+                required
+                label="密码"
+                placeholder="你的密码"
+                value={form.values.password}
+                onChange={(e) =>
+                  form.setValue("password", e.currentTarget.value)
+                }
+                error={form.errors.password}
+              />
+              <TextInput
+                required
+                label="验证码"
+                placeholder={
+                  timeout === 0
+                    ? "点击右侧图标获取验证码"
+                    : `重新发送 (${timeout} 秒)`
+                }
+                value={form.values.code}
+                onChange={(e) => form.setValue("code", e.currentTarget.value)}
+                error={form.errors.code}
+                rightSection={
+                  <ActionIcon onClick={() => sendValidCode()}>
+                    <Tooltip
+                      label={
+                        timeout === 0
+                          ? "点击发送验证码"
+                          : `重新发送 (${timeout} 秒)`
+                      }
+                      withArrow
+                    >
+                      <TwoDimensionalCode />
+                    </Tooltip>
+                  </ActionIcon>
+                }
+              />
+              <Submit loading={form.loading}>注册</Submit>
+            </Form>
             <LinkGroup>
               <BLink variant="link" to="/login">
                 登录

@@ -7,8 +7,8 @@ import useForm from "../../utils/use-form";
 import { useLogin } from "../../api/ums";
 import useToast from "../../utils/use-toast";
 import Main from "../../components/Main";
-import { VStack } from "../../components/layout/Stack";
 import Header from "../../components/header/Header";
+import Form from "../../components/form/Form";
 
 const Login: React.FC = () => {
   const toast = useToast();
@@ -40,31 +40,29 @@ const Login: React.FC = () => {
         <FluidCenter>
           <Card>
             <Title>Hoshi-Note</Title>
-            <form onSubmit={form.onSubmit}>
-              <VStack>
-                <TextInput
-                  required
-                  label="用户名/邮箱"
-                  placeholder="你的用户名或邮箱"
-                  value={form.values.username}
-                  onChange={(e) =>
-                    form.setValue("username", e.currentTarget.value)
-                  }
-                  error={form.errors.username}
-                />
-                <PasswordInput
-                  required
-                  label="密码"
-                  placeholder="你的密码"
-                  value={form.values.password}
-                  onChange={(e) =>
-                    form.setValue("password", e.currentTarget.value)
-                  }
-                  error={form.errors.password}
-                />
-                <Submit loading={form.loading}>登录</Submit>
-              </VStack>
-            </form>
+            <Form onSubmit={form.onSubmit}>
+              <TextInput
+                required
+                label="用户名/邮箱"
+                placeholder="你的用户名或邮箱"
+                value={form.values.username}
+                onChange={(e) =>
+                  form.setValue("username", e.currentTarget.value)
+                }
+                error={form.errors.username}
+              />
+              <PasswordInput
+                required
+                label="密码"
+                placeholder="你的密码"
+                value={form.values.password}
+                onChange={(e) =>
+                  form.setValue("password", e.currentTarget.value)
+                }
+                error={form.errors.password}
+              />
+              <Submit loading={form.loading}>登录</Submit>
+            </Form>
             <LinkGroup>
               <BLink variant="link" to="/register">
                 快速注册
