@@ -8,6 +8,8 @@ import React, { forwardRef } from "react";
 import Box from "../layout/Box";
 import TreeList from "./TreeList";
 import TreeItem from "./TreeItem";
+import { css } from "@emotion/react";
+import { useTh } from "../../theme/hooks/use-th";
 
 type TreeProps = Assign<
   Omit<TreeRootProps<any>, "render">,
@@ -18,13 +20,29 @@ type TreeProps = Assign<
 
 const Tree: UIComponent<"div", TreeProps> = forwardRef(
   ({ treeRef, ...props }, ref) => {
+    const th = useTh();
     return (
-      <Box ref={ref}>
+      <Box
+        ref={ref}
+        css={css`
+          .drop-target {
+            background-color: ${th.color("primary.1")};
+          }
+
+          .dragging-source {
+            opacity: 0.3;
+          }
+        `}
+      >
         <TreeRoot
           {...props}
           listComponent={TreeList}
           render={TreeItem}
           ref={treeRef}
+          classes={{
+            dropTarget: "drop-target",
+            draggingSource: "dragging-source",
+          }}
         />
       </Box>
     );

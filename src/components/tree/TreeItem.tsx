@@ -1,10 +1,14 @@
-import { NodeModel, RenderParams } from "@minoru/react-dnd-treeview/dist/types";
+import {
+  NodeModel,
+  RenderParams,
+  useDragOver,
+} from "@minoru/react-dnd-treeview";
 import React from "react";
 import Box from "../../components/layout/Box";
-import { Down, Github, More, Right } from "@icon-park/react";
+import { Dot, Down, Facebook, Github, More, Right } from "@icon-park/react";
 import { css } from "@emotion/react";
 import { useTh } from "../../theme/hooks/use-th";
-import { ActionIcon } from "@mantine/core";
+import { ActionIcon, Menu } from "@mantine/core";
 import { HStack } from "../layout/Stack";
 
 const TreeItem = <T extends object>(
@@ -12,11 +16,12 @@ const TreeItem = <T extends object>(
   { depth, isOpen, onToggle }: RenderParams
 ): React.ReactElement => {
   const th = useTh();
-  const OpenIcon = node.droppable && (isOpen ? Down : Right);
+  const dragOverProps = useDragOver(node.id, isOpen, onToggle);
   return (
     <HStack
       spacing={1}
       wrapChildren={false}
+      {...dragOverProps}
       css={css`
         display: flex;
         align-items: center;
@@ -37,16 +42,20 @@ const TreeItem = <T extends object>(
         }
       `}
     >
-      <Box
+      <ActionIcon
+        size="xs"
+        onClick={onToggle}
+        disabled={!node.droppable}
         css={css`
           width: 1em;
+          cursor: pointer !important;
         `}
       >
-        {OpenIcon && <OpenIcon onClick={onToggle} />}
-      </Box>
-      <Box>
+        {node.droppable ? isOpen ? <Down /> : <Right /> : <Dot />}
+      </ActionIcon>
+      <ActionIcon size="xs">
         <Github />
-      </Box>
+      </ActionIcon>
       <Box
         css={css`
           flex-grow: 1;
@@ -57,9 +66,16 @@ const TreeItem = <T extends object>(
       >
         {node.text}
       </Box>
-      <ActionIcon size="xs">
-        <More />
-      </ActionIcon>
+      <Menu
+        control={
+          <ActionIcon size="xs">
+            <More />
+          </ActionIcon>
+        }
+      >
+        <Menu.Item icon={<Facebook />}>Settings</Menu.Item>
+        <Menu.Item icon={<Facebook />}>Messages</Menu.Item>
+      </Menu>
     </HStack>
   );
 };
