@@ -1,25 +1,35 @@
 import React, { Children, forwardRef, isValidElement } from "react";
 import Flex, { FlexProps } from "./Flex";
-import { css } from "@emotion/react";
 import { Assign, Styles, UIComponent } from "../../utils/types";
 import { useTh } from "../../theme/hooks/use-th";
+import { useCss } from "@mantine/core";
 
 export type StackProps = Assign<
   FlexProps,
   {
     direction?: "column" | "column-reverse" | "row" | "row-reverse";
-    divider?: React.ReactNode;
+    divider?: React.ReactElement;
     spacing?: string | number;
+    wrapChildren?: boolean;
     styles?: Styles<"spacing" | "divider">;
   }
 >;
 
 const Stack: UIComponent<"div", StackProps> = forwardRef(
   (
-    { direction = "row", divider, spacing = 4, styles, children, ...props },
+    {
+      direction = "row",
+      divider,
+      spacing = 4,
+      wrapChildren = true,
+      styles,
+      children,
+      ...props
+    },
     ref
   ) => {
     const th = useTh();
+    const { css, cx } = useCss();
     const marginType = (
       {
         column: "margin-top",
@@ -35,26 +45,54 @@ const Stack: UIComponent<"div", StackProps> = forwardRef(
           .map((child, index) => {
             const isFirst = index === 0;
             const margin = th.spacing(spacing);
-            return (
-              <React.Fragment key={`stack-item-${index}`}>
-                {!isFirst && divider && (
-                  <div
-                    css={css`
-                      ${marginType}: ${margin};
-                      ${styles?.divider}
-                    `}
-                  >
-                    {divider}
-                  </div>
-                )}
+            const _divider =
+              divider &&
+              (wrapChildren ? (
                 <div
-                  css={css`
-                    ${marginType}: ${isFirst ? undefined : margin};
-                    ${styles?.spacing}
+                  className={css`
+                    ${marginType}: ${margin};
+                    ${styles?.divider}
                   `}
                 >
-                  {child}
+                  {divider}
                 </div>
+              ) : (
+                React.cloneElement(divider, {
+                  className: cx(
+                    css`
+                      ${marginType}: ${margin};
+                      ${styles?.divider}
+                    `,
+                    divider.props.className
+                  ),
+                })
+              ));
+            const _child = wrapChildren ? (
+              <div
+                className={css`
+                  ${marginType}: ${isFirst ? undefined : margin};
+                  ${styles?.spacing}
+                `}
+              >
+                {child}
+              </div>
+            ) : (
+              React.cloneElement(child, {
+                // @ts-ignore
+                className: cx(
+                  css`
+                    ${marginType}: ${isFirst ? undefined : margin};
+                    ${styles?.spacing}
+                  `,
+                  // @ts-ignore
+                  child.props.className
+                ),
+              })
+            );
+            return (
+              <React.Fragment key={`stack-item-${index}`}>
+                {!isFirst && _divider}
+                {_child}
               </React.Fragment>
             );
           })}

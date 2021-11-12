@@ -9,7 +9,6 @@ import {
   Search,
   Twitter,
 } from "@icon-park/react";
-import TreeRoot from "./TreeRoot";
 import { useLogout } from "../../api/ums";
 import { Divider, Menu, Text } from "@mantine/core";
 import Sidebar from "../../components/sidebar/Sidebar";
@@ -17,6 +16,7 @@ import { dashboard } from "./router";
 import ArrayRoute from "../../router/ArrayRoute";
 import SidebarMenu from "../../components/sidebar/SidebarMenu";
 import SidebarItem from "../../components/sidebar/SidebarItem";
+import Tree from "../../components/tree/Tree";
 
 const Dashboard: React.FC = () => {
   const logout = useLogout();
@@ -119,7 +119,7 @@ const Dashboard: React.FC = () => {
         <SidebarItem to="/settings" icon={<Search />}>
           设置
         </SidebarItem>
-        <TreeRoot tree={tree} onDrop={(data) => setTree(data)} rootId={0} />
+        <Tree tree={tree} onDrop={(data) => setTree(data)} rootId={0} />
       </Sidebar>
       <ArrayRoute routes={dashboard} />
     </AppShell>

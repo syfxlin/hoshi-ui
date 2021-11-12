@@ -33,6 +33,7 @@ const SidebarControl = forwardRef<HTMLButtonElement, SidebarControlProps>(
             user && (
               <Stack
                 align="center"
+                wrapChildren={false}
                 css={css`
                   margin: ${th.spacing(2)};
                   padding: ${th.spacing(2)} ${th.spacing(3)};
@@ -42,14 +43,6 @@ const SidebarControl = forwardRef<HTMLButtonElement, SidebarControlProps>(
                     background-color: ${th.color("gray.2", "gray.7")};
                   }
                 `}
-                styles={{
-                  spacing: css`
-                    &:nth-of-type(2) {
-                      flex-grow: 1;
-                      min-width: 0;
-                    }
-                  `,
-                }}
               >
                 <Avatar
                   src={user.info.avatar}
@@ -58,7 +51,12 @@ const SidebarControl = forwardRef<HTMLButtonElement, SidebarControlProps>(
                     border-radius: 50%;
                   `}
                 />
-                <Box>
+                <Box
+                  css={css`
+                    flex-grow: 1;
+                    min-width: 0;
+                  `}
+                >
                   <Text
                     css={css`
                       white-space: nowrap;

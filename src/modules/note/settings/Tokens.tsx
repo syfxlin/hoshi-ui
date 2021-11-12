@@ -88,19 +88,18 @@ const Tokens: React.FC = () => {
               return (
                 <HStack
                   key={token.token}
+                  wrapChildren={false}
                   css={css`
                     width: 100%;
                     align-items: center;
                   `}
-                  styles={{
-                    spacing: css`
-                      &:nth-of-type(1) {
-                        flex-grow: 1;
-                      }
-                    `,
-                  }}
                 >
-                  <HStack spacing={1}>
+                  <HStack
+                    spacing={1}
+                    css={css`
+                      flex-grow: 1;
+                    `}
+                  >
                     <Text weight={500}>{token.name}</Text>
                     <Text>-</Text>
                     <Text>{token.token}</Text>

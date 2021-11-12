@@ -55,7 +55,7 @@ export const LinkGroup = forwardRef<HTMLDivElement, StackProps>(
         {...props}
         justify="center"
         spacing="xs"
-        divider="-"
+        divider={<span>-</span>}
         ref={ref}
         css={css`
           margin-top: ${th.spacing(2)};

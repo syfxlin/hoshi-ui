@@ -76,22 +76,21 @@ const Safety: React.FC = () => {
               return (
                 <HStack
                   key={logged.sessionId}
+                  wrapChildren={false}
                   css={css`
                     width: 100%;
                     align-items: center;
                   `}
-                  styles={{
-                    spacing: css`
-                      &:nth-of-type(2) {
-                        flex-grow: 1;
-                      }
-                    `,
-                  }}
                 >
                   <ThemeIcon variant="light" size="xl">
                     {icons[ua.device.type ?? "desktop"]}
                   </ThemeIcon>
-                  <VStack spacing={1}>
+                  <VStack
+                    spacing={1}
+                    css={css`
+                      flex-grow: 1;
+                    `}
+                  >
                     <Text weight={500}>
                       {logged.address} - {logged.sessionId}
                     </Text>

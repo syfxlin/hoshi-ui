@@ -42,7 +42,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
         transition: background-color 150ms;
 
         &:hover {
-          color: ${th.color("primary.8", "primary.1")};
+          background-color: ${th.color("gray.3", "gray.7")};
           text-decoration: none;
         }
 
