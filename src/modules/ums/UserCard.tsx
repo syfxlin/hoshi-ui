@@ -35,7 +35,7 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
         >
           <Image
             withPlaceholder
-            src={user.info.avatar}
+            src={user.info.avatar ?? undefined}
             alt={user.username}
             width="auto"
             css={css`

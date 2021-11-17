@@ -24,7 +24,7 @@ const AuthorizeView: React.FC<AuthorizeViewProps> = ({
   children,
   ...props
 }) => {
-  const [auth] = useAuth();
+  const auth = useAuth();
   if (auth.state === "loading") {
     return (
       <>{typeof loading === "function" ? loading(auth, props) : loading}</>

@@ -1,28 +1,28 @@
 import { ApiEntity, ApiPage, request } from "./request";
 import { token } from "../store/token";
-import { useAuth } from "../store/auth";
 import { history } from "../store/history";
+import { recoil } from "../utils/recoil";
 
 export type Role = {
   name: string;
   createdTime: string;
   status: boolean;
   permissions: string[];
-  description?: string;
+  description?: string | null;
 };
 
 export type UserInfo = {
   id: User["id"];
-  avatar?: string;
-  bio?: string;
-  address?: string;
-  url?: string;
-  company?: string;
-  status?: string;
+  avatar?: string | null;
+  bio?: string | null;
+  address?: string | null;
+  url?: string | null;
+  company?: string | null;
+  status?: string | null;
 };
 
 export type User = {
-  id: string;
+  id: number;
   username: string;
   password: string;
   nickname: string;
@@ -67,32 +67,16 @@ export const login = async ({ username, password }: LoginView) => {
   );
   const t =
     response.headers["X-Auth-Token"] ?? response.headers["x-auth-token"];
-  token.set(t);
+  recoil.set(token, t);
+  history.push("/");
   return response.data.data;
-};
-
-export const useLogin = () => {
-  const [, setter] = useAuth();
-  return async (data: LoginView) => {
-    const user = await login(data);
-    setter(user);
-    history.push("/");
-  };
 };
 
 export const logout = async () => {
   const response = await request.post("/hoshi-ums/logout");
-  token.remove();
+  recoil.reset(token);
+  history.push("/");
   return response.data;
-};
-
-export const useLogout = () => {
-  const [, setter] = useAuth();
-  return async () => {
-    await logout();
-    setter(null);
-    history.push("/");
-  };
 };
 
 export const sendRegisterCode = (email: User["email"]) =>
@@ -203,6 +187,7 @@ export const excludeLogged = (sessionId: LoggedView["sessionId"]) =>
     .then((response) => response.data);
 
 export type Token = {
+  id: number;
   token: string;
   name: string;
 };

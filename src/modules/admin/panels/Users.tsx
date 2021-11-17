@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { css } from "@emotion/react";
 import ColorModeButton from "../../../components/header/ColorModeButton";
-import { HStack } from "../../../components/layout/Stack";
+import { HStack, VStack } from "../../../components/layout/Stack";
 import Box from "../../../components/layout/Box";
 import { useTh } from "../../../theme/hooks/use-th";
 import useSWR from "swr";
@@ -58,10 +58,7 @@ const Users: React.FC = () => {
       adminListUsers(
         {
           page,
-          sort: Object.entries(sort).map(([property, direction]) => ({
-            property,
-            direction,
-          })) as any,
+          sort,
         },
         search === "" ? undefined : search
       )
@@ -71,7 +68,7 @@ const Users: React.FC = () => {
   // edit form
   const edit = useForm({
     initial: {
-      id: "",
+      id: 0,
       username: "",
       password: "",
       nickname: "",
@@ -108,9 +105,9 @@ const Users: React.FC = () => {
       );
     },
   });
-  const assignRole = useForm<{ id: string; roles: string[] }>({
+  const assignRole = useForm<{ id: number; roles: string[] }>({
     initial: {
-      id: "",
+      id: 0,
       roles: [],
     },
     handleSubmit: (values, loading) => {
@@ -325,6 +322,17 @@ const Users: React.FC = () => {
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">
+          <TextInput
+            aria-label="搜索用户"
+            placeholder="搜索用户"
+            size="xs"
+            icon={<Search />}
+            value={search}
+            onChange={(e) => setSearch(e.currentTarget.value)}
+            rightSection={
+              !query.error && !query.data ? <Loader size="xs" /> : <div />
+            }
+          />
           <Button size="xs" onClick={() => add.setValue("opened", true)}>
             新增用户
           </Button>
@@ -332,61 +340,45 @@ const Users: React.FC = () => {
         </HStack>
       </AppShellHeader>
       <Panel title="用户列表">
-        <HStack spacing={2}>
-          <TextInput
-            aria-label="搜索"
-            placeholder="搜索"
-            icon={<Search />}
-            value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
-            rightSection={
-              !query.error && !query.data ? <Loader size="xs" /> : undefined
-            }
-          />
-          <Button onClick={() => add.setValue("opened", true)}>新增</Button>
-        </HStack>
-        <Box
-          css={css`
-            flex: 1;
-            margin-top: ${th.spacing(4)};
-          `}
-        >
-          <AutoResizer>
-            {(size) => (
-              <BaseTable
-                fixed
-                width={size.width}
-                height={size.height}
-                columns={columns}
-                data={data?.records}
-                sortState={sort}
-                onColumnSort={({ key, order }) => {
-                  const newSort = {
-                    ...sort,
-                    [key]: order,
-                  };
-                  if (sort[key] === "desc") {
-                    delete newSort[key];
-                  }
-                  setSort(newSort);
-                  query.mutate();
-                }}
-              />
-            )}
-          </AutoResizer>
-        </Box>
-        {data && (
-          <Pagination
-            total={data.pages}
-            page={page}
-            onChange={setPage}
-            position="center"
+        <VStack spacing={2} wrapChildren={false} grow={1}>
+          <Box
             css={css`
-              margin-top: ${th.spacing(2)};
-              margin-bottom: ${th.spacing(4)};
+              flex: 1;
             `}
-          />
-        )}
+          >
+            <AutoResizer>
+              {(size) => (
+                <BaseTable
+                  fixed
+                  width={size.width}
+                  height={size.height}
+                  columns={columns}
+                  data={data?.records}
+                  sortState={sort}
+                  onColumnSort={({ key, order }) => {
+                    const newSort = {
+                      ...sort,
+                      [key]: order,
+                    };
+                    if (sort?.[key] === "desc") {
+                      delete newSort[key];
+                    }
+                    setSort(newSort);
+                    query.mutate();
+                  }}
+                />
+              )}
+            </AutoResizer>
+          </Box>
+          {data && (
+            <Pagination
+              total={data.pages}
+              page={page}
+              onChange={setPage}
+              position="center"
+            />
+          )}
+        </VStack>
       </Panel>
       <Modal
         opened={add.values.opened}
@@ -435,7 +427,7 @@ const Users: React.FC = () => {
         </Form>
       </Modal>
       <Modal
-        opened={edit.values.id !== ""}
+        opened={edit.values.id !== 0}
         onClose={() => edit.reset()}
         title={`编辑用户: ${edit.values.id}`}
       >
@@ -472,7 +464,7 @@ const Users: React.FC = () => {
         </Form>
       </Modal>
       <Modal
-        opened={assignRole.values.id !== ""}
+        opened={assignRole.values.id !== 0}
         onClose={() => assignRole.reset()}
         title={`分配角色: ${assignRole.values.id}`}
       >

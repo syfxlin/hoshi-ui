@@ -286,7 +286,7 @@ const Roles: React.FC = () => {
           <TextInput
             label="描述"
             placeholder="描述"
-            value={add.values.description}
+            value={add.values.description ?? ""}
             onChange={(e) => add.setValue("description", e.currentTarget.value)}
             error={add.errors.description}
           />
@@ -314,7 +314,7 @@ const Roles: React.FC = () => {
           <TextInput
             label="描述"
             placeholder="描述"
-            value={edit.values.description}
+            value={edit.values.description ?? ""}
             onChange={(e) =>
               edit.setValue("description", e.currentTarget.value)
             }

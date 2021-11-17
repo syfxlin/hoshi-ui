@@ -45,7 +45,7 @@ const SidebarControl = forwardRef<HTMLButtonElement, SidebarControlProps>(
                 `}
               >
                 <Avatar
-                  src={user.info.avatar}
+                  src={user.info.avatar ?? undefined}
                   alt={`${user.nickname}'s avatar`}
                   css={css`
                     border-radius: 50%;
@@ -68,7 +68,7 @@ const SidebarControl = forwardRef<HTMLButtonElement, SidebarControlProps>(
                   </Text>
                   <Text
                     size="xs"
-                    color="gray"
+                    color="dimmed"
                     css={css`
                       white-space: nowrap;
                       text-overflow: ellipsis;

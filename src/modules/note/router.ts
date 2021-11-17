@@ -7,6 +7,10 @@ export const dashboard: (match: match) => RouteDefinition[] = ({ path }) => [
     path: `${path}/home`,
     component: loadable(() => import("./dashboard/Home")),
   },
+  {
+    path: `${path}/files`,
+    component: loadable(() => import("./dashboard/File")),
+  },
 ];
 
 export const settings: (match: match) => RouteDefinition[] = ({ path }) => [

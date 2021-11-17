@@ -1,55 +1,34 @@
-import { atom, AtomEffect, AtomOptions, DefaultValue } from "recoil";
+import { RecoilState, RecoilValue, useRecoilCallback } from "recoil";
+import React from "react";
 
-type EffectListener<T> = (
-  newValue: T | DefaultValue,
-  oldValue: T | DefaultValue
-) => void;
+interface RecoilUtils {
+  get: <T>(atom: RecoilValue<T>) => T;
+  getAsync: <T>(atom: RecoilValue<T>) => Promise<T>;
+  set: <T>(atom: RecoilState<T>, valOrUpdater: T | ((currVal: T) => T)) => void;
+  reset: <T>(atom: RecoilState<T>) => void;
+}
 
-type AtomValue<T> =
-  | T
-  | DefaultValue
-  | Promise<T | DefaultValue>
-  | ((param: T | DefaultValue) => T | DefaultValue);
+// @ts-ignore
+export const recoil: RecoilUtils = {};
 
-export const atomEffect = <T>(options: AtomOptions<T>) => {
-  const listeners: EffectListener<T>[] = [];
-  const on = (listener: EffectListener<T>) => listeners.push(listener);
-  const off = (listener: EffectListener<T>) => {
-    const index = listeners.indexOf(listener);
-    if (index > -1) {
-      listeners.splice(index, 1);
-    }
-  };
-  const operate: {
-    set?: (value: AtomValue<T>) => void;
-    reset?: () => void;
-  } = {};
-  const effect: AtomEffect<T> = ({ setSelf, resetSelf, onSet }) => {
-    operate.set = setSelf;
-    operate.reset = resetSelf;
-    onSet((newValue, oldValue) =>
-      listeners.forEach((listener) => listener(newValue, oldValue))
-    );
-  };
-  const state = atom({
-    ...options,
-    effects_UNSTABLE: [...(options.effects_UNSTABLE ?? []), effect],
-  });
-  return {
-    state,
-    on,
-    off,
-    set: (value: AtomValue<T>) => {
-      if (!operate.set) {
-        throw new Error("Atom effect not init");
-      }
-      return operate.set(value);
-    },
-    reset: () => {
-      if (!operate.reset) {
-        throw new Error("Atom effect not init");
-      }
-      return operate.reset();
-    },
-  };
+export const RecoilLink: React.FC = () => {
+  recoil.get = useRecoilCallback(
+    ({ snapshot }) =>
+      (atom) =>
+        snapshot.getLoadable(atom).contents,
+    []
+  );
+
+  recoil.getAsync = useRecoilCallback(
+    ({ snapshot }) =>
+      (atom) =>
+        snapshot.getPromise(atom),
+    []
+  );
+
+  recoil.set = useRecoilCallback(({ set }) => set, []);
+
+  recoil.reset = useRecoilCallback(({ reset }) => reset, []);
+
+  return null;
 };

@@ -4,15 +4,14 @@ import { PasswordInput, TextInput } from "@mantine/core";
 import { BLink } from "../../components/Link";
 import { Card, LinkGroup, Submit, Title } from "./form";
 import useForm from "../../utils/use-form";
-import { useLogin } from "../../api/ums";
 import useToast from "../../utils/use-toast";
 import Main from "../../components/Main";
 import Header from "../../components/header/Header";
 import Form from "../../components/form/Form";
+import { login } from "../../api/ums";
 
 const Login: React.FC = () => {
   const toast = useToast();
-  const login = useLogin();
   const form = useForm({
     initial: {
       username: "",

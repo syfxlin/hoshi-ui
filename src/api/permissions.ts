@@ -1,6 +1,7 @@
 import { SelectItem } from "@mantine/core/lib/src/components/Select/types";
 
 export const permissions: SelectItem[] = [
+  // User
   {
     value: "ME",
     label: "个人信息管理",
@@ -16,6 +17,13 @@ export const permissions: SelectItem[] = [
     label: "关注",
     group: "User",
   },
+  // File
+  {
+    value: "FILE",
+    label: "文件管理",
+    group: "File",
+  },
+  // Admin
   {
     value: "USER_MANAGER",
     label: "用户管理",
@@ -26,6 +34,7 @@ export const permissions: SelectItem[] = [
     label: "角色管理",
     group: "Admin",
   },
+  // Ops
   {
     value: "BOOT_ADMIN",
     label: "监控",

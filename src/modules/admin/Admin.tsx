@@ -12,7 +12,7 @@ import {
   Search,
   Twitter,
 } from "@icon-park/react";
-import { useLogout } from "../../api/ums";
+import { logout } from "../../api/ums";
 import "react-base-table/styles.css";
 import ArrayRoute from "../../router/ArrayRoute";
 import SidebarMenu from "../../components/sidebar/SidebarMenu";
@@ -20,7 +20,6 @@ import SidebarItem from "../../components/sidebar/SidebarItem";
 import SidebarCollapse from "../../components/sidebar/SidebarCollapse";
 
 const Admin: React.FC = () => {
-  const logout = useLogout();
   return (
     <AppShell>
       <Sidebar>

@@ -9,7 +9,7 @@ import {
   Search,
   Twitter,
 } from "@icon-park/react";
-import { useLogout } from "../../api/ums";
+import { logout } from "../../api/ums";
 import { Divider, Menu, Text } from "@mantine/core";
 import Sidebar from "../../components/sidebar/Sidebar";
 import { dashboard } from "./router";
@@ -19,7 +19,6 @@ import SidebarItem from "../../components/sidebar/SidebarItem";
 import Tree from "../../components/tree/Tree";
 
 const Dashboard: React.FC = () => {
-  const logout = useLogout();
   const [tree, setTree] = useState<any>([
     {
       id: 1,
@@ -115,6 +114,9 @@ const Dashboard: React.FC = () => {
         </SidebarItem>
         <SidebarItem to="/dashboard/search" icon={<Search />}>
           搜索
+        </SidebarItem>
+        <SidebarItem to="/dashboard/files" icon={<Search />}>
+          文件管理
         </SidebarItem>
         <SidebarItem to="/settings" icon={<Search />}>
           设置

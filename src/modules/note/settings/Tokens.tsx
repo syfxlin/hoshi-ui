@@ -7,11 +7,18 @@ import AppShellContainer from "../../../components/app-shell/AppShellContainer";
 import useSWR from "swr";
 import { addToken, listTokens, revokeToken } from "../../../api/ums";
 import Async from "../../../components/Async";
-import { Button, Divider, Modal, Text, TextInput } from "@mantine/core";
+import {
+  Button,
+  Divider,
+  Modal,
+  Tab,
+  Tabs,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { css } from "@emotion/react";
 import useToast from "../../../utils/use-toast";
 import useLoading from "../../../utils/use-loading";
-import SubTitle from "../SubTitle";
 import { useTh } from "../../../theme/hooks/use-th";
 import useForm from "../../../utils/use-form";
 import { Submit } from "../../ums/form";
@@ -60,62 +67,60 @@ const Tokens: React.FC = () => {
         </HStack>
       </AppShellHeader>
       <Panel title="API 令牌">
-        <Async query={query}>
-          <SubTitle>令牌</SubTitle>
-          <VStack
-            divider={<Divider />}
-            css={css`
-              margin-top: ${th.spacing(4)};
-            `}
-          >
-            {query.data?.data?.map((token) => {
-              const onRevoke = () => {
-                loading.wrap(
-                  revokeToken(token.token)
-                    .then(
-                      toast.api.success({
-                        title: "撤销成功",
-                      })
-                    )
-                    .then(() => query.mutate())
-                    .catch(
-                      toast.api.error({
-                        title: "撤销失败",
-                      })
-                    )
-                );
-              };
-              return (
-                <HStack
-                  key={token.token}
-                  wrapChildren={false}
-                  css={css`
-                    width: 100%;
-                    align-items: center;
-                  `}
-                >
-                  <HStack
-                    spacing={1}
-                    css={css`
-                      flex-grow: 1;
-                    `}
-                  >
-                    <Text weight={500}>{token.name}</Text>
-                    <Text>-</Text>
-                    <Text>{token.token}</Text>
-                  </HStack>
-                  <Button
-                    variant="light"
-                    loading={loading.loading}
-                    onClick={onRevoke}
-                  >
-                    撤销
-                  </Button>
-                </HStack>
-              );
-            })}
-          </VStack>
-        </Async>
+        <Tabs tabPadding="md">
+          <Tab label="令牌">
+            <Async query={query}>
+              <VStack divider={<Divider />}>
+                {query.data?.data?.map((token) => {
+                  const onRevoke = () => {
+                    loading.wrap(
+                      revokeToken(token.token)
+                        .then(
+                          toast.api.success({
+                            title: "撤销成功",
+                          })
+                        )
+                        .then(() => query.mutate())
+                        .catch(
+                          toast.api.error({
+                            title: "撤销失败",
+                          })
+                        )
+                    );
+                  };
+                  return (
+                    <HStack
+                      key={token.token}
+                      wrapChildren={false}
+                      css={css`
+                        width: 100%;
+                        align-items: center;
+                      `}
+                    >
+                      <HStack
+                        spacing={1}
+                        css={css`
+                          flex-grow: 1;
+                        `}
+                      >
+                        <Text weight={500}>{token.name}</Text>
+                        <Text>-</Text>
+                        <Text>{token.token}</Text>
+                      </HStack>
+                      <Button
+                        variant="light"
+                        loading={loading.loading}
+                        onClick={onRevoke}
+                      >
+                        撤销
+                      </Button>
+                    </HStack>
+                  );
+                })}
+              </VStack>
+            </Async>
+          </Tab>
+        </Tabs>
       </Panel>
       <Modal
         opened={add.values.opened}

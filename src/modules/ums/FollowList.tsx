@@ -80,7 +80,7 @@ const FollowList: React.FC<FollowListProps> = ({ user, type }) => {
                 <Avatar
                   size="lg"
                   radius="xl"
-                  src={user.info.avatar}
+                  src={user.info.avatar ?? undefined}
                   alt={`${user.nickname}'s avatar`}
                   mr="md"
                 />
@@ -95,7 +95,11 @@ const FollowList: React.FC<FollowListProps> = ({ user, type }) => {
                     <Link to={`/users/${user.username}`} color="dark">
                       {user.nickname}
                     </Link>
-                    <Link to={`/users/${user.username}`} color="gray" size="sm">
+                    <Link
+                      to={`/users/${user.username}`}
+                      color="dimmed"
+                      size="sm"
+                    >
                       {user.username}
                     </Link>
                   </HStack>
@@ -105,7 +109,7 @@ const FollowList: React.FC<FollowListProps> = ({ user, type }) => {
                       {user.info.address ?? "未填写"}
                     </InfoItem>
                     <InfoItem icon={<LinkTwo />} size="xs">
-                      <Anchor href={user.info.url} size="xs">
+                      <Anchor href={user.info.url ?? undefined} size="xs">
                         {user.info.url ?? "未填写"}
                       </Anchor>
                     </InfoItem>

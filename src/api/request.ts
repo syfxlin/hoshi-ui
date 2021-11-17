@@ -1,7 +1,9 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import { token } from "../store/token";
 import { history } from "../store/history";
 import qs from "qs";
+import { recoil } from "../utils/recoil";
+import { token } from "../store/token";
+import { Incl } from "../utils/types";
 
 export const request = axios.create({
   baseURL: import.meta.env.VITE_SERVER_URL,
@@ -27,10 +29,7 @@ export type ApiPage<T = any> = {
 export type Pageable = {
   page: number;
   size?: number;
-  sort?: {
-    property: string;
-    direction?: "asc" | "desc";
-  }[];
+  sort?: Record<string, "asc" | "desc">;
 };
 
 export const pageable = (page: Pageable) => {
@@ -41,9 +40,50 @@ export const pageable = (page: Pageable) => {
     params.size = String(page.size);
   }
   if (page.sort !== undefined) {
-    params.sort = page.sort.map((s) => `${s.property},${s.direction ?? "asc"}`);
+    params.sort = Object.entries(page.sort).map(
+      ([prop, dir]) => `${prop},${dir ?? "asc"}`
+    );
   }
   return params;
+};
+
+export const omit = <T, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> => {
+  return Object.entries(obj)
+    .filter(([key]) => !keys.includes(key as K))
+    .reduce(
+      (obj, [key, value]) => ({
+        ...obj,
+        [key]: value,
+      }),
+      {} as T
+    );
+};
+
+export const incl = <T, K extends keyof T>(obj: T, keys: K[]): Incl<T, K> => {
+  return Object.entries(obj)
+    .filter(([key]) => keys.includes(key as K))
+    .reduce(
+      (obj, [key, value]) => ({
+        ...obj,
+        [key]: value,
+      }),
+      {} as T
+    );
+};
+
+export const filter = <T>(
+  obj: T,
+  fn: <K extends keyof T>(key: T, value: T[K]) => boolean
+) => {
+  return Object.entries(obj)
+    .filter(([key, value]) => fn(key as any, value))
+    .reduce(
+      (obj, [key, value]) => ({
+        ...obj,
+        [key]: value,
+      }),
+      {} as T
+    );
 };
 
 export const createAxiosError = <T = any>(
@@ -77,11 +117,12 @@ export const createAxiosError = <T = any>(
 
 request.interceptors.request.use(
   (config) => {
-    if (token.exist()) {
+    const t = recoil.get(token);
+    if (t !== null) {
       if (!config.headers) {
         config.headers = {};
       }
-      config.headers["Authorization"] = `Bearer ${token.get()}`;
+      config.headers["Authorization"] = `Bearer ${t}`;
     }
     return config;
   },
@@ -106,7 +147,7 @@ request.interceptors.response.use(
   },
   (error) => {
     if (error.response.status === 401) {
-      token.remove();
+      recoil.reset(token);
       history.push("/login");
     }
     return Promise.reject(error);

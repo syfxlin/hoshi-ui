@@ -1,5 +1,5 @@
 import React from "react";
-import { useLogout, User } from "../../api/ums";
+import { logout, User } from "../../api/ums";
 import { BLink } from "../Link";
 import AuthorizeView from "../../router/AuthorizeView";
 import { Avatar, Divider, Menu, Text } from "@mantine/core";
@@ -8,7 +8,6 @@ import Stack from "../layout/Stack";
 import { css } from "@emotion/react";
 
 const AuthButton: React.FC = () => {
-  const logout = useLogout();
   const anonymous = (
     <>
       <Stack spacing="xs">
@@ -27,7 +26,7 @@ const AuthButton: React.FC = () => {
         <Menu
           control={
             <Avatar
-              src={user.info.avatar}
+              src={user.info.avatar ?? undefined}
               alt={`${user.nickname}'s avatar`}
               css={css`
                 border-radius: 50%;

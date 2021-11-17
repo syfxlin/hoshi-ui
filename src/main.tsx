@@ -7,11 +7,13 @@ import App from "./App";
 import GlobalStyles from "./theme/GlobalStyles";
 import { theme } from "./theme";
 import MantineProvider from "./theme/MantineProvider";
+import { RecoilLink } from "./utils/recoil";
 
 const Root: React.FC = () => {
   return (
     <React.StrictMode>
       <RecoilRoot>
+        <RecoilLink />
         <MantineProvider theme={theme}>
           <NotificationsProvider position="top-center" limit={5}>
             <NormalizeCSS />

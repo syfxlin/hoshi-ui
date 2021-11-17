@@ -23,3 +23,5 @@ export interface UIComponent<
 export type Styles<K extends string> = {
   [P in K]?: SerializedStyles;
 };
+
+export type Incl<T, K extends keyof T> = Pick<T, Extract<keyof T, K>>;
