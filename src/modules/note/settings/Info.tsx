@@ -28,6 +28,8 @@ import Form from "../../../components/form/Form";
 import VerifyCodeInput from "../../../components/form/VerifyCodeInput";
 import { Link } from "../../../components/Link";
 import { Dropzone } from "@mantine/dropzone";
+import { uploadFile } from "../../../api/file";
+import { mod } from "../../../api/url";
 
 const Info: React.FC = () => {
   const toast = useToast();
@@ -142,8 +144,34 @@ const Info: React.FC = () => {
                   <Form onSubmit={info.onSubmit}>
                     <InputWrapper label="头像" error={info.errors.avatar}>
                       <HStack>
-                        <Dropzone onDrop={(files) => console.log(files)}>
-                          {(status) => (
+                        <Dropzone
+                          onDrop={(files) => {
+                            info.wrapLoading(
+                              uploadFile(files[0])
+                                .then((res) => {
+                                  if (res.data) {
+                                    info.setValue(
+                                      "avatar",
+                                      mod("hoshi-file", res.data.url)
+                                    );
+                                  }
+                                  return res;
+                                })
+                                .then(
+                                  toast.api.success({
+                                    title: "上传成功",
+                                  })
+                                )
+                                .catch(
+                                  toast.api.error({
+                                    title: "上传失败",
+                                  })
+                                )
+                            );
+                          }}
+                          multiple={false}
+                        >
+                          {() => (
                             <Avatar
                               size="xl"
                               src={info.values.avatar ?? undefined}

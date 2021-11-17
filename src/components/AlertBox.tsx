@@ -27,6 +27,7 @@ const AlertBox: UIComponent<"div", AlertBoxProps> = forwardRef(
             max-width: 25rem;
             margin-left: 20px;
             margin-right: 20px;
+            overflow-x: auto;
             ${styles?.alert}
           `}
         >
