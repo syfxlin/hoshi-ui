@@ -7,12 +7,13 @@ import { Assign, UIComponent } from "../../utils/types";
 import React, { forwardRef } from "react";
 import Box from "../layout/Box";
 import TreeList from "./TreeList";
-import TreeItem from "./TreeItem";
 import { css } from "@emotion/react";
 import { useTh } from "../../theme/hooks/use-th";
 
+export const TreeContext = React.createContext(null);
+
 type TreeProps = Assign<
-  Omit<TreeRootProps<any>, "render">,
+  TreeRootProps<any>,
   {
     treeRef?: React.ForwardedRef<TreeMethods>;
   }
@@ -37,7 +38,6 @@ const Tree: UIComponent<"div", TreeProps> = forwardRef(
         <TreeRoot
           {...props}
           listComponent={TreeList}
-          render={TreeItem}
           ref={treeRef}
           classes={{
             dropTarget: "drop-target",

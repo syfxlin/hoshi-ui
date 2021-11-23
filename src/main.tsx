@@ -8,6 +8,7 @@ import GlobalStyles from "./theme/GlobalStyles";
 import { theme } from "./theme";
 import MantineProvider from "./theme/MantineProvider";
 import { RecoilLink } from "./utils/recoil";
+import { ModalsProvider } from "@mantine/modals";
 
 const Root: React.FC = () => {
   return (
@@ -15,11 +16,13 @@ const Root: React.FC = () => {
       <RecoilRoot>
         <RecoilLink />
         <MantineProvider theme={theme}>
-          <NotificationsProvider position="top-center" limit={5}>
-            <NormalizeCSS />
-            <GlobalStyles />
-            <App />
-          </NotificationsProvider>
+          <ModalsProvider>
+            <NotificationsProvider position="top-center" limit={5}>
+              <NormalizeCSS />
+              <GlobalStyles />
+              <App />
+            </NotificationsProvider>
+          </ModalsProvider>
         </MantineProvider>
       </RecoilRoot>
     </React.StrictMode>

@@ -2,7 +2,7 @@ import {
   addFollowing,
   deleteFollowing,
   followByUserId,
-  User,
+  UserView,
 } from "../../api/ums";
 import React, { useMemo, useState } from "react";
 import Flex from "../../components/layout/Flex";
@@ -27,7 +27,7 @@ import { css } from "@emotion/react";
 import { useTh } from "../../theme/hooks/use-th";
 
 type FollowListProps = {
-  user: User;
+  user: UserView;
   type: "followers" | "following";
 };
 

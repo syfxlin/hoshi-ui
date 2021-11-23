@@ -1,10 +1,9 @@
 import React from "react";
 import AppShell from "../../components/app-shell/AppShell";
-import "react-base-table/styles.css";
 import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
 
-const Admin: React.FC = () => {
+const Settings: React.FC = () => {
   return (
     <AppShell>
       <Sidebar />
@@ -13,4 +12,4 @@ const Admin: React.FC = () => {
   );
 };
 
-export default Admin;
+export default Settings;

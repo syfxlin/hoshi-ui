@@ -19,15 +19,12 @@ import {
 import { css } from "@emotion/react";
 import useToast from "../../../utils/use-toast";
 import useLoading from "../../../utils/use-loading";
-import { useTh } from "../../../theme/hooks/use-th";
 import useForm from "../../../utils/use-form";
-import { Submit } from "../../ums/form";
 import Form from "../../../components/form/Form";
 
 const Tokens: React.FC = () => {
   const query = useSWR(["listTokens"], () => listTokens());
   const toast = useToast();
-  const th = useTh();
   const loading = useLoading();
   const add = useForm({
     initial: {
@@ -135,7 +132,9 @@ const Tokens: React.FC = () => {
             onChange={(e) => add.setValue("name", e.currentTarget.value)}
             error={add.errors.name}
           />
-          <Submit loading={add.loading}>提交</Submit>
+          <Button type="submit" fullWidth loading={add.loading}>
+            提交
+          </Button>
         </Form>
       </Modal>
     </AppShellContainer>

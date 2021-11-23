@@ -1,13 +1,13 @@
 import React, { useCallback } from "react";
 import { Loadable } from "recoil";
 import AuthorizeView from "./AuthorizeView";
-import { Role, User } from "../api/ums";
+import { RoleView, UserView } from "../api/ums";
 
 type RoleViewProps = {
   loading?:
     | React.ReactNode
     | ((
-        auth: Loadable<User | null | undefined>,
+        auth: Loadable<UserView | null | undefined>,
         props: any
       ) => React.ReactNode);
   children?:
@@ -19,8 +19,8 @@ type RoleViewProps = {
          * none 未登录
          */
         status: "accept" | "block" | "none",
-        user: User | null | undefined,
-        auth: Loadable<User | null | undefined>,
+        user: UserView | null | undefined,
+        auth: Loadable<UserView | null | undefined>,
         props: any
       ) => React.ReactNode);
   /**
@@ -40,7 +40,7 @@ const PermissionsView: React.FC<RoleViewProps> = ({
   ...props
 }) => {
   const matcher = useCallback(
-    (roles: Role[]) => {
+    (roles: RoleView[]) => {
       if (!permissions || permissions.length === 0) {
         return true;
       }

@@ -13,6 +13,7 @@ const TreeList: UIComponent<"div", any> = forwardRef((props, ref) => (
       padding-left: 0;
       flex-grow: 1;
       width: 100%;
+      margin: 0;
     `}
   />
 ));

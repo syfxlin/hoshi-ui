@@ -23,9 +23,9 @@ import {
   adminListUsers,
   adminUpdateUser,
   adminUpdateUserRole,
-  UpdateUser,
+  UpdateUserView,
 } from "../../../api/admin";
-import { User } from "../../../api/ums";
+import { UserView } from "../../../api/ums";
 import BaseTable, {
   AutoResizer,
   ColumnShape,
@@ -34,7 +34,6 @@ import BaseTable, {
 import useToast from "../../../utils/use-toast";
 import AuthorizeView from "../../../router/AuthorizeView";
 import useForm from "../../../utils/use-form";
-import { Submit } from "../../ums/form";
 import Panel from "../../../components/Panel";
 import { wrap } from "../../../utils/react";
 import { Search } from "@icon-park/react";
@@ -42,6 +41,7 @@ import { useDebouncedValue } from "@mantine/hooks";
 import AppShellContainer from "../../../components/app-shell/AppShellContainer";
 import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 import Form from "../../../components/form/Form";
+import { useModals } from "@mantine/modals";
 
 const Users: React.FC = () => {
   const th = useTh();
@@ -75,7 +75,7 @@ const Users: React.FC = () => {
       email: "",
     },
     handleSubmit: (values, loading) => {
-      const user: UpdateUser = {};
+      const user: UpdateUserView = {};
       if (values.username !== "") {
         user.username = values.username;
       }
@@ -146,6 +146,7 @@ const Users: React.FC = () => {
         ) || "请输入正确的邮箱",
       nickname: (value) => value.length > 0 || "昵称必须不为空",
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     handleSubmit: ({ opened, ...user }, loading) => {
       loading(
         adminAddUser(user)
@@ -165,7 +166,7 @@ const Users: React.FC = () => {
     },
   });
   // users table
-  const columns = useMemo<ColumnShape<User>[]>(
+  const columns = useMemo<ColumnShape<UserView>[]>(
     () => [
       {
         key: "id",
@@ -233,7 +234,7 @@ const Users: React.FC = () => {
           return (
             <AuthorizeView>
               {(user) => {
-                const [forceDelete, setForceDelete] = useState(false);
+                const modals = useModals();
                 return (
                   <HStack spacing={1}>
                     <Button
@@ -286,26 +287,33 @@ const Users: React.FC = () => {
                       disabled={!!user && user.id === rowData.id}
                       color="red"
                       onClick={() => {
-                        if (!forceDelete) {
-                          setForceDelete(true);
-                          setTimeout(() => setForceDelete(false), 5000);
-                        } else {
-                          adminDeleteUser(rowData.id)
-                            .then(
-                              toast.api.success({
-                                title: "删除成功",
-                              })
-                            )
-                            .then(() => query.mutate())
-                            .catch(
-                              toast.api.error({
-                                title: "删除失败",
-                              })
-                            );
-                        }
+                        modals.openConfirmModal({
+                          title: "确认删除该用户？",
+                          labels: {
+                            confirm: "确认删除",
+                            cancel: "取消删除",
+                          },
+                          confirmProps: {
+                            color: "red",
+                          },
+                          onConfirm: () => {
+                            adminDeleteUser(rowData.id)
+                              .then(
+                                toast.api.success({
+                                  title: "删除成功",
+                                })
+                              )
+                              .then(() => query.mutate())
+                              .catch(
+                                toast.api.error({
+                                  title: "删除失败",
+                                })
+                              );
+                          },
+                        });
                       }}
                     >
-                      {forceDelete ? "确认删除？" : "删除"}
+                      删除
                     </Button>
                   </HStack>
                 );
@@ -423,7 +431,9 @@ const Users: React.FC = () => {
             checked={add.values.status}
             onChange={(e) => add.setValue("status", e.currentTarget.checked)}
           />
-          <Submit loading={add.loading}>提交</Submit>
+          <Button type="submit" fullWidth loading={add.loading}>
+            提交
+          </Button>
         </Form>
       </Modal>
       <Modal
@@ -460,7 +470,9 @@ const Users: React.FC = () => {
             onChange={(e) => edit.setValue("password", e.currentTarget.value)}
             error={edit.errors.password}
           />
-          <Submit loading={edit.loading}>提交</Submit>
+          <Button type="submit" fullWidth loading={edit.loading}>
+            提交
+          </Button>
         </Form>
       </Modal>
       <Modal
@@ -480,7 +492,9 @@ const Users: React.FC = () => {
             value={assignRole.values.roles}
             onChange={(value) => assignRole.setValue("roles", value)}
           />
-          <Submit loading={assignRole.loading}>提交</Submit>
+          <Button type="submit" fullWidth loading={assignRole.loading}>
+            提交
+          </Button>
         </Form>
       </Modal>
     </AppShellContainer>

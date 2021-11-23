@@ -1,8 +1,8 @@
 import React from "react";
 import Main from "../components/Main";
 import AlertBox from "../components/AlertBox";
-import { Button } from "@mantine/core";
-import { useHistory } from "react-router-dom";
+import { Anchor } from "@mantine/core";
+import { useNavigate } from "react-router-dom";
 
 type BlockProps = {
   roles?: string[];
@@ -10,7 +10,7 @@ type BlockProps = {
 };
 
 const Block: React.FC<BlockProps> = (props) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const description =
     props.roles && props.roles.length > 0
       ? `有 [${props.roles}] 的权限`
@@ -21,9 +21,9 @@ const Block: React.FC<BlockProps> = (props) => {
         该页面需要
         {description}
         才可访问。
-        <Button color="red" variant="link" onClick={() => history.goBack()}>
+        <Anchor color="red" onClick={() => navigate(-1)}>
           返回？
-        </Button>
+        </Anchor>
       </AlertBox>
     </Main>
   );

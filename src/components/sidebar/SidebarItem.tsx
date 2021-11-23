@@ -24,8 +24,8 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
   return (
     <Link
       {...props}
-      activeClassName="active"
-      exact
+      className={({ isActive }) => (isActive ? "active" : "")}
+      end
       css={css`
         display: flex;
         align-items: center;

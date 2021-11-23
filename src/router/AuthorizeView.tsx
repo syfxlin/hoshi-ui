@@ -1,20 +1,20 @@
 import React from "react";
 import { useAuth } from "../store/auth";
 import { Loadable } from "recoil";
-import { User } from "../api/ums";
+import { UserView } from "../api/ums";
 
 type AuthorizeViewProps = {
   loading?:
     | React.ReactNode
     | ((
-        auth: Loadable<User | null | undefined>,
+        auth: Loadable<UserView | null | undefined>,
         props: any
       ) => React.ReactNode);
   children?:
     | React.ReactNode
     | ((
-        user: User | null | undefined,
-        auth: Loadable<User | null | undefined>,
+        user: UserView | null | undefined,
+        auth: Loadable<UserView | null | undefined>,
         props: any
       ) => React.ReactNode);
 };

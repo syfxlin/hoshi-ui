@@ -2,7 +2,7 @@ import React from "react";
 import LoadingBox from "./LoadingBox";
 import { AxiosError } from "axios";
 import { ApiEntity } from "../api/request";
-import { Button } from "@mantine/core";
+import { Anchor } from "@mantine/core";
 import AlertBox from "./AlertBox";
 import { SWRResponse } from "swr";
 import { Styles } from "../utils/types";
@@ -29,9 +29,9 @@ export default function Async<T, E extends AxiosError<ApiEntity>>({
       <AlertBox title={error ?? "获取失败"} {...props} css={styles?.alert}>
         {(query.error as AxiosError<ApiEntity>).response?.data.message ??
           query.error.message}
-        <Button color="red" variant="link" onClick={() => query.mutate()}>
+        <Anchor color="red" onClick={() => query.mutate()}>
           重试？
-        </Button>
+        </Anchor>
       </AlertBox>
     );
   }

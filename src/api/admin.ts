@@ -1,9 +1,38 @@
 import { ApiEntity, ApiPage, pageable, Pageable, request } from "./request";
-import { Role, User } from "./ums";
+import { RoleView, UserView } from "./ums";
+
+export type UpdateUserView = {
+  username?: string;
+  nickname?: string;
+  email?: string;
+  status?: boolean;
+  password?: string;
+};
+
+export type AddUserView = {
+  username: string;
+  nickname: string;
+  password: string;
+  email: string;
+  status: boolean;
+};
+
+export type AddRoleView = {
+  name: string;
+  description: string;
+  status: boolean;
+  permissions: string[];
+};
+
+export type UpdateRoleView = {
+  description?: string;
+  permissions?: string[];
+  status?: boolean;
+};
 
 export const adminListUsers = (page: Pageable, search?: string) =>
   request
-    .get<ApiEntity<ApiPage<User>>>(`/hoshi-ums/admin/users`, {
+    .get<ApiEntity<ApiPage<UserView>>>(`/hoshi-ums/admin/users`, {
       params: {
         ...pageable(page),
         ...(search ? { search } : {}),
@@ -11,63 +40,44 @@ export const adminListUsers = (page: Pageable, search?: string) =>
     })
     .then((response) => response.data);
 
-export type UpdateUser = Partial<
-  Omit<
-    User,
-    | "id"
-    | "createdTime"
-    | "roles"
-    | "info"
-    | "followersCount"
-    | "followingCount"
-  >
->;
-
-export const adminUpdateUser = (userId: User["id"], user: UpdateUser) =>
+export const adminUpdateUser = (userId: number, user: UpdateUserView) =>
   request
-    .put<ApiEntity<User>>(`/hoshi-ums/admin/users/${userId}`, user)
+    .put<ApiEntity<UserView>>(`/hoshi-ums/admin/users/${userId}`, user)
     .then((response) => response.data);
 
-export const adminDeleteUser = (userId: User["id"]) =>
+export const adminDeleteUser = (userId: number) =>
   request
     .delete<ApiEntity>(`/hoshi-ums/admin/users/${userId}`)
     .then((response) => response.data);
 
-export const adminUpdateUserRole = (userId: User["id"], roles: string[]) =>
+export const adminUpdateUserRole = (userId: number, roles: string[]) =>
   request
-    .put<ApiEntity<User>>(`/hoshi-ums/admin/users/${userId}/role`, { roles })
+    .put<ApiEntity<UserView>>(`/hoshi-ums/admin/users/${userId}/role`, {
+      roles,
+    })
     .then((response) => response.data);
 
-export type AddUser = Omit<
-  User,
-  "id" | "createdTime" | "roles" | "info" | "followingCount" | "followersCount"
->;
-
-export const adminAddUser = (user: AddUser) =>
+export const adminAddUser = (user: AddUserView) =>
   request
-    .post<ApiEntity<User>>(`/hoshi-ums/admin/users`, user)
+    .post<ApiEntity<UserView>>(`/hoshi-ums/admin/users`, user)
     .then((response) => response.data);
 
 export const adminListRoles = () =>
   request
-    .get<ApiEntity<Role[]>>(`/hoshi-ums/admin/roles`)
+    .get<ApiEntity<RoleView[]>>(`/hoshi-ums/admin/roles`)
     .then((response) => response.data);
 
-export type AddRole = Omit<Role, "createdTime">;
-
-export const adminAddRole = (role: AddRole) =>
+export const adminAddRole = (role: AddRoleView) =>
   request
-    .post<ApiEntity<Role>>(`/hoshi-ums/admin/roles`, role)
+    .post<ApiEntity<RoleView>>(`/hoshi-ums/admin/roles`, role)
     .then((response) => response.data);
 
-export type UpdateRole = Partial<Omit<Role, "name" | "createdTime">>;
-
-export const adminUpdateRole = (roleName: Role["name"], role: UpdateRole) =>
+export const adminUpdateRole = (roleName: string, role: UpdateRoleView) =>
   request
-    .put<ApiEntity<Role>>(`/hoshi-ums/admin/roles/${roleName}`, role)
+    .put<ApiEntity<RoleView>>(`/hoshi-ums/admin/roles/${roleName}`, role)
     .then((response) => response.data);
 
-export const adminDeleteRole = (roleName: Role["name"]) =>
+export const adminDeleteRole = (roleName: string) =>
   request
     .delete<ApiEntity>(`/hoshi-ums/admin/roles/${roleName}`)
     .then((response) => response.data);

@@ -1,5 +1,5 @@
 import React from "react";
-import { logout, User } from "../../api/ums";
+import { logout, UserView } from "../../api/ums";
 import { BLink } from "../Link";
 import AuthorizeView from "../../router/AuthorizeView";
 import { Avatar, Divider, Menu, Text } from "@mantine/core";
@@ -20,7 +20,7 @@ const AuthButton: React.FC = () => {
       </Stack>
     </>
   );
-  const authorize = (user: User) => {
+  const authorize = (user: UserView) => {
     return (
       <>
         <Menu

@@ -1,17 +1,17 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useTh } from "../../../theme/hooks/use-th";
 import useToast from "../../../utils/use-toast";
 import useSWR from "swr";
 import {
-  AddRole,
+  AddRoleView,
   adminAddRole,
   adminDeleteRole,
   adminListRoles,
   adminUpdateRole,
-  UpdateRole,
+  UpdateRoleView,
 } from "../../../api/admin";
 import BaseTable, { AutoResizer, ColumnShape } from "react-base-table";
-import { Role } from "../../../api/ums";
+import { RoleView } from "../../../api/ums";
 import {
   Badge,
   Button,
@@ -26,12 +26,12 @@ import Panel from "../../../components/Panel";
 import Box from "../../../components/layout/Box";
 import { css } from "@emotion/react";
 import useForm from "../../../utils/use-form";
-import { Submit } from "../../ums/form";
 import { wrap } from "../../../utils/react";
 import { permissions } from "../../../api/permissions";
 import AppShellContainer from "../../../components/app-shell/AppShellContainer";
 import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 import Form from "../../../components/form/Form";
+import { useModals } from "@mantine/modals";
 
 const Roles: React.FC = () => {
   const th = useTh();
@@ -40,7 +40,7 @@ const Roles: React.FC = () => {
   const query = useSWR(["adminListRoles"], () => adminListRoles());
   const data = useMemo(() => query.data?.data, [query.data]);
   // form
-  const add = useForm<{ opened: boolean } & AddRole>({
+  const add = useForm<{ opened: boolean } & AddRoleView>({
     initial: {
       opened: false,
       name: "",
@@ -51,6 +51,7 @@ const Roles: React.FC = () => {
     validate: {
       name: (value) => value.length > 0 || "角色名称必须不为空",
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     handleSubmit: ({ opened, ...role }, loading) => {
       loading(
         adminAddRole(role)
@@ -72,7 +73,7 @@ const Roles: React.FC = () => {
   const edit = useForm<
     {
       name: string;
-    } & UpdateRole
+    } & UpdateRoleView
   >({
     initial: {
       name: "",
@@ -80,7 +81,7 @@ const Roles: React.FC = () => {
       permissions: [],
     },
     handleSubmit: (values, loading) => {
-      const role: UpdateRole = {};
+      const role: UpdateRoleView = {};
       if (values.description !== "") {
         role.description = values.description;
       }
@@ -103,7 +104,7 @@ const Roles: React.FC = () => {
     },
   });
   // roles table
-  const columns = useMemo<ColumnShape<Role>[]>(
+  const columns = useMemo<ColumnShape<RoleView>[]>(
     () => [
       {
         key: "name",
@@ -170,7 +171,7 @@ const Roles: React.FC = () => {
         frozen: "right",
         resizable: true,
         cellRenderer: wrap(({ rowData }) => {
-          const [forceDelete, setForceDelete] = useState(false);
+          const modals = useModals();
           return (
             <HStack spacing={1}>
               <Button
@@ -210,26 +211,33 @@ const Roles: React.FC = () => {
                 color="red"
                 disabled={["USER", "ADMIN"].includes(rowData.name)}
                 onClick={() => {
-                  if (!forceDelete) {
-                    setForceDelete(true);
-                    setTimeout(() => setForceDelete(false), 5000);
-                  } else {
-                    adminDeleteRole(rowData.name)
-                      .then(
-                        toast.api.success({
-                          title: "删除成功",
-                        })
-                      )
-                      .then(() => query.mutate())
-                      .catch(
-                        toast.api.error({
-                          title: "删除失败",
-                        })
-                      );
-                  }
+                  modals.openConfirmModal({
+                    title: "确认删除该权限？",
+                    labels: {
+                      confirm: "确认删除",
+                      cancel: "取消删除",
+                    },
+                    confirmProps: {
+                      color: "red",
+                    },
+                    onConfirm: () => {
+                      adminDeleteRole(rowData.name)
+                        .then(
+                          toast.api.success({
+                            title: "删除成功",
+                          })
+                        )
+                        .then(() => query.mutate())
+                        .catch(
+                          toast.api.error({
+                            title: "删除失败",
+                          })
+                        );
+                    },
+                  });
                 }}
               >
-                {forceDelete ? "确认删除？" : "删除"}
+                删除
               </Button>
             </HStack>
           );
@@ -302,7 +310,9 @@ const Roles: React.FC = () => {
             checked={add.values.status}
             onChange={(e) => add.setValue("status", e.currentTarget.checked)}
           />
-          <Submit loading={add.loading}>提交</Submit>
+          <Button type="submit" fullWidth loading={add.loading}>
+            提交
+          </Button>
         </Form>
       </Modal>
       <Modal
@@ -327,7 +337,9 @@ const Roles: React.FC = () => {
             onChange={(value) => edit.setValue("permissions", value)}
             error={edit.errors.permissions}
           />
-          <Submit loading={edit.loading}>提交</Submit>
+          <Button type="submit" fullWidth loading={edit.loading}>
+            提交
+          </Button>
         </Form>
       </Modal>
     </AppShellContainer>

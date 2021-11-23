@@ -1,4 +1,4 @@
-import { addFollowing, User } from "../../api/ums";
+import { addFollowing, UserView } from "../../api/ums";
 import React from "react";
 import { Anchor, Button, Card, Image, Text, Title } from "@mantine/core";
 import AspectRatio from "../../components/layout/AspectRatio";
@@ -16,7 +16,7 @@ import useToast from "../../utils/use-toast";
 import { useTh } from "../../theme/hooks/use-th";
 
 type UserCardProps = {
-  user: User;
+  user: UserView;
 };
 
 const UserCard: React.FC<UserCardProps> = ({ user }) => {

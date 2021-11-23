@@ -17,11 +17,27 @@ export const permissions: SelectItem[] = [
     label: "关注",
     group: "User",
   },
+  {
+    value: "TOKEN",
+    label: "令牌管理",
+    group: "User",
+  },
   // File
   {
     value: "FILE",
     label: "文件管理",
     group: "File",
+  },
+  // Note
+  {
+    value: "WORKSPACE",
+    label: "工作区管理",
+    group: "Note",
+  },
+  {
+    value: "NOTE",
+    label: "笔记管理",
+    group: "Note",
   },
   // Admin
   {

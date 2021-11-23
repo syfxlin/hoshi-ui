@@ -38,22 +38,24 @@ const useToast = () => {
 
   const api = {
     success: (props: Partial<ToastProps>) => (response: ApiEntity) => {
-      return create({
+      create({
         color: "green",
         autoClose: 3000,
         title: "操作成功",
         ...props,
         message: response.message ?? props.message ?? "操作成功",
       });
+      return response;
     },
     error: (props: Partial<ToastProps>) => (err: AxiosError<ApiEntity>) => {
-      return create({
+      create({
         color: "red",
         autoClose: 3000,
         title: "操作失败",
         ...props,
         message: err.response?.data.message ?? props.message ?? "未知错误",
       });
+      return err;
     },
   };
 

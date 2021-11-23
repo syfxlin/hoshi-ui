@@ -6,6 +6,7 @@ import ColorModeButton from "../../../components/header/ColorModeButton";
 import Panel from "../../../components/Panel";
 import AuthorizeView from "../../../router/AuthorizeView";
 import {
+  Anchor,
   Button,
   Card,
   Col,
@@ -41,7 +42,6 @@ import { mod } from "../../../api/url";
 import Box from "../../../components/layout/Box";
 import useForm from "../../../utils/use-form";
 import Form from "../../../components/form/Form";
-import { Submit } from "../../ums/form";
 
 const File: React.FC = () => {
   // tool
@@ -206,9 +206,8 @@ const File: React.FC = () => {
                                 {item.contentType ?? "Unknown"} - {item.size}
                               </Text>
                               <HStack spacing={2}>
-                                <Button
+                                <Anchor
                                   size="sm"
-                                  variant="link"
                                   onClick={() =>
                                     window.open(
                                       mod("hoshi-file", item.url, "download")
@@ -216,10 +215,9 @@ const File: React.FC = () => {
                                   }
                                 >
                                   下载
-                                </Button>
-                                <Button
+                                </Anchor>
+                                <Anchor
                                   size="sm"
-                                  variant="link"
                                   onClick={() => {
                                     edit.setValues({
                                       id: item.id,
@@ -229,10 +227,9 @@ const File: React.FC = () => {
                                   }}
                                 >
                                   编辑
-                                </Button>
-                                <Button
+                                </Anchor>
+                                <Anchor
                                   size="sm"
-                                  variant="link"
                                   color="red"
                                   onClick={() =>
                                     deleteFile(item.disk)
@@ -250,7 +247,7 @@ const File: React.FC = () => {
                                   }
                                 >
                                   删除
-                                </Button>
+                                </Anchor>
                               </HStack>
                             </VStack>
                           </Card>
@@ -339,7 +336,9 @@ const File: React.FC = () => {
             }
             error={edit.errors.description}
           />
-          <Submit loading={edit.loading}>提交</Submit>
+          <Button type="submit" fullWidth loading={edit.loading}>
+            提交
+          </Button>
         </Form>
       </Modal>
     </AppShellContainer>

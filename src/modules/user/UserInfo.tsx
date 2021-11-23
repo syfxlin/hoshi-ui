@@ -1,5 +1,5 @@
 import React from "react";
-import { User, userByUsername } from "../../api/ums";
+import { userByUsername, UserView } from "../../api/ums";
 import { useLocation, useParams } from "react-router-dom";
 import Async from "../../components/Async";
 import Main from "../../components/Main";
@@ -10,11 +10,7 @@ import useSWR from "swr";
 import Header from "../../components/header/Header";
 import { css } from "@emotion/react";
 
-type Params = {
-  username: string;
-};
-
-const tabs: Record<string, (user: User) => React.ReactNode> = {
+const tabs: Record<string, (user: UserView) => React.ReactNode> = {
   overview: () => "Text",
   followers: (user) => <FollowList user={user} type="followers" />,
   following: (user) => <FollowList user={user} type="following" />,
@@ -24,7 +20,7 @@ const UserInfo: React.FC = () => {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const tab = params.get("tab") ?? "overview";
-  const { username } = useParams<Params>();
+  const { username } = useParams<"username">();
   const query = useSWR(["userByUsername", username], (key, username) =>
     userByUsername(username)
   );
@@ -46,11 +42,11 @@ const UserInfo: React.FC = () => {
             >
               <Grid gutter="md">
                 <Col span={12} md={4}>
-                  <UserCard user={data.data as User} />
+                  <UserCard user={data.data as UserView} />
                 </Col>
                 <Col span={12} md={8}>
                   <Card padding="xl" shadow="md" radius="md">
-                    {(tabs[tab] ?? tabs["overview"])(data.data as User)}
+                    {(tabs[tab] ?? tabs["overview"])(data.data as UserView)}
                   </Card>
                 </Col>
               </Grid>

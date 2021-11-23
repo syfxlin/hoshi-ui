@@ -1,6 +1,6 @@
 import React from "react";
 import { RouteProps } from "react-router";
-import { Redirect, Route } from "react-router-dom";
+import { Navigate, Route } from "react-router-dom";
 import LoadingBox from "../components/LoadingBox";
 import AuthorizeView from "./AuthorizeView";
 
@@ -10,11 +10,11 @@ export const AnonymousRoute: React.FC<AnonymousRouteProps> = (props) => {
   return (
     <Route
       {...props}
-      render={(p) => (
+      element={
         <AuthorizeView loading={<LoadingBox />}>
-          {(user) => (user ? <Redirect to="/" /> : props?.render?.(p))}
+          {(user) => (user ? <Navigate to="/" /> : props?.element)}
         </AuthorizeView>
-      )}
+      }
     />
   );
 };
