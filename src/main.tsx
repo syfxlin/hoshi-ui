@@ -17,7 +17,7 @@ const Root: React.FC = () => {
         <RecoilLink />
         <MantineProvider theme={theme}>
           <ModalsProvider>
-            <NotificationsProvider position="top-center" limit={5}>
+            <NotificationsProvider position="top-center" limit={5} zIndex={999}>
               <NormalizeCSS />
               <GlobalStyles />
               <App />

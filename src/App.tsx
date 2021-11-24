@@ -46,7 +46,6 @@ const App: React.FC = () => {
             <Route index element={<Navigate to="home" />} />
             <AuthorizeRoute path="home" roles={["ME"]} element={<Home />} />
             <AuthorizeRoute path="files" roles={["FILE"]} element={<File />} />
-            <AuthorizeRoute path="doc/:id" element={<Doc />} />
             <AuthorizeRoute path="doc/:id/:mode" element={<Doc />} />
           </AuthorizeRoute>
           <AuthorizeRoute path="/settings" element={<Settings />}>

@@ -36,6 +36,7 @@ const Tiptap = forwardRef<Editor, TiptapProps>((props, ref) => {
 
   // value change
   useEffect(() => {
+    // if not equals, indicates a state change caused by an external change
     if (editor && JSON.stringify(editor.getJSON()) !== props.value) {
       editor.commands.setContent(JSON.parse(props.value), false);
     }

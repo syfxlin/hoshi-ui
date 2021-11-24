@@ -8,7 +8,7 @@ const useLoading = (initial?: boolean) => {
   const then = () => setLoading(false);
   const wrap = (p: Promise<any>) => {
     setLoading(true);
-    p.finally(() => setLoading(false));
+    return p.finally(() => setLoading(false));
   };
 
   return {
