@@ -17,6 +17,8 @@
     "@mantine/modals": "^3.2.2",
     "@mantine/notifications": "^3.2.2",
     "@minoru/react-dnd-treeview": "^1.5.11",
+    "@syfxlin/tiptap-starter-kit": "^0.0.1-beta.4",
+    "@tiptap/react": "^2.0.0-beta.95",
     "@types/qs": "^6.9.7",
     "axios": "^0.24.0",
     "dayjs": "^1.10.7",

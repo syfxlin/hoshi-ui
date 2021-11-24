@@ -20,6 +20,8 @@ const AppShellHeader: UIComponent<"header", BoxProps> = forwardRef(
           justify-content: space-between;
           padding-left: ${th.spacing(4)};
           padding-right: ${th.spacing(4)};
+          position: sticky;
+          top: 0;
         `}
       />
     );

@@ -1,13 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import useSWR from "swr";
 import {
   addNote,
   addWorkspace,
   deleteNote,
   deleteWorkspace,
   listNotes,
+  ListNoteView,
   listWorkspaces,
-  NoteView,
   updateNote,
   updateWorkspace,
   WorkspaceView,
@@ -36,6 +35,7 @@ import Form from "../../../components/form/Form";
 import { useModals } from "@mantine/modals";
 import useMap from "../../../utils/use-map";
 import { useNavigate, useParams } from "react-router-dom";
+import useSWRState from "../../../utils/use-swr-state";
 
 const WorkspaceTree: React.FC = () => {
   const th = useTh();
@@ -47,25 +47,19 @@ const WorkspaceTree: React.FC = () => {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<[string, "asc" | "desc"]>(["name", "asc"]);
   // query & data
-  const query = useSWR(
-    ["listWorkspaces", page, sort],
-    (key, page, sort) =>
-      listWorkspaces({
-        page,
-        sort: {
-          [sort[0]]: sort[1],
-        },
-      }),
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
+  const query = useSWRState(["listWorkspaces", page, sort], (key, page, sort) =>
+    listWorkspaces({
+      page,
+      sort: {
+        [sort[0]]: sort[1],
+      },
+    })
   );
   const data = useMemo(() => query.data?.data, [query.data]);
   // tree
   const [tree, treeOp] = useMap<
     string | number,
-    NodeModel<WorkspaceView | NoteView>
+    NodeModel<WorkspaceView | ListNoteView>
   >();
   useEffect(() => {
     if (!data) {
@@ -135,7 +129,7 @@ const WorkspaceTree: React.FC = () => {
         canDrag={(node) => node?.parent !== 0}
         onDrop={(data, options) => {
           if (options.dragSource && options.dropTarget) {
-            const note = options.dragSource.data as NoteView;
+            const note = options.dragSource.data as ListNoteView;
             const target = options.dropTarget.data;
             const isWorkspace = options.dropTarget.parent === 0;
             updateNote(note.id, {
@@ -155,10 +149,10 @@ const WorkspaceTree: React.FC = () => {
               );
           }
         }}
-        render={TreeItem<NoteView | WorkspaceView>({
+        render={TreeItem<ListNoteView | WorkspaceView>({
           onClick: (node) => {
             if (node.parent !== 0) {
-              navigate(`/dashboard/doc/${node.data?.id}`);
+              navigate(`/dashboard/doc/${node.data?.id}/preview`);
             }
           },
           isActive: (node) => id === node.data?.id,
@@ -167,12 +161,12 @@ const WorkspaceTree: React.FC = () => {
               ...node,
               loaded: "loading",
             });
-            let entity: ApiEntity<ApiPage<NoteView>>;
+            let entity: ApiEntity<ApiPage<ListNoteView>>;
             if (node.parent === 0) {
               const data = node.data as WorkspaceView;
               entity = await listNotes(data.id);
             } else {
-              const data = node.data as NoteView;
+              const data = node.data as ListNoteView;
               entity = await listNotes(data.workspace, data.id);
             }
             treeOp.set(node.id, {
@@ -217,7 +211,7 @@ const WorkspaceTree: React.FC = () => {
                   onSelect={(emoji) => {
                     const update =
                       node.parent === 0 ? updateWorkspace : updateNote;
-                    const data = node.data as WorkspaceView | NoteView;
+                    const data = node.data as WorkspaceView | ListNoteView;
                     update(data.id, {
                       icon: emoji.id,
                     })
@@ -255,7 +249,7 @@ const WorkspaceTree: React.FC = () => {
                     data.id
                   )
                     .then((res) => {
-                      const data = res.data as NoteView;
+                      const data = res.data as ListNoteView;
                       treeOp.set(data.id, {
                         id: data.id,
                         parent: data.parent ?? data.workspace,
@@ -271,7 +265,7 @@ const WorkspaceTree: React.FC = () => {
                       })
                     );
                 } else {
-                  const data = node.data as NoteView;
+                  const data = node.data as ListNoteView;
                   addNote(
                     {
                       name: "新页面",
@@ -280,7 +274,7 @@ const WorkspaceTree: React.FC = () => {
                     data.id
                   )
                     .then((res) => {
-                      const data = res.data as NoteView;
+                      const data = res.data as ListNoteView;
                       treeOp.set(data.id, {
                         id: data.id,
                         parent: data.parent ?? data.workspace,
@@ -337,7 +331,7 @@ const WorkspaceTree: React.FC = () => {
                             })
                           );
                       } else {
-                        const data = node.data as NoteView;
+                        const data = node.data as ListNoteView;
                         deleteNote(data.id)
                           .then(
                             toast.api.success({

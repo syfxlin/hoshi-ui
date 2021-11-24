@@ -32,6 +32,17 @@ export type NoteView = {
   updatedTime: string;
 };
 
+export type ListNoteView = {
+  id: string;
+  parent?: string | null;
+  workspace: string;
+  name: string;
+  icon?: string | null;
+  status: NoteStatus;
+  createdTime: string;
+  updatedTime: string;
+};
+
 export type AddWorkspaceView = {
   name: string;
   description?: string;
@@ -89,11 +100,16 @@ export const deleteWorkspace = (id: string) =>
 
 export const listNotes = (workspaceId: string, parentId?: string) =>
   request
-    .get<ApiEntity<ApiPage<NoteView>>>(
+    .get<ApiEntity<ApiPage<ListNoteView>>>(
       parentId
-        ? `/hoshi-note/notes/${workspaceId}/${parentId}`
-        : `/hoshi-note/notes/${workspaceId}`
+        ? `/hoshi-note/notes/list/${workspaceId}/${parentId}`
+        : `/hoshi-note/notes/list/${workspaceId}`
     )
+    .then((response) => response.data);
+
+export const getNote = (id: string) =>
+  request
+    .get<ApiEntity<NoteView>>(`/hoshi-note/notes/${id}`)
     .then((response) => response.data);
 
 export const addNote = (

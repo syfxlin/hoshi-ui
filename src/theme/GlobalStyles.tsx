@@ -1,6 +1,7 @@
 import React from "react";
 import { css, Global } from "@emotion/react";
 import { useTh } from "./hooks/use-th";
+import "katex/dist/katex.css";
 
 const GlobalStyles: React.FC = () => {
   const th = useTh();
@@ -94,6 +95,52 @@ const GlobalStyles: React.FC = () => {
           display: flex;
           justify-content: center;
           align-items: center;
+        }
+
+        // tiptap
+        :root {
+          --tiptap-color-text: ${th.color("black", "dark.0")};
+          --tiptap-color-text-secondly: ${th.color("gray.5", "gray.7")};
+          --tiptap-color-background: ${th.color("white", "dark.7")};
+          --tiptap-color-background-hover: ${th.color("gray.3", "gray.7")};
+          --tiptap-color-background-secondly: ${th.color("gray.0", "dark.7")};
+          --tiptap-color-border: ${th.color("gray.4", "gray.8")};
+          --tiptap-color-reverse-text: ${th.color("white", "dark.7")};
+          --tiptap-color-reverse-text-secondly: ${th.color("gray.0", "dark.7")};
+          --tiptap-color-reverse-background: ${th.color("dark.7", "gray.0")};
+          --tiptap-color-reverse-bakcground-secondly: ${th.color(
+            "dark.4",
+            "gray.4"
+          )};
+          --tiptap-color-primary: ${th.color("primary.7")};
+          --tiptap-color-selected: #8cf;
+          --tiptap-color-code: ${th.color("red.9")};
+          --tiptap-color-mark: ${th.color("yellow.2")};
+          --tiptap-font-family: ${th.font("sans")};
+          --tiptap-font-family-mono: ${th.font("mono")};
+          --tiptap-font-weight: 400;
+          --tiptap-font-size: ${th.fontSize("md")};
+          --tiptap-line-height: 1.7;
+        }
+
+        .tippy-box[data-animation="shift-away"][data-state="hidden"] {
+          opacity: 0;
+        }
+
+        .tippy-box[data-animation="shift-away"][data-state="hidden"][data-placement^="top"] {
+          transform: translateY(10px);
+        }
+
+        .tippy-box[data-animation="shift-away"][data-state="hidden"][data-placement^="bottom"] {
+          transform: translateY(-10px);
+        }
+
+        .tippy-box[data-animation="shift-away"][data-state="hidden"][data-placement^="left"] {
+          transform: translateX(10px);
+        }
+
+        .tippy-box[data-animation="shift-away"][data-state="hidden"][data-placement^="right"] {
+          transform: translateX(-10px);
         }
       `}
     />
