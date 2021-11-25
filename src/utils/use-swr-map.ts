@@ -14,7 +14,7 @@ const useSWRMap = <K = any, V = any, E = any>(
         const clone = new Map(prev ?? []);
         clone.set(key, value);
         return clone;
-      });
+      }, false);
     },
     [query.mutate]
   );
@@ -24,7 +24,7 @@ const useSWRMap = <K = any, V = any, E = any>(
         const clone = new Map(prev ?? []);
         entries?.forEach(([key, value]) => clone.set(key, value));
         return clone;
-      });
+      }, false);
     },
     [query.mutate]
   );
@@ -35,7 +35,7 @@ const useSWRMap = <K = any, V = any, E = any>(
         const clone = new Map(prev ?? []);
         clone.delete(key);
         return clone;
-      });
+      }, false);
     },
     [query.mutate]
   );
@@ -45,7 +45,7 @@ const useSWRMap = <K = any, V = any, E = any>(
         const clone = new Map(prev ?? []);
         keys?.forEach((key) => clone.delete(key));
         return clone;
-      });
+      }, false);
     },
     [query.mutate]
   );
@@ -59,7 +59,7 @@ const useSWRMap = <K = any, V = any, E = any>(
           clone.set(key, value(old));
         }
         return clone;
-      });
+      }, false);
     },
     [query.mutate]
   );

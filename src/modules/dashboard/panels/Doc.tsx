@@ -4,12 +4,7 @@ import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 import { HStack } from "../../../components/layout/Stack";
 import ColorModeButton from "../../../components/header/ColorModeButton";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  getBreadcrumb,
-  getNote,
-  NoteView,
-  updateNote,
-} from "../../../api/note";
+import { getBreadcrumb } from "../../../api/note";
 import { useTh } from "../../../theme/hooks/use-th";
 import { css } from "@emotion/react";
 import {
@@ -21,7 +16,6 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
-import useSWRState from "../../../utils/use-swr-state";
 import ContentEditable from "../../../components/form/ContentEditable";
 import Tiptap from "../../../components/form/Tiptap";
 import { Editor } from "@tiptap/react";
@@ -32,6 +26,7 @@ import useLoading from "../../../utils/use-loading";
 import useSWR from "swr";
 import { Link } from "../../../components/Link";
 import { Down } from "@icon-park/react";
+import useNote from "../../../api/use-note";
 
 const Doc: React.FC = () => {
   const th = useTh();
@@ -46,24 +41,7 @@ const Doc: React.FC = () => {
     return entity.data;
   });
 
-  const query = useSWRState(["getNote", id], async (key, id) => {
-    const item = localStorage.getItem(`doc:${id}`);
-    if (item) {
-      return JSON.parse(item).data as NoteView;
-    }
-    const entity = await getNote(id);
-    return entity.data;
-  });
-
-  // TODO: 改进修改
-  // const tree = useWorkspaces();
-  // useEffect(() => {
-  //   if (query.data) {
-  //     tree.update(query.data.id, {
-  //       text: query.data.name,
-  //     });
-  //   }
-  // }, [query.data]);
+  const query = useNote(id);
 
   // editor
   const editor = useRef<Editor>(null);
@@ -78,15 +56,11 @@ const Doc: React.FC = () => {
         return Promise.resolve();
       }
       return saving.wrap(
-        updateNote(data.id, {
+        query.$updateNote(data.id, {
           name: data.name,
           content: data.content ?? undefined,
           attributes: data.attributes ?? undefined,
-        }).catch(
-          toast.api.error({
-            title: "修改笔记失败",
-          })
-        )
+        })
       );
     }
   );
@@ -216,9 +190,10 @@ const Doc: React.FC = () => {
             placeholder="从撰写一个标题开始..."
             value={query.data?.name ?? ""}
             onChange={(value) =>
-              query.update({
+              query.set((prev) => ({
+                ...prev,
                 name: value,
-              })
+              }))
             }
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -235,9 +210,10 @@ const Doc: React.FC = () => {
           value={query.data?.content ?? `{"type":"doc"}`}
           onChange={(value) => {
             // update to memory
-            query.update({
+            query.set((prev) => ({
+              ...prev,
               content: value,
-            });
+            }));
             enable.current = true;
           }}
         />
