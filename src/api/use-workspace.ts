@@ -1,21 +1,36 @@
-import useSWR from "swr";
-import { ApiEntity, request } from "./request";
-import { useCallback } from "react";
 import { NodeModel } from "../components/tree/TreeItem";
-import { ListNoteView, WorkspaceView } from "./note";
+import {
+  addNote,
+  AddNoteView,
+  addWorkspace,
+  AddWorkspaceView,
+  deleteNote,
+  deleteWorkspace,
+  listNotes,
+  ListNoteView,
+  listWorkspaces,
+  NoteView,
+  updateNote,
+  updateWorkspace,
+  WorkspaceView,
+} from "./note";
+import useSWRMap from "../utils/use-swr-map";
+import useToast from "../utils/use-toast";
+import { useModals } from "@mantine/modals";
 
 export const useWorkspaces = () => {
-  const query = useSWR<
-    Map<string | number, NodeModel<WorkspaceView | ListNoteView>>
+  const toast = useToast();
+  const modals = useModals();
+
+  const query = useSWRMap<
+    string | number,
+    NodeModel<WorkspaceView | ListNoteView>
   >(
     "workspaces",
     async () => {
-      const response = await request.get<ApiEntity<WorkspaceView[]>>(
-        `/hoshi-note/workspaces`
-      );
-      const workspaces = response.data.data;
+      const entity = await listWorkspaces();
       return new Map(
-        workspaces?.map<[string, NodeModel<WorkspaceView>]>((w) => [
+        entity.data?.map<[string, NodeModel<WorkspaceView>]>((w) => [
           w.id,
           {
             id: w.id,
@@ -36,85 +51,205 @@ export const useWorkspaces = () => {
     }
   );
 
-  const put = useCallback(
-    (key: string | number, value: NodeModel<WorkspaceView | ListNoteView>) => {
-      query.mutate((prev) => {
-        const clone = new Map(prev ?? []);
-        clone.set(key, value);
-        return clone;
-      });
-    },
-    [query.mutate]
-  );
-
-  const remove = useCallback(
-    (key: string | number) => {
-      query.mutate((prev) => {
-        const clone = new Map(prev ?? []);
-        clone.delete(key);
-        return clone;
-      });
-    },
-    [query.mutate]
-  );
-
-  const putAll = useCallback(
-    (
-      entries?: [string | number, NodeModel<WorkspaceView | ListNoteView>][]
-    ) => {
-      if (!entries) {
-        return;
-      }
-      query.mutate((prev) => {
-        const clone = new Map(prev ?? []);
-        entries.forEach(([key, value]) => clone.set(key, value));
-        return clone;
-      });
-    },
-    [query.mutate]
-  );
-
-  const removeAll = useCallback(
-    (keys?: (string | number)[]) => {
-      if (!keys) {
-        return;
-      }
-      query.mutate((prev) => {
-        const clone = new Map(prev ?? []);
-        keys.forEach((key) => clone.delete(key));
-        return clone;
-      });
-    },
-    [query.mutate]
-  );
-
-  const update = useCallback(
-    (
-      key: string | number,
-      value: Partial<NodeModel<WorkspaceView | ListNoteView>>
-    ) => {
-      query.mutate((prev) => {
-        const v = prev?.get(key);
-        if (!v) {
-          return prev;
-        }
-        const clone = new Map(prev ?? []);
-        clone.set(key, {
-          ...v,
-          ...value,
+  const $addWorkspace = (workspace: AddWorkspaceView) =>
+    addWorkspace(workspace)
+      .then(
+        toast.api.success({
+          title: "新增成功",
+        })
+      )
+      .then((res) => {
+        const data = res.data as WorkspaceView;
+        query.add(data.id, {
+          id: data.id,
+          parent: 0,
+          text: data.name,
+          droppable: true,
+          loaded: false,
+          data,
         });
-        return clone;
-      });
-    },
-    [query.mutate]
-  );
+        return res;
+      })
+      .catch(
+        toast.api.error({
+          title: "新增失败",
+        })
+      );
+
+  const $moveNote = (id: string, workspace: string, parent?: string) =>
+    updateNote(id, {
+      workspace,
+      parent,
+    })
+      .then((res) => {
+        const data = res.data as NoteView;
+        query.set(id, (prev) => ({
+          ...prev,
+          id: data.id,
+          parent: data.parent ?? data.workspace,
+          text: data.name,
+          data,
+        }));
+        return res;
+      })
+      .catch(
+        toast.api.error({
+          title: "移动失败",
+        })
+      );
+
+  const $loadNotes = async (workspace: string, parent?: string) => {
+    const id = parent ?? workspace;
+    await query.set(id, (prev) => ({
+      ...prev,
+      loaded: "loading",
+    }));
+    const entity = await listNotes(workspace, parent);
+    await query.addAll(
+      entity.data?.map((n) => [
+        n.id,
+        {
+          id: n.id,
+          parent: n.parent ?? n.workspace,
+          text: n.name,
+          droppable: true,
+          loaded: false,
+          data: n,
+        },
+      ])
+    );
+    await query.set(id, (prev) => ({
+      ...prev,
+      loaded: true,
+    }));
+  };
+
+  const $updateWorkspaceIcon = (id: string, icon?: string) =>
+    updateWorkspace(id, {
+      icon,
+    })
+      .then((res) => {
+        const data = res.data as WorkspaceView;
+        query.set(id, (prev) => ({
+          ...prev,
+          id: data.id,
+          text: data.name,
+          data,
+        }));
+        return res;
+      })
+      .catch(
+        toast.api.error({
+          title: "修改图标失败",
+        })
+      );
+
+  const $updateNoteIcon = (id: string, icon?: string) =>
+    updateNote(id, {
+      icon,
+    })
+      .then((res) => {
+        const data = res.data as NoteView;
+        query.set(id, (prev) => ({
+          ...prev,
+          id: data.id,
+          parent: data.parent ?? data.workspace,
+          text: data.name,
+          data,
+        }));
+        return res;
+      })
+      .catch(
+        toast.api.error({
+          title: "修改图标失败",
+        })
+      );
+
+  const $addNote = (note: AddNoteView, workspace: string, parent?: string) =>
+    addNote(note, workspace, parent)
+      .then((res) => {
+        const data = res.data as ListNoteView;
+        query.add(data.id, {
+          id: data.id,
+          parent: data.parent ?? data.workspace,
+          text: data.name,
+          droppable: true,
+          loaded: false,
+          data,
+        });
+        return res;
+      })
+      .catch(
+        toast.api.error({
+          title: "新增失败",
+        })
+      );
+
+  const $deleteWorkspace = (id: string) =>
+    modals.openConfirmModal({
+      title: "确认删除该工作区？",
+      labels: {
+        confirm: "确认删除",
+        cancel: "取消删除",
+      },
+      confirmProps: {
+        color: "red",
+      },
+      onConfirm: () => {
+        deleteWorkspace(id)
+          .then(
+            toast.api.success({
+              title: "删除成功",
+            })
+          )
+          .then(() => {
+            query.remove(id);
+          })
+          .catch(
+            toast.api.error({
+              title: "删除失败",
+            })
+          );
+      },
+    });
+
+  const $deleteNote = (id: string) =>
+    modals.openConfirmModal({
+      title: "确认删除该工笔记？",
+      labels: {
+        confirm: "确认删除",
+        cancel: "取消删除",
+      },
+      confirmProps: {
+        color: "red",
+      },
+      onConfirm: () => {
+        deleteNote(id)
+          .then(
+            toast.api.success({
+              title: "删除成功",
+            })
+          )
+          .then(() => {
+            query.remove(id);
+          })
+          .catch(
+            toast.api.error({
+              title: "删除失败",
+            })
+          );
+      },
+    });
 
   return {
     ...query,
-    put,
-    putAll,
-    remove,
-    removeAll,
-    update,
+    $addWorkspace,
+    $moveNote,
+    $loadNotes,
+    $updateWorkspaceIcon,
+    $updateNoteIcon,
+    $addNote,
+    $deleteWorkspace,
+    $deleteNote,
   };
 };

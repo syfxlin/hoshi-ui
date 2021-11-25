@@ -1,15 +1,5 @@
 import React, { useState } from "react";
-import {
-  addNote,
-  addWorkspace,
-  deleteNote,
-  deleteWorkspace,
-  listNotes,
-  ListNoteView,
-  updateNote,
-  updateWorkspace,
-  WorkspaceView,
-} from "../../../api/note";
+import { ListNoteView, WorkspaceView } from "../../../api/note";
 import { Delete, Facebook, Plus } from "@icon-park/react";
 import TreeButton from "../../../components/tree/TreeButton";
 import TreeItem from "../../../components/tree/TreeItem";
@@ -26,23 +16,19 @@ import {
 import Tree from "../../../components/tree/Tree";
 import "emoji-mart/css/emoji-mart.css";
 import { Emoji, Picker } from "emoji-mart";
-import { ApiEntity } from "../../../api/request";
 import { useTh } from "../../../theme/hooks/use-th";
 import useForm from "../../../utils/use-form";
-import useToast from "../../../utils/use-toast";
 import Form from "../../../components/form/Form";
-import { useModals } from "@mantine/modals";
 import { useNavigate, useParams } from "react-router-dom";
 import { useWorkspaces } from "../../../api/use-workspace";
 
 const WorkspaceTree: React.FC = () => {
   const th = useTh();
-  const toast = useToast();
-  const modals = useModals();
   const navigate = useNavigate();
+  // params
   const { id } = useParams<"id">();
-  // tree
-  const tree = useWorkspaces();
+  // workspaces
+  const workspaces = useWorkspaces();
   // form
   const add = useForm({
     initial: {
@@ -58,37 +44,13 @@ const WorkspaceTree: React.FC = () => {
     },
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     handleSubmit: ({ opened, ...workspace }, loading) => {
-      loading(
-        addWorkspace(workspace)
-          .then(
-            toast.api.success({
-              title: "新增成功",
-            })
-          )
-          .then((res) => {
-            const data = res.data as WorkspaceView;
-            tree.put(data.id, {
-              id: data.id,
-              parent: 0,
-              text: data.name,
-              droppable: true,
-              loaded: false,
-              data,
-            });
-            add.reset();
-          })
-          .catch(
-            toast.api.error({
-              title: "新增失败",
-            })
-          )
-      );
+      loading(workspaces.$addWorkspace(workspace).then(() => add.reset()));
     },
   });
   return (
     <>
       <Tree
-        tree={[...(tree.data?.values() ?? [])]}
+        tree={[...(workspaces.data?.values() ?? [])]}
         rootId={0}
         canDrag={(node) => node?.parent !== 0}
         onDrop={(data, options) => {
@@ -96,57 +58,28 @@ const WorkspaceTree: React.FC = () => {
             const note = options.dragSource.data as ListNoteView;
             const target = options.dropTarget.data;
             const isWorkspace = options.dropTarget.parent === 0;
-            updateNote(note.id, {
-              workspace: isWorkspace ? target.id : target.workspace,
-              parent: isWorkspace ? "null" : target.id,
-            })
-              .then(() => {
-                tree.update(options.dragSourceId, {
-                  parent: options.dropTargetId,
-                });
-              })
-              .catch(
-                toast.api.error({
-                  title: "移动失败",
-                })
-              );
+            workspaces.$moveNote(
+              note.id,
+              isWorkspace ? target.id : target.workspace,
+              isWorkspace ? "null" : target.id
+            );
           }
         }}
         render={TreeItem<ListNoteView | WorkspaceView>({
+          isActive: (node) => id === node.data?.id,
           onClick: (node) => {
             if (node.parent !== 0) {
               navigate(`/dashboard/doc/${node.data?.id}/preview`);
             }
           },
-          isActive: (node) => id === node.data?.id,
           onLoad: async (node) => {
-            tree.update(node.id, {
-              loaded: "loading",
-            });
-            let entity: ApiEntity<ListNoteView[]>;
             if (node.parent === 0) {
               const data = node.data as WorkspaceView;
-              entity = await listNotes(data.id);
+              await workspaces.$loadNotes(data.id);
             } else {
               const data = node.data as ListNoteView;
-              entity = await listNotes(data.workspace, data.id);
+              await workspaces.$loadNotes(data.workspace, data.id);
             }
-            tree.update(node.id, {
-              loaded: true,
-            });
-            tree.putAll(
-              entity.data?.map((n) => [
-                n.id,
-                {
-                  id: n.id,
-                  parent: n.parent ?? n.workspace,
-                  text: n.name,
-                  droppable: true,
-                  loaded: false,
-                  data: n,
-                },
-              ])
-            );
           },
           left: (node) => {
             const [opened, setOpened] = useState(false);
@@ -174,26 +107,11 @@ const WorkspaceTree: React.FC = () => {
                   style={{ border: "none" }}
                   onSelect={(emoji) => {
                     const update =
-                      node.parent === 0 ? updateWorkspace : updateNote;
+                      node.parent === 0
+                        ? workspaces.$updateWorkspaceIcon
+                        : workspaces.$updateNoteIcon;
                     const data = node.data as WorkspaceView | ListNoteView;
-                    update(data.id, {
-                      icon: emoji.id,
-                    })
-                      .then(() => {
-                        tree.put(node.id, {
-                          ...node,
-                          data: {
-                            ...data,
-                            icon: emoji.id,
-                          },
-                        });
-                        setOpened(false);
-                      })
-                      .catch(
-                        toast.api.error({
-                          title: "修改图标失败",
-                        })
-                      );
+                    update(data.id, emoji.id).then(() => setOpened(false));
                   }}
                 />
               </Popover>
@@ -206,53 +124,14 @@ const WorkspaceTree: React.FC = () => {
               onClick={() => {
                 if (node.parent === 0) {
                   const data = node.data as WorkspaceView;
-                  addNote(
-                    {
-                      name: "新页面",
-                    },
-                    data.id
-                  )
-                    .then((res) => {
-                      const data = res.data as ListNoteView;
-                      tree.put(data.id, {
-                        id: data.id,
-                        parent: data.parent ?? data.workspace,
-                        text: data.name,
-                        droppable: true,
-                        loaded: false,
-                        data,
-                      });
-                    })
-                    .catch(
-                      toast.api.error({
-                        title: "新增失败",
-                      })
-                    );
+                  workspaces.$addNote({ name: "新页面" }, data.id);
                 } else {
                   const data = node.data as ListNoteView;
-                  addNote(
-                    {
-                      name: "新页面",
-                    },
+                  workspaces.$addNote(
+                    { name: "新页面" },
                     data.workspace,
                     data.id
-                  )
-                    .then((res) => {
-                      const data = res.data as ListNoteView;
-                      tree.put(data.id, {
-                        id: data.id,
-                        parent: data.parent ?? data.workspace,
-                        text: data.name,
-                        droppable: true,
-                        loaded: false,
-                        data,
-                      });
-                    })
-                    .catch(
-                      toast.api.error({
-                        title: "新增失败",
-                      })
-                    );
+                  );
                 }
               }}
             >
@@ -268,51 +147,13 @@ const WorkspaceTree: React.FC = () => {
                 icon={<Delete />}
                 color="red"
                 onClick={() => {
-                  modals.openConfirmModal({
-                    title: "确认删除该工作区/笔记？",
-                    labels: {
-                      confirm: "确认删除",
-                      cancel: "取消删除",
-                    },
-                    confirmProps: {
-                      color: "red",
-                    },
-                    onConfirm: () => {
-                      if (node.parent === 0) {
-                        const data = node.data as WorkspaceView;
-                        deleteWorkspace(data.id)
-                          .then(
-                            toast.api.success({
-                              title: "删除成功",
-                            })
-                          )
-                          .then(() => {
-                            tree.remove(node.id);
-                          })
-                          .catch(
-                            toast.api.error({
-                              title: "删除失败",
-                            })
-                          );
-                      } else {
-                        const data = node.data as ListNoteView;
-                        deleteNote(data.id)
-                          .then(
-                            toast.api.success({
-                              title: "删除成功",
-                            })
-                          )
-                          .then(() => {
-                            tree.remove(node.id);
-                          })
-                          .catch(
-                            toast.api.error({
-                              title: "删除失败",
-                            })
-                          );
-                      }
-                    },
-                  });
+                  if (node.parent === 0) {
+                    const data = node.data as WorkspaceView;
+                    workspaces.$deleteWorkspace(data.id);
+                  } else {
+                    const data = node.data as ListNoteView;
+                    workspaces.$deleteNote(data.id);
+                  }
                 }}
               >
                 删除
