@@ -40,7 +40,7 @@ const SidebarControl = forwardRef<HTMLButtonElement, SidebarControlProps>(
                   border-radius: ${th.radius("sm")};
 
                   &:hover {
-                    background-color: ${th.color("gray.2", "gray.7")};
+                    background-color: ${th.color("gray.3", "gray.7")};
                   }
                 `}
               >

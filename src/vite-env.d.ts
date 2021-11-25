@@ -11,3 +11,7 @@ interface ImportMetaEnv {
   // custom
   VITE_SERVER_URL: string;
 }
+
+declare module "emoji-mart-virtualized" {
+  export * from "emoji-mart";
+}

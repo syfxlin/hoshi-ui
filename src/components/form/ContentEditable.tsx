@@ -66,17 +66,14 @@ const ContentEditable: React.FC<ContentEditableProps> = (props) => {
       }}
       css={css`
         outline: none;
+        display: block;
 
-        &:empty {
+        &:empty::before {
           display: inline-block;
-
-          &::before {
-            display: inline-block;
-            color: ${th.color("gray.5", "gray.7")};
-            content: attr(data-placeholder);
-            pointer-events: none;
-            height: 0;
-          }
+          color: ${th.color("gray.5", "gray.7")};
+          content: attr(data-placeholder);
+          pointer-events: none;
+          height: 0;
         }
       `}
     />

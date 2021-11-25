@@ -14,8 +14,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import Tree from "../../../components/tree/Tree";
-import "emoji-mart/css/emoji-mart.css";
-import { Emoji, Picker } from "emoji-mart";
+import { Emoji, Picker } from "emoji-mart-virtualized";
 import { useTh } from "../../../theme/hooks/use-th";
 import useForm from "../../../utils/use-form";
 import Form from "../../../components/form/Form";

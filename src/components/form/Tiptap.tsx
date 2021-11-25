@@ -54,7 +54,13 @@ const Tiptap = forwardRef<Editor, TiptapProps>((props, ref) => {
 
   return (
     <>
-      <EditorContent editor={editor} className={editorCss} />
+      <EditorContent
+        editor={editor}
+        className={editorCss}
+        css={css`
+          cursor: text;
+        `}
+      />
       <Box
         onClick={() => editor?.commands.focus()}
         css={css`

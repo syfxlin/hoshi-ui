@@ -2,6 +2,8 @@ import React from "react";
 import { css, Global } from "@emotion/react";
 import { useTh } from "./hooks/use-th";
 import "katex/dist/katex.css";
+import "tippy.js/animations/shift-away.css";
+import "emoji-mart-virtualized/css/emoji-mart.css";
 
 const GlobalStyles: React.FC = () => {
   const th = useTh();
@@ -121,26 +123,6 @@ const GlobalStyles: React.FC = () => {
           --tiptap-font-weight: 400;
           --tiptap-font-size: ${th.fontSize("md")};
           --tiptap-line-height: 1.7;
-        }
-
-        .tippy-box[data-animation="shift-away"][data-state="hidden"] {
-          opacity: 0;
-        }
-
-        .tippy-box[data-animation="shift-away"][data-state="hidden"][data-placement^="top"] {
-          transform: translateY(10px);
-        }
-
-        .tippy-box[data-animation="shift-away"][data-state="hidden"][data-placement^="bottom"] {
-          transform: translateY(-10px);
-        }
-
-        .tippy-box[data-animation="shift-away"][data-state="hidden"][data-placement^="left"] {
-          transform: translateX(10px);
-        }
-
-        .tippy-box[data-animation="shift-away"][data-state="hidden"][data-placement^="right"] {
-          transform: translateX(-10px);
         }
       `}
     />

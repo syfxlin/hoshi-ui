@@ -9,28 +9,23 @@ const useNote = (id?: string) => {
 
   const workspaces = useWorkspaces();
 
-  const query = useSWRValue(
-    ["note", id],
-    async (key, id) => {
-      const item = localStorage.getItem(`doc:${id}`);
-      if (item) {
-        return JSON.parse(item).data as NoteView;
-      }
-      const entity = await getNote(id);
-      return entity.data as NoteView;
-    },
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      refreshWhenHidden: false,
-      refreshWhenOffline: false,
+  const query = useSWRValue(["note", id], async (key, id) => {
+    const item = localStorage.getItem(`doc:${id}`);
+    if (item) {
+      return JSON.parse(item).data as NoteView;
     }
-  );
+    const entity = await getNote(id);
+    return entity.data as NoteView;
+  });
 
-  const $updateNote = (id: string, note: UpdateNoteView) =>
-    updateNote(id, note)
+  const $updateNote = (note: UpdateNoteView) =>
+    updateNote(query.data?.id as string, note)
       .then((res) => {
         const data = res.data as NoteView;
+        query.set((prev) => ({
+          ...prev,
+          ...data,
+        }));
         workspaces.set(data.id, (prev) => ({
           ...prev,
           id: data.id,
