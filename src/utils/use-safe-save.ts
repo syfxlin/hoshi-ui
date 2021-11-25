@@ -13,7 +13,13 @@ const useSafeSave = <T = any>(
 
   const [, cancel3s, reset3s] = useTimeoutFn(() => {
     if (enable.current) {
-      localStorage.setItem(key(data), JSON.stringify(data));
+      localStorage.setItem(
+        key(data),
+        JSON.stringify({
+          time: Date.now(),
+          data,
+        })
+      );
     }
   }, 3000);
 
@@ -26,7 +32,13 @@ const useSafeSave = <T = any>(
   }, 30000);
 
   const _save = useCallback(() => {
-    localStorage.setItem(key(data), JSON.stringify(data));
+    localStorage.setItem(
+      key(data),
+      JSON.stringify({
+        time: Date.now(),
+        data,
+      })
+    );
     return save(data).then(() => {
       localStorage.removeItem(key(data));
     });
@@ -49,7 +61,13 @@ const useSafeSave = <T = any>(
       return;
     }
     const saveToLocal = () => {
-      localStorage.setItem(key(data), JSON.stringify(data));
+      localStorage.setItem(
+        key(data),
+        JSON.stringify({
+          time: Date.now(),
+          data,
+        })
+      );
     };
     const saveToCloud = () => {
       save(data).then(() => {

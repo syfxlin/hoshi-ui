@@ -1,4 +1,4 @@
-import { ApiEntity, ApiPage, pageable, Pageable, request } from "./request";
+import { ApiEntity, request } from "./request";
 
 export type WorkspaceView = {
   id: string;
@@ -27,7 +27,7 @@ export type NoteView = {
   icon?: string | null;
   version: number;
   status: NoteStatus;
-  attributes?: Record<string, any> | null;
+  attributes?: string | null;
   createdTime: string;
   updatedTime: string;
 };
@@ -74,13 +74,24 @@ export type UpdateNoteView = {
   attributes?: string;
 };
 
-export const listWorkspaces = (page: Pageable) =>
+export type BreadcrumbView = {
+  workspace: {
+    id: string;
+    name: string;
+  };
+  parent: {
+    id: string;
+    name: string;
+  }[];
+  children: {
+    id: string;
+    name: string;
+  }[];
+};
+
+export const listWorkspaces = () =>
   request
-    .get<ApiEntity<ApiPage<WorkspaceView>>>(`/hoshi-note/workspaces`, {
-      params: {
-        ...pageable(page),
-      },
-    })
+    .get<ApiEntity<WorkspaceView[]>>(`/hoshi-note/workspaces`)
     .then((response) => response.data);
 
 export const addWorkspace = (workspace: AddWorkspaceView) =>
@@ -100,7 +111,7 @@ export const deleteWorkspace = (id: string) =>
 
 export const listNotes = (workspaceId: string, parentId?: string) =>
   request
-    .get<ApiEntity<ApiPage<ListNoteView>>>(
+    .get<ApiEntity<ListNoteView[]>>(
       parentId
         ? `/hoshi-note/notes/list/${workspaceId}/${parentId}`
         : `/hoshi-note/notes/list/${workspaceId}`
@@ -132,4 +143,9 @@ export const updateNote = (id: string, note: UpdateNoteView) =>
 export const deleteNote = (id: string) =>
   request
     .delete<ApiEntity>(`/hoshi-note/notes/${id}`)
+    .then((response) => response.data);
+
+export const getBreadcrumb = (id: string) =>
+  request
+    .get<ApiEntity<BreadcrumbView>>(`/hoshi-note/notes/${id}/breadcrumb`)
     .then((response) => response.data);

@@ -39,7 +39,7 @@ const TreeItem =
       if (!node.droppable) {
         return;
       }
-      if (props.onLoad && !node.loaded) {
+      if (props.onLoad && node.loaded === false) {
         props.onLoad(node, params).finally(() => params.onToggle());
       } else {
         params.onToggle();

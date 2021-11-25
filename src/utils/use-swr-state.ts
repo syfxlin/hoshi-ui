@@ -13,13 +13,24 @@ const useSWRState = <D = any, E = any>(
     ...options,
   });
 
-  const setState = (value: D) => {
+  const set = (value: D) => {
     query.mutate(value, false);
+  };
+
+  const update = (value: Partial<D>) => {
+    query.mutate(
+      (current) => ({
+        ...(current as any),
+        ...value,
+      }),
+      false
+    );
   };
 
   return {
     ...query,
-    setState,
+    set,
+    update,
   };
 };
 

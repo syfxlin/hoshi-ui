@@ -4,10 +4,23 @@ import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 import { HStack } from "../../../components/layout/Stack";
 import ColorModeButton from "../../../components/header/ColorModeButton";
 import { useNavigate, useParams } from "react-router-dom";
-import { getNote, NoteView } from "../../../api/note";
+import {
+  getBreadcrumb,
+  getNote,
+  NoteView,
+  updateNote,
+} from "../../../api/note";
 import { useTh } from "../../../theme/hooks/use-th";
 import { css } from "@emotion/react";
-import { Button, Container, Title, Tooltip } from "@mantine/core";
+import {
+  ActionIcon,
+  Breadcrumbs,
+  Button,
+  Container,
+  Menu,
+  Title,
+  Tooltip,
+} from "@mantine/core";
 import useSWRState from "../../../utils/use-swr-state";
 import ContentEditable from "../../../components/form/ContentEditable";
 import Tiptap from "../../../components/form/Tiptap";
@@ -16,6 +29,9 @@ import useSafeSave from "../../../utils/use-safe-save";
 import { useMount } from "react-use";
 import useToast from "../../../utils/use-toast";
 import useLoading from "../../../utils/use-loading";
+import useSWR from "swr";
+import { Link } from "../../../components/Link";
+import { Down } from "@icon-park/react";
 
 const Doc: React.FC = () => {
   const th = useTh();
@@ -25,38 +41,66 @@ const Doc: React.FC = () => {
   const { id, mode } = useParams<"id" | "mode">();
 
   // query & params
+  const breadcrumbs = useSWR(["getBreadcrumb", id], async (key, id) => {
+    const entity = await getBreadcrumb(id);
+    return entity.data;
+  });
+
   const query = useSWRState(["getNote", id], async (key, id) => {
     const item = localStorage.getItem(`doc:${id}`);
     if (item) {
-      return JSON.parse(item) as NoteView;
+      return JSON.parse(item).data as NoteView;
     }
     const entity = await getNote(id);
     return entity.data;
   });
 
+  // TODO: 改进修改
+  // const tree = useWorkspaces();
+  // useEffect(() => {
+  //   if (query.data) {
+  //     tree.update(query.data.id, {
+  //       text: query.data.name,
+  //     });
+  //   }
+  // }, [query.data]);
+
   // editor
   const editor = useRef<Editor>(null);
 
   // save
+  const saving = useLoading();
   const [enable, save] = useSafeSave(
     query.data,
     (data) => `doc:${data?.id}`,
     (data) => {
-      console.log(data);
-      return new Promise((resolve) => {
-        setTimeout(resolve, 1000);
-      });
+      if (!data) {
+        return Promise.resolve();
+      }
+      return saving.wrap(
+        updateNote(data.id, {
+          name: data.name,
+          content: data.content ?? undefined,
+          attributes: data.attributes ?? undefined,
+        }).catch(
+          toast.api.error({
+            title: "修改笔记失败",
+          })
+        )
+      );
     }
   );
-  const saving = useLoading();
 
   useMount(() => {
-    if (localStorage.getItem(`doc:${id}`)) {
+    const item = localStorage.getItem(`doc:${id}`);
+    if (item) {
       const message = toast.create({
         color: "orange",
         disallowClose: true,
         autoClose: false,
-        title: "已恢复本地保存的文档",
+        title: `已恢复本地保存的文档，保存自 ${new Date(
+          JSON.parse(item).time
+        ).toLocaleString()}`,
         message: (
           <HStack
             css={css`
@@ -103,16 +147,43 @@ const Doc: React.FC = () => {
   return (
     <AppShellContainer>
       <AppShellHeader>
-        <div />
+        {breadcrumbs.data ? (
+          <Breadcrumbs>
+            <Link to={`/dashboard/workspace/${breadcrumbs.data.workspace.id}`}>
+              {breadcrumbs.data.workspace.name}
+            </Link>
+            {breadcrumbs.data.parent.map((item) => (
+              <Link key={item.id} to={`/dashboard/doc/${item.id}/${mode}`}>
+                {item.name}
+              </Link>
+            ))}
+            <Menu
+              control={
+                <ActionIcon size="xs">
+                  <Down />
+                </ActionIcon>
+              }
+            >
+              {breadcrumbs.data.children.map((item) => (
+                <Menu.Item
+                  key={item.id}
+                  onClick={() => navigate(`/dashboard/doc/${item.id}/${mode}`)}
+                >
+                  {item.name}
+                </Menu.Item>
+              ))}
+            </Menu>
+          </Breadcrumbs>
+        ) : (
+          <div />
+        )}
         <HStack spacing="xs" align="center">
           <Button
             size="xs"
             loading={mode === "edit" && saving.loading}
             onClick={() => {
               if (mode === "edit") {
-                saving.wrap(
-                  save().then(() => navigate(`/dashboard/doc/${id}/preview`))
-                );
+                save().then(() => navigate(`/dashboard/doc/${id}/preview`));
               } else {
                 navigate(`/dashboard/doc/${id}/edit`);
               }
@@ -145,8 +216,7 @@ const Doc: React.FC = () => {
             placeholder="从撰写一个标题开始..."
             value={query.data?.name ?? ""}
             onChange={(value) =>
-              query.setState({
-                ...(query.data as any),
+              query.update({
                 name: value,
               })
             }
@@ -165,11 +235,9 @@ const Doc: React.FC = () => {
           value={query.data?.content ?? `{"type":"doc"}`}
           onChange={(value) => {
             // update to memory
-            const data = {
-              ...(query.data as any),
+            query.update({
               content: value,
-            };
-            query.setState(data);
+            });
             enable.current = true;
           }}
         />

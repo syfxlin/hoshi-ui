@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   addNote,
   addWorkspace,
@@ -6,14 +6,13 @@ import {
   deleteWorkspace,
   listNotes,
   ListNoteView,
-  listWorkspaces,
   updateNote,
   updateWorkspace,
   WorkspaceView,
 } from "../../../api/note";
 import { Delete, Facebook, Plus } from "@icon-park/react";
 import TreeButton from "../../../components/tree/TreeButton";
-import TreeItem, { NodeModel } from "../../../components/tree/TreeItem";
+import TreeItem from "../../../components/tree/TreeItem";
 import {
   ActionIcon,
   Button,
@@ -27,15 +26,14 @@ import {
 import Tree from "../../../components/tree/Tree";
 import "emoji-mart/css/emoji-mart.css";
 import { Emoji, Picker } from "emoji-mart";
-import { ApiEntity, ApiPage } from "../../../api/request";
+import { ApiEntity } from "../../../api/request";
 import { useTh } from "../../../theme/hooks/use-th";
 import useForm from "../../../utils/use-form";
 import useToast from "../../../utils/use-toast";
 import Form from "../../../components/form/Form";
 import { useModals } from "@mantine/modals";
-import useMap from "../../../utils/use-map";
 import { useNavigate, useParams } from "react-router-dom";
-import useSWRState from "../../../utils/use-swr-state";
+import { useWorkspaces } from "../../../api/use-workspace";
 
 const WorkspaceTree: React.FC = () => {
   const th = useTh();
@@ -43,43 +41,8 @@ const WorkspaceTree: React.FC = () => {
   const modals = useModals();
   const navigate = useNavigate();
   const { id } = useParams<"id">();
-  // query params
-  const [page, setPage] = useState(1);
-  const [sort, setSort] = useState<[string, "asc" | "desc"]>(["name", "asc"]);
-  // query & data
-  const query = useSWRState(["listWorkspaces", page, sort], (key, page, sort) =>
-    listWorkspaces({
-      page,
-      sort: {
-        [sort[0]]: sort[1],
-      },
-    })
-  );
-  const data = useMemo(() => query.data?.data, [query.data]);
   // tree
-  const [tree, treeOp] = useMap<
-    string | number,
-    NodeModel<WorkspaceView | ListNoteView>
-  >();
-  useEffect(() => {
-    if (!data) {
-      return;
-    }
-    treeOp.setAll(
-      data.records.map<[string, NodeModel<WorkspaceView>]>(
-        (w: WorkspaceView) => [
-          w.id,
-          {
-            id: w.id,
-            parent: 0,
-            text: w.name,
-            droppable: true,
-            data: w,
-          },
-        ]
-      )
-    );
-  }, [data]);
+  const tree = useWorkspaces();
   // form
   const add = useForm({
     initial: {
@@ -104,11 +67,12 @@ const WorkspaceTree: React.FC = () => {
           )
           .then((res) => {
             const data = res.data as WorkspaceView;
-            treeOp.set(data.id, {
+            tree.put(data.id, {
               id: data.id,
               parent: 0,
               text: data.name,
               droppable: true,
+              loaded: false,
               data,
             });
             add.reset();
@@ -124,7 +88,7 @@ const WorkspaceTree: React.FC = () => {
   return (
     <>
       <Tree
-        tree={[...tree.values()]}
+        tree={[...(tree.data?.values() ?? [])]}
         rootId={0}
         canDrag={(node) => node?.parent !== 0}
         onDrop={(data, options) => {
@@ -137,8 +101,7 @@ const WorkspaceTree: React.FC = () => {
               parent: isWorkspace ? "null" : target.id,
             })
               .then(() => {
-                treeOp.set(options.dragSourceId, {
-                  ...(options.dragSource as any),
+                tree.update(options.dragSourceId, {
                   parent: options.dropTargetId,
                 });
               })
@@ -157,11 +120,10 @@ const WorkspaceTree: React.FC = () => {
           },
           isActive: (node) => id === node.data?.id,
           onLoad: async (node) => {
-            treeOp.set(node.id, {
-              ...node,
+            tree.update(node.id, {
               loaded: "loading",
             });
-            let entity: ApiEntity<ApiPage<ListNoteView>>;
+            let entity: ApiEntity<ListNoteView[]>;
             if (node.parent === 0) {
               const data = node.data as WorkspaceView;
               entity = await listNotes(data.id);
@@ -169,20 +131,22 @@ const WorkspaceTree: React.FC = () => {
               const data = node.data as ListNoteView;
               entity = await listNotes(data.workspace, data.id);
             }
-            treeOp.set(node.id, {
-              ...node,
+            tree.update(node.id, {
               loaded: true,
             });
-            entity.data?.records.forEach((n) => {
-              treeOp.set(n.id, {
-                id: n.id,
-                parent: n.parent ?? n.workspace,
-                text: n.name,
-                droppable: true,
-                loaded: false,
-                data: n,
-              });
-            });
+            tree.putAll(
+              entity.data?.map((n) => [
+                n.id,
+                {
+                  id: n.id,
+                  parent: n.parent ?? n.workspace,
+                  text: n.name,
+                  droppable: true,
+                  loaded: false,
+                  data: n,
+                },
+              ])
+            );
           },
           left: (node) => {
             const [opened, setOpened] = useState(false);
@@ -216,7 +180,7 @@ const WorkspaceTree: React.FC = () => {
                       icon: emoji.id,
                     })
                       .then(() => {
-                        treeOp.set(node.id, {
+                        tree.put(node.id, {
                           ...node,
                           data: {
                             ...data,
@@ -250,7 +214,7 @@ const WorkspaceTree: React.FC = () => {
                   )
                     .then((res) => {
                       const data = res.data as ListNoteView;
-                      treeOp.set(data.id, {
+                      tree.put(data.id, {
                         id: data.id,
                         parent: data.parent ?? data.workspace,
                         text: data.name,
@@ -275,7 +239,7 @@ const WorkspaceTree: React.FC = () => {
                   )
                     .then((res) => {
                       const data = res.data as ListNoteView;
-                      treeOp.set(data.id, {
+                      tree.put(data.id, {
                         id: data.id,
                         parent: data.parent ?? data.workspace,
                         text: data.name,
@@ -323,7 +287,7 @@ const WorkspaceTree: React.FC = () => {
                             })
                           )
                           .then(() => {
-                            treeOp.unset(node.id);
+                            tree.remove(node.id);
                           })
                           .catch(
                             toast.api.error({
@@ -339,7 +303,7 @@ const WorkspaceTree: React.FC = () => {
                             })
                           )
                           .then(() => {
-                            treeOp.unset(node.id);
+                            tree.remove(node.id);
                           })
                           .catch(
                             toast.api.error({
