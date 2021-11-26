@@ -1,7 +1,6 @@
 import { ApiEntity, ApiPage, request } from "./request";
-import { token } from "../store/token";
-import { history } from "../store/history";
-import { recoil } from "../utils/recoil";
+import { history } from "../router/history";
+import { token } from "./use-me";
 
 export type RoleView = {
   name: string;
@@ -98,14 +97,14 @@ export const login = async ({ username, password }: LoginView) => {
   );
   const t =
     response.headers["X-Auth-Token"] ?? response.headers["x-auth-token"];
-  recoil.set(token, t);
+  token.set(t);
   history.push("/");
   return response.data.data;
 };
 
 export const logout = async () => {
   const response = await request.post("/hoshi-ums/logout");
-  recoil.reset(token);
+  token.set();
   history.push("/");
   return response.data;
 };

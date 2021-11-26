@@ -1,15 +1,12 @@
 import React, { useCallback } from "react";
-import { Loadable } from "recoil";
 import AuthorizeView from "./AuthorizeView";
 import { RoleView, UserView } from "../api/ums";
+import useMe from "../api/use-me";
 
 type RoleViewProps = {
   loading?:
     | React.ReactNode
-    | ((
-        auth: Loadable<UserView | null | undefined>,
-        props: any
-      ) => React.ReactNode);
+    | ((auth: ReturnType<typeof useMe>, props: any) => React.ReactNode);
   children?:
     | React.ReactNode
     | ((
@@ -20,7 +17,7 @@ type RoleViewProps = {
          */
         status: "accept" | "block" | "none",
         user: UserView | null | undefined,
-        auth: Loadable<UserView | null | undefined>,
+        auth: ReturnType<typeof useMe>,
         props: any
       ) => React.ReactNode);
   /**

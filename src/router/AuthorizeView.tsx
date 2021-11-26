@@ -1,20 +1,16 @@
 import React from "react";
-import { useAuth } from "../store/auth";
-import { Loadable } from "recoil";
 import { UserView } from "../api/ums";
+import useMe from "../api/use-me";
 
 type AuthorizeViewProps = {
   loading?:
     | React.ReactNode
-    | ((
-        auth: Loadable<UserView | null | undefined>,
-        props: any
-      ) => React.ReactNode);
+    | ((auth: ReturnType<typeof useMe>, props: any) => React.ReactNode);
   children?:
     | React.ReactNode
     | ((
-        user: UserView | null | undefined,
-        auth: Loadable<UserView | null | undefined>,
+        user: UserView | undefined,
+        auth: ReturnType<typeof useMe>,
         props: any
       ) => React.ReactNode);
 };
@@ -24,24 +20,13 @@ const AuthorizeView: React.FC<AuthorizeViewProps> = ({
   children,
   ...props
 }) => {
-  const auth = useAuth();
-  if (auth.state === "loading") {
-    return (
-      <>{typeof loading === "function" ? loading(auth, props) : loading}</>
-    );
-  } else if (auth.state === "hasValue") {
-    const value = auth.getValue();
-    return (
-      <>
-        {typeof children === "function"
-          ? children(value, auth, props)
-          : children}
-      </>
-    );
+  const me = useMe();
+  if (!me.error && !me.data) {
+    return <>{typeof loading === "function" ? loading(me, props) : loading}</>;
   }
   return (
     <>
-      {typeof children === "function" ? children(null, auth, props) : children}
+      {typeof children === "function" ? children(me.data, me, props) : children}
     </>
   );
 };

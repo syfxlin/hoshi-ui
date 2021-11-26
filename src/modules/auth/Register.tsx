@@ -11,7 +11,7 @@ import {
 import { Link } from "../../components/Link";
 import { TwoDimensionalCode } from "@icon-park/react";
 import useToast from "../../utils/use-toast";
-import { history } from "../../store/history";
+import { history } from "../../router/history";
 import useCountDown from "../../utils/use-count-down";
 import Form from "../../components/form/Form";
 import FormPage, { LinkGroup } from "./FormPage";

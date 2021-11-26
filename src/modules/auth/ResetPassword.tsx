@@ -3,7 +3,7 @@ import useForm from "../../utils/use-form";
 import useToast from "../../utils/use-toast";
 import useCountDown from "../../utils/use-count-down";
 import { resetPassword, sendResetPasswordCode } from "../../api/ums";
-import { history } from "../../store/history";
+import { history } from "../../router/history";
 import {
   ActionIcon,
   Button,

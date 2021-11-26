@@ -1,5 +1,5 @@
 import useSWRValue from "../utils/use-swr-value";
-import { userMe } from "./ums";
+import { userMe, UserView } from "./ums";
 import { AxiosError } from "axios";
 import { swr } from "../utils/swr-outside";
 
@@ -7,7 +7,7 @@ export const TOKEN_NAME = "hoshi-note$token";
 
 export const token = {
   get: () => localStorage.getItem(TOKEN_NAME),
-  set: (value: string | null) => {
+  set: (value?: string | null) => {
     if (value) {
       localStorage.setItem(TOKEN_NAME, value);
     } else {
@@ -19,17 +19,17 @@ export const token = {
 };
 
 const useMe = () => {
-  const query = useSWRValue("me", async () => {
+  const query = useSWRValue<UserView | undefined>("me", async () => {
     if (!token.get()) {
-      return null;
+      return undefined;
     }
     try {
       const response = await userMe();
-      return response.data.data ?? null;
+      return response.data.data;
     } catch (e) {
       const error = e as AxiosError;
       if (error.response?.status === 401) {
-        return null;
+        return undefined;
       } else {
         throw e;
       }

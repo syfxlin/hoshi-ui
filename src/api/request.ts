@@ -1,9 +1,8 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import { history } from "../store/history";
+import { history } from "../router/history";
 import qs from "qs";
-import { recoil } from "../utils/recoil";
-import { token } from "../store/token";
 import { Incl } from "../utils/types";
+import { token } from "./use-me";
 
 export const request = axios.create({
   baseURL: import.meta.env.VITE_SERVER_URL,
@@ -117,7 +116,7 @@ export const createAxiosError = <T = any>(
 
 request.interceptors.request.use(
   (config) => {
-    const t = recoil.get(token);
+    const t = token.get();
     if (t !== null) {
       if (!config.headers) {
         config.headers = {};
@@ -147,7 +146,7 @@ request.interceptors.response.use(
   },
   (error) => {
     if (error.response.status === 401) {
-      recoil.reset(token);
+      token.set();
       history.push("/login");
     }
     return Promise.reject(error);

@@ -3,7 +3,7 @@ import CSidebar from "../../components/sidebar/Sidebar";
 import { Left, Search } from "@icon-park/react";
 import SidebarItem from "../../components/sidebar/SidebarItem";
 import SidebarControl from "../../components/sidebar/SidebarControl";
-import { history } from "../../store/history";
+import { history } from "../../router/history";
 
 const Sidebar: React.FC = () => {
   return (

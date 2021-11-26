@@ -1,13 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { RecoilRoot } from "recoil";
 import { NormalizeCSS } from "@mantine/core";
 import { NotificationsProvider } from "@mantine/notifications";
 import App from "./App";
 import GlobalStyles from "./theme/GlobalStyles";
 import { theme } from "./theme";
 import MantineProvider from "./theme/MantineProvider";
-import { RecoilLink } from "./utils/recoil";
 import { ModalsProvider } from "@mantine/modals";
 import { SWRConfig } from "swr";
 import { SWROutside } from "./utils/swr-outside";
@@ -17,22 +15,15 @@ const Root: React.FC = () => {
     <React.StrictMode>
       <SWRConfig>
         <SWROutside />
-        <RecoilRoot>
-          <RecoilLink />
-          <MantineProvider theme={theme}>
-            <ModalsProvider>
-              <NotificationsProvider
-                position="top-center"
-                limit={5}
-                zIndex={999}
-              >
-                <NormalizeCSS />
-                <GlobalStyles />
-                <App />
-              </NotificationsProvider>
-            </ModalsProvider>
-          </MantineProvider>
-        </RecoilRoot>
+        <MantineProvider theme={theme}>
+          <ModalsProvider>
+            <NotificationsProvider position="top-center" limit={5} zIndex={999}>
+              <NormalizeCSS />
+              <GlobalStyles />
+              <App />
+            </NotificationsProvider>
+          </ModalsProvider>
+        </MantineProvider>
       </SWRConfig>
     </React.StrictMode>
   );

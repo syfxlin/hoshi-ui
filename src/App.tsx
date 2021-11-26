@@ -6,7 +6,7 @@ import loadable from "@loadable/component";
 import { AuthorizeRoute } from "./router/AuthorizeRoute";
 import Routes from "./router/Routes";
 import BrowserRouter from "./router/BrowserHistory";
-import { history } from "./store/history";
+import { history } from "./router/history";
 
 // App
 const Login = loadable(() => import("./modules/auth/Login"));

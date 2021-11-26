@@ -1,8 +1,25 @@
 import React from "react";
-import { swr } from "../../../utils/swr-outside";
+import useMe from "../../../api/use-me";
 
 const Home: React.FC = () => {
-  return <div>{JSON.stringify(swr.mutate !== undefined)}</div>;
+  const me = useMe();
+  return (
+    <div>
+      <button
+        onClick={() => {
+          me.set(
+            (prev) =>
+              prev && {
+                ...prev,
+                username: "Admin1",
+              }
+          );
+        }}
+      >
+        click
+      </button>
+    </div>
+  );
 };
 
 export default Home;
