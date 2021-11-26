@@ -23,6 +23,9 @@ export type UseForm<T> = {
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   wrapLoading: (p: Promise<any>) => void;
+  opened: boolean;
+  open: (values?: Partial<T>) => void;
+  close: () => void;
 };
 
 const useForm = <T extends Record<string, any>>({
@@ -33,6 +36,7 @@ const useForm = <T extends Record<string, any>>({
   const [values, setValues] = useState<T>(initial);
   const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
   const [loading, setLoading] = useState(false);
+  const [opened, setOpened] = useState(false);
 
   const valid = (): boolean => {
     let isValid = true;
@@ -78,6 +82,18 @@ const useForm = <T extends Record<string, any>>({
     }
   };
 
+  const open = (values?: Partial<T>) => {
+    if (values) {
+      Object.entries(values).forEach(([key, value]) => setValue(key, value));
+    }
+    setOpened(true);
+  };
+
+  const close = () => {
+    setOpened(false);
+    reset();
+  };
+
   return {
     values,
     errors,
@@ -91,6 +107,9 @@ const useForm = <T extends Record<string, any>>({
     loading,
     setLoading,
     wrapLoading,
+    opened,
+    open,
+    close,
   };
 };
 

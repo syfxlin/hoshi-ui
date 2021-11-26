@@ -11,7 +11,9 @@ import {
   listWorkspaces,
   NoteView,
   updateNote,
+  UpdateNoteView,
   updateWorkspace,
+  UpdateWorkspaceView,
   WorkspaceView,
 } from "./note";
 import useSWRMap from "../utils/use-swr-map";
@@ -67,28 +69,6 @@ export const useWorkspaces = () => {
         })
       );
 
-  const $moveNote = (id: string, workspace: string, parent?: string) =>
-    updateNote(id, {
-      workspace,
-      parent,
-    })
-      .then((res) => {
-        const data = res.data as NoteView;
-        query.set(id, (prev) => ({
-          ...prev,
-          id: data.id,
-          parent: data.parent ?? data.workspace,
-          text: data.name,
-          data,
-        }));
-        return res;
-      })
-      .catch(
-        toast.api.error({
-          title: "移动失败",
-        })
-      );
-
   const $loadNotes = async (workspace: string, parent?: string) => {
     const id = parent ?? workspace;
     await query.set(id, (prev) => ({
@@ -115,13 +95,11 @@ export const useWorkspaces = () => {
     }));
   };
 
-  const $updateWorkspaceIcon = (id: string, icon?: string) =>
-    updateWorkspace(id, {
-      icon,
-    })
+  const $updateWorkspace = (workspace: UpdateWorkspaceView) =>
+    updateWorkspace(workspace)
       .then((res) => {
         const data = res.data as WorkspaceView;
-        query.set(id, (prev) => ({
+        query.set(data.id, (prev) => ({
           ...prev,
           id: data.id,
           text: data.name,
@@ -132,47 +110,6 @@ export const useWorkspaces = () => {
       .catch(
         toast.api.error({
           title: "修改图标失败",
-        })
-      );
-
-  const $updateNoteIcon = (id: string, icon?: string) =>
-    updateNote(id, {
-      icon,
-    })
-      .then((res) => {
-        const data = res.data as NoteView;
-        query.set(id, (prev) => ({
-          ...prev,
-          id: data.id,
-          parent: data.parent ?? data.workspace,
-          text: data.name,
-          data,
-        }));
-        return res;
-      })
-      .catch(
-        toast.api.error({
-          title: "修改图标失败",
-        })
-      );
-
-  const $addNote = (note: AddNoteView, workspace: string, parent?: string) =>
-    addNote(note, workspace, parent)
-      .then((res) => {
-        const data = res.data as ListNoteView;
-        query.add(data.id, {
-          id: data.id,
-          parent: data.parent ?? data.workspace,
-          text: data.name,
-          droppable: true,
-          loaded: false,
-          data,
-        });
-        return res;
-      })
-      .catch(
-        toast.api.error({
-          title: "新增失败",
         })
       );
 
@@ -203,6 +140,68 @@ export const useWorkspaces = () => {
           );
       },
     });
+
+  const $addNote = (note: AddNoteView) =>
+    addNote(note)
+      .then((res) => {
+        const data = res.data as ListNoteView;
+        query.add(data.id, {
+          id: data.id,
+          parent: data.parent ?? data.workspace,
+          text: data.name,
+          droppable: true,
+          loaded: false,
+          data,
+        });
+        return res;
+      })
+      .catch(
+        toast.api.error({
+          title: "新增失败",
+        })
+      );
+
+  const $updateNote = (note: UpdateNoteView) =>
+    updateNote(note)
+      .then((res) => {
+        const data = res.data as NoteView;
+        query.set(data.id, (prev) => ({
+          ...prev,
+          id: data.id,
+          parent: data.parent ?? data.workspace,
+          text: data.name,
+          data,
+        }));
+        return res;
+      })
+      .catch(
+        toast.api.error({
+          title: "修改图标失败",
+        })
+      );
+
+  const $moveNote = (id: string, workspace: string, parent?: string) =>
+    updateNote({
+      id,
+      workspace,
+      parent,
+    })
+      .then((res) => {
+        const data = res.data as NoteView;
+        query.set(id, (prev) => ({
+          ...prev,
+          id: data.id,
+          parent: data.parent ?? data.workspace,
+          text: data.name,
+          data,
+        }));
+        return res;
+      })
+      .catch(
+        toast.api.error({
+          title: "移动失败",
+        })
+      );
 
   const $deleteNote = (id: string) =>
     modals.openConfirmModal({
@@ -237,8 +236,8 @@ export const useWorkspaces = () => {
     $addWorkspace,
     $moveNote,
     $loadNotes,
-    $updateWorkspaceIcon,
-    $updateNoteIcon,
+    $updateWorkspace,
+    $updateNote,
     $addNote,
     $deleteWorkspace,
     $deleteNote,

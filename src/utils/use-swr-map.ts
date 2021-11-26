@@ -70,6 +70,13 @@ const useSWRMap = <K = any, V = any, E = any>(
     [query.mutate]
   );
 
+  const keys = useCallback(() => [...(query.data?.keys() ?? [])], [query.data]);
+
+  const values = useCallback(
+    () => [...(query.data?.values() ?? [])],
+    [query.data]
+  );
+
   return {
     ...query,
     add,
@@ -77,6 +84,8 @@ const useSWRMap = <K = any, V = any, E = any>(
     remove,
     removeAll,
     set,
+    keys,
+    values,
   };
 };
 

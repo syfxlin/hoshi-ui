@@ -1,25 +1,30 @@
-import React, { useState } from "react";
-import { ListNoteView, WorkspaceView } from "../../../api/note";
-import { Delete, Facebook, Plus } from "@icon-park/react";
+import React from "react";
+import {
+  AddWorkspaceView,
+  ListNoteView,
+  UpdateWorkspaceView,
+  WorkspaceView,
+} from "../../../api/note";
+import { Delete, Editor, Facebook, Plus } from "@icon-park/react";
 import TreeButton from "../../../components/tree/TreeButton";
 import TreeItem from "../../../components/tree/TreeItem";
 import {
   ActionIcon,
   Button,
   Divider,
+  InputWrapper,
   Menu,
   Modal,
-  Popover,
   Switch,
   TextInput,
 } from "@mantine/core";
 import Tree from "../../../components/tree/Tree";
-import { Emoji, Picker } from "emoji-mart-virtualized";
 import { useTh } from "../../../theme/hooks/use-th";
 import useForm from "../../../utils/use-form";
 import Form from "../../../components/form/Form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useWorkspaces } from "../../../api/use-workspace";
+import EmojiPicker from "../../../components/form/EmojiPicker";
 
 const WorkspaceTree: React.FC = () => {
   const th = useTh();
@@ -29,9 +34,8 @@ const WorkspaceTree: React.FC = () => {
   // workspaces
   const workspaces = useWorkspaces();
   // form
-  const add = useForm({
+  const add = useForm<AddWorkspaceView>({
     initial: {
-      opened: false,
       name: "",
       description: "",
       domain: "",
@@ -41,15 +45,48 @@ const WorkspaceTree: React.FC = () => {
     validate: {
       name: (value) => value.length > 0 || "工作区名称必须不为空",
     },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    handleSubmit: ({ opened, ...workspace }, loading) => {
-      loading(workspaces.$addWorkspace(workspace).then(() => add.reset()));
+    handleSubmit: (values, loading) => {
+      loading(
+        workspaces
+          .$addWorkspace({
+            name: values.name,
+            description: values.description || undefined,
+            domain: values.domain || undefined,
+            icon: values.icon || undefined,
+            disclose: values.disclose,
+          })
+          .then(() => add.close())
+      );
+    },
+  });
+  const edit = useForm<UpdateWorkspaceView>({
+    initial: {
+      id: "",
+      name: "",
+      description: "",
+      domain: "",
+      icon: "",
+      disclose: false,
+    },
+    handleSubmit: (values, loading) => {
+      loading(
+        workspaces
+          .$updateWorkspace({
+            id: values.id,
+            name: values.name || undefined,
+            description: values.description || undefined,
+            domain: values.domain || undefined,
+            icon: values.icon || undefined,
+            disclose: values.disclose,
+          })
+          .then(() => edit.close())
+      );
     },
   });
   return (
     <>
       <Tree
-        tree={[...(workspaces.data?.values() ?? [])]}
+        tree={workspaces.values()}
         rootId={0}
         canDrag={(node) => node?.parent !== 0}
         onDrop={(data, options) => {
@@ -68,7 +105,7 @@ const WorkspaceTree: React.FC = () => {
           isActive: (node) => id === node.data?.id,
           onClick: (node) => {
             if (node.parent !== 0) {
-              navigate(`/dashboard/doc/${node.data?.id}/preview`);
+              navigate(`/doc/${node.data?.id}/preview`);
             }
           },
           onLoad: async (node) => {
@@ -81,39 +118,25 @@ const WorkspaceTree: React.FC = () => {
             }
           },
           left: (node) => {
-            const [opened, setOpened] = useState(false);
             return (
-              <Popover
-                opened={opened}
-                onClose={() => setOpened(false)}
-                withArrow
-                spacing={0}
-                target={
-                  <ActionIcon size="xs" onClick={() => setOpened(!opened)}>
-                    <Emoji
-                      set="twitter"
-                      size={th.theme.fontSizes.base}
-                      emoji={
-                        node.data?.icon ||
-                        (node.parent === 0 ? "file_folder" : "spiral_note_pad")
-                      }
-                    />
-                  </ActionIcon>
+              <EmojiPicker
+                size={[th.theme.fontSizes.base, "xs"]}
+                emoji={
+                  node.data?.icon ||
+                  (node.parent === 0 ? "file_folder" : "spiral_note_pad")
                 }
-              >
-                <Picker
-                  set="twitter"
-                  style={{ border: "none" }}
-                  onSelect={(emoji) => {
-                    const update =
-                      node.parent === 0
-                        ? workspaces.$updateWorkspaceIcon
-                        : workspaces.$updateNoteIcon;
-                    const data = node.data as WorkspaceView | ListNoteView;
-                    update(data.id, emoji.id).then(() => setOpened(false));
-                  }}
-                />
-              </Popover>
+                onSelect={async (emoji) => {
+                  const update =
+                    node.parent === 0
+                      ? workspaces.$updateWorkspace
+                      : workspaces.$updateNote;
+                  const data = node.data as WorkspaceView | ListNoteView;
+                  await update({
+                    id: data.id,
+                    icon: emoji.id,
+                  });
+                }}
+              />
             );
           },
           text: (node) => node.text,
@@ -123,14 +146,14 @@ const WorkspaceTree: React.FC = () => {
               onClick={() => {
                 if (node.parent === 0) {
                   const data = node.data as WorkspaceView;
-                  workspaces.$addNote({ name: "新页面" }, data.id);
+                  workspaces.$addNote({ workspace: data.id, name: "新页面" });
                 } else {
                   const data = node.data as ListNoteView;
-                  workspaces.$addNote(
-                    { name: "新页面" },
-                    data.workspace,
-                    data.id
-                  );
+                  workspaces.$addNote({
+                    workspace: data.workspace,
+                    parent: data.id,
+                    name: "新页面",
+                  });
                 }
               }}
             >
@@ -140,7 +163,27 @@ const WorkspaceTree: React.FC = () => {
           menu: (node) => (
             <>
               <Menu.Item icon={<Facebook />}>Settings</Menu.Item>
-              <Menu.Item icon={<Facebook />}>Messages</Menu.Item>
+              <Menu.Item
+                icon={<Editor />}
+                onClick={() => {
+                  if (node.parent === 0) {
+                    const data = node.data as WorkspaceView;
+                    edit.open({
+                      id: data.id,
+                      name: data.name,
+                      description: data.description || "",
+                      domain: data.domain || "",
+                      icon: data.icon || "",
+                      disclose: data.disclose,
+                    });
+                  } else {
+                    const data = node.data as ListNoteView;
+                    navigate(`/doc/${data.id}/edit`);
+                  }
+                }}
+              >
+                编辑
+              </Menu.Item>
               <Divider />
               <Menu.Item
                 icon={<Delete />}
@@ -161,14 +204,10 @@ const WorkspaceTree: React.FC = () => {
           ),
         })}
       />
-      <TreeButton icon={<Plus />} onClick={() => add.setValue("opened", true)}>
+      <TreeButton icon={<Plus />} onClick={() => add.open()}>
         增加工作区
       </TreeButton>
-      <Modal
-        opened={add.values.opened}
-        onClose={() => add.reset()}
-        title="新增工作区"
-      >
+      <Modal opened={add.opened} onClose={() => add.close()} title="新增工作区">
         <Form onSubmit={add.onSubmit}>
           <TextInput
             required
@@ -185,6 +224,15 @@ const WorkspaceTree: React.FC = () => {
             onChange={(e) => add.setValue("description", e.currentTarget.value)}
             error={add.errors.description}
           />
+          <InputWrapper label="图标">
+            <EmojiPicker
+              size={[th.theme.fontSizes.base * 1.5, "lg"]}
+              emoji={add.values.icon || "spiral_note_pad"}
+              onSelect={async (emoji) => {
+                add.setValue("icon", emoji.id || "");
+              }}
+            />
+          </InputWrapper>
           <TextInput
             label="域名"
             placeholder="域名"
@@ -198,6 +246,55 @@ const WorkspaceTree: React.FC = () => {
             onChange={(e) => add.setValue("disclose", e.currentTarget.checked)}
           />
           <Button type="submit" fullWidth loading={add.loading}>
+            提交
+          </Button>
+        </Form>
+      </Modal>
+      <Modal
+        opened={edit.opened}
+        onClose={() => edit.close()}
+        title={`修改工作区：${edit.values.id}`}
+      >
+        <Form onSubmit={edit.onSubmit}>
+          <TextInput
+            required
+            label="工作区名称"
+            placeholder="工作区名称"
+            value={edit.values.name}
+            onChange={(e) => edit.setValue("name", e.currentTarget.value)}
+            error={edit.errors.name}
+          />
+          <TextInput
+            label="工作区描述"
+            placeholder="工作区描述"
+            value={edit.values.description}
+            onChange={(e) =>
+              edit.setValue("description", e.currentTarget.value)
+            }
+            error={edit.errors.description}
+          />
+          <InputWrapper label="图标">
+            <EmojiPicker
+              size={[th.theme.fontSizes.base * 1.5, "lg"]}
+              emoji={edit.values.icon || "spiral_note_pad"}
+              onSelect={async (emoji) => {
+                edit.setValue("icon", emoji.id || "");
+              }}
+            />
+          </InputWrapper>
+          <TextInput
+            label="域名"
+            placeholder="域名"
+            value={edit.values.domain}
+            onChange={(e) => edit.setValue("domain", e.currentTarget.value)}
+            error={edit.errors.domain}
+          />
+          <Switch
+            label="是否公开"
+            checked={edit.values.disclose}
+            onChange={(e) => edit.setValue("disclose", e.currentTarget.checked)}
+          />
+          <Button type="submit" fullWidth loading={edit.loading}>
             提交
           </Button>
         </Form>

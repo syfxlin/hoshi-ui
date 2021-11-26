@@ -37,26 +37,30 @@ const useToast = () => {
   };
 
   const api = {
-    success: (props: Partial<ToastProps>) => (response: ApiEntity) => {
-      create({
-        color: "green",
-        autoClose: 3000,
-        title: "操作成功",
-        ...props,
-        message: response.message ?? props.message ?? "操作成功",
-      });
-      return response;
-    },
-    error: (props: Partial<ToastProps>) => (err: AxiosError<ApiEntity>) => {
-      create({
-        color: "red",
-        autoClose: 3000,
-        title: "操作失败",
-        ...props,
-        message: err.response?.data.message ?? props.message ?? "未知错误",
-      });
-      return err;
-    },
+    success:
+      (props: Partial<ToastProps>) =>
+      <T>(response: ApiEntity<T>) => {
+        create({
+          color: "green",
+          autoClose: 3000,
+          title: "操作成功",
+          ...props,
+          message: response.message ?? props.message ?? "操作成功",
+        });
+        return response;
+      },
+    error:
+      (props: Partial<ToastProps>) =>
+      <E>(err: AxiosError<ApiEntity<E>>) => {
+        create({
+          color: "red",
+          autoClose: 3000,
+          title: "操作失败",
+          ...props,
+          message: err.response?.data.message ?? props.message ?? "未知错误",
+        });
+        return err;
+      },
   };
 
   const def = {

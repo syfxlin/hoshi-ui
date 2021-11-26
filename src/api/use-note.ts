@@ -18,8 +18,11 @@ const useNote = (id?: string) => {
     return entity.data as NoteView;
   });
 
-  const $updateNote = (note: UpdateNoteView) =>
-    updateNote(query.data?.id as string, note)
+  const $updateNote = (note: Omit<UpdateNoteView, "id">) =>
+    updateNote({
+      ...note,
+      id: query.data?.id as string,
+    })
       .then((res) => {
         const data = res.data as NoteView;
         query.set((prev) => ({

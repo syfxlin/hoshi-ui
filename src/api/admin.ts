@@ -1,7 +1,15 @@
-import { ApiEntity, ApiPage, pageable, Pageable, request } from "./request";
+import {
+  ApiEntity,
+  ApiPage,
+  omit,
+  pageable,
+  Pageable,
+  request,
+} from "./request";
 import { RoleView, UserView } from "./ums";
 
 export type UpdateUserView = {
+  id: number;
   username?: string;
   nickname?: string;
   email?: string;
@@ -25,6 +33,7 @@ export type AddRoleView = {
 };
 
 export type UpdateRoleView = {
+  name: string;
   description?: string;
   permissions?: string[];
   status?: boolean;
@@ -40,19 +49,22 @@ export const adminListUsers = (page: Pageable, search?: string) =>
     })
     .then((response) => response.data);
 
-export const adminUpdateUser = (userId: number, user: UpdateUserView) =>
+export const adminUpdateUser = (user: UpdateUserView) =>
   request
-    .put<ApiEntity<UserView>>(`/hoshi-ums/admin/users/${userId}`, user)
+    .put<ApiEntity<UserView>>(
+      `/hoshi-ums/admin/users/${user.id}`,
+      omit(user, ["id"])
+    )
     .then((response) => response.data);
 
-export const adminDeleteUser = (userId: number) =>
+export const adminDeleteUser = (id: number) =>
   request
-    .delete<ApiEntity>(`/hoshi-ums/admin/users/${userId}`)
+    .delete<ApiEntity>(`/hoshi-ums/admin/users/${id}`)
     .then((response) => response.data);
 
-export const adminUpdateUserRole = (userId: number, roles: string[]) =>
+export const adminUpdateUserRole = (id: number, roles: string[]) =>
   request
-    .put<ApiEntity<UserView>>(`/hoshi-ums/admin/users/${userId}/role`, {
+    .put<ApiEntity<UserView>>(`/hoshi-ums/admin/users/${id}/role`, {
       roles,
     })
     .then((response) => response.data);
@@ -72,12 +84,15 @@ export const adminAddRole = (role: AddRoleView) =>
     .post<ApiEntity<RoleView>>(`/hoshi-ums/admin/roles`, role)
     .then((response) => response.data);
 
-export const adminUpdateRole = (roleName: string, role: UpdateRoleView) =>
+export const adminUpdateRole = (role: UpdateRoleView) =>
   request
-    .put<ApiEntity<RoleView>>(`/hoshi-ums/admin/roles/${roleName}`, role)
+    .put<ApiEntity<RoleView>>(
+      `/hoshi-ums/admin/roles/${role.name}`,
+      omit(role, ["name"])
+    )
     .then((response) => response.data);
 
-export const adminDeleteRole = (roleName: string) =>
+export const adminDeleteRole = (name: string) =>
   request
-    .delete<ApiEntity>(`/hoshi-ums/admin/roles/${roleName}`)
+    .delete<ApiEntity>(`/hoshi-ums/admin/roles/${name}`)
     .then((response) => response.data);

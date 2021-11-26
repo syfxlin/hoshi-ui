@@ -1,15 +1,6 @@
 import React, { useMemo } from "react";
 import { useTh } from "../../../theme/hooks/use-th";
-import useToast from "../../../utils/use-toast";
-import useSWR from "swr";
-import {
-  AddRoleView,
-  adminAddRole,
-  adminDeleteRole,
-  adminListRoles,
-  adminUpdateRole,
-  UpdateRoleView,
-} from "../../../api/admin";
+import { AddRoleView, UpdateRoleView } from "../../../api/admin";
 import BaseTable, { AutoResizer, ColumnShape } from "react-base-table";
 import { RoleView } from "../../../api/ums";
 import {
@@ -32,17 +23,15 @@ import AppShellContainer from "../../../components/app-shell/AppShellContainer";
 import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 import Form from "../../../components/form/Form";
 import { useModals } from "@mantine/modals";
+import useRoles from "../../../api/use-roles";
 
 const Roles: React.FC = () => {
   const th = useTh();
-  const toast = useToast();
-  // query & data
-  const query = useSWR(["adminListRoles"], () => adminListRoles());
-  const data = useMemo(() => query.data?.data, [query.data]);
+  // roles & data
+  const roles = useRoles();
   // form
-  const add = useForm<{ opened: boolean } & AddRoleView>({
+  const add = useForm<AddRoleView>({
     initial: {
-      opened: false,
       name: "",
       description: "",
       status: true,
@@ -52,54 +41,34 @@ const Roles: React.FC = () => {
       name: (value) => value.length > 0 || "角色名称必须不为空",
     },
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    handleSubmit: ({ opened, ...role }, loading) => {
+    handleSubmit: (values, loading) => {
       loading(
-        adminAddRole(role)
-          .then(
-            toast.api.success({
-              title: "新增成功",
-            })
-          )
-          .then(() => query.mutate())
-          .then(() => add.reset())
-          .catch(
-            toast.api.error({
-              title: "新增失败",
-            })
-          )
+        roles
+          .$addRole({
+            name: values.name,
+            description: values.description,
+            status: values.status,
+            permissions: values.permissions,
+          })
+          .then(() => add.close())
       );
     },
   });
-  const edit = useForm<
-    {
-      name: string;
-    } & UpdateRoleView
-  >({
+  const edit = useForm<UpdateRoleView>({
     initial: {
       name: "",
       description: "",
       permissions: [],
     },
     handleSubmit: (values, loading) => {
-      const role: UpdateRoleView = {};
-      if (values.description !== "") {
-        role.description = values.description;
-      }
-      role.permissions = values.permissions;
       loading(
-        adminUpdateRole(values.name, role)
-          .then(
-            toast.api.success({
-              title: "修改成功",
-            })
-          )
-          .then(() => query.mutate())
-          .then(() => edit.reset())
-          .catch(
-            toast.api.error({
-              title: "修改失败",
-            })
-          )
+        roles
+          .$updateRole({
+            name: values.name,
+            description: values.description || undefined,
+            permissions: values.permissions,
+          })
+          .then(() => edit.close())
       );
     },
   });
@@ -178,18 +147,10 @@ const Roles: React.FC = () => {
                 size="xs"
                 disabled={["USER", "ADMIN"].includes(rowData.name)}
                 onClick={() => {
-                  adminUpdateRole(rowData.name, { status: !rowData.status })
-                    .then(
-                      toast.api.success({
-                        title: "操作成功",
-                      })
-                    )
-                    .then(() => query.mutate())
-                    .catch(
-                      toast.api.error({
-                        title: "操作失败",
-                      })
-                    );
+                  roles.$updateRole({
+                    name: rowData.name,
+                    status: !rowData.status,
+                  });
                 }}
               >
                 {rowData.status ? "禁用" : "启用"}
@@ -197,7 +158,7 @@ const Roles: React.FC = () => {
               <Button
                 size="xs"
                 onClick={() =>
-                  edit.setValues({
+                  edit.open({
                     name: rowData.name,
                     description: rowData.description ?? "",
                     permissions: rowData.permissions ?? [],
@@ -221,18 +182,7 @@ const Roles: React.FC = () => {
                       color: "red",
                     },
                     onConfirm: () => {
-                      adminDeleteRole(rowData.name)
-                        .then(
-                          toast.api.success({
-                            title: "删除成功",
-                          })
-                        )
-                        .then(() => query.mutate())
-                        .catch(
-                          toast.api.error({
-                            title: "删除失败",
-                          })
-                        );
+                      roles.$deleteRole(rowData.name);
                     },
                   });
                 }}
@@ -244,14 +194,14 @@ const Roles: React.FC = () => {
         }),
       },
     ],
-    [query, edit]
+    [roles, edit]
   );
   return (
     <AppShellContainer>
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">
-          <Button size="xs" onClick={() => add.setValue("opened", true)}>
+          <Button size="xs" onClick={() => add.open()}>
             新增角色
           </Button>
           <ColorModeButton />
@@ -271,18 +221,14 @@ const Roles: React.FC = () => {
                 width={size.width}
                 height={size.height}
                 columns={columns}
-                data={data}
+                data={roles.values()}
                 rowKey="name"
               />
             )}
           </AutoResizer>
         </Box>
       </Panel>
-      <Modal
-        opened={add.values.opened}
-        onClose={() => add.reset()}
-        title="新增角色"
-      >
+      <Modal opened={add.opened} onClose={() => add.close()} title="新增角色">
         <Form onSubmit={add.onSubmit}>
           <TextInput
             label="名称"
@@ -316,8 +262,8 @@ const Roles: React.FC = () => {
         </Form>
       </Modal>
       <Modal
-        opened={edit.values.name !== ""}
-        onClose={() => edit.reset()}
+        opened={edit.opened}
+        onClose={() => edit.close()}
         title={`编辑角色: ${edit.values.name}`}
       >
         <Form onSubmit={edit.onSubmit}>

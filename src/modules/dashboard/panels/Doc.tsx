@@ -1,10 +1,9 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import AppShellContainer from "../../../components/app-shell/AppShellContainer";
 import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 import { HStack } from "../../../components/layout/Stack";
 import ColorModeButton from "../../../components/header/ColorModeButton";
 import { useNavigate, useParams } from "react-router-dom";
-import { getBreadcrumb } from "../../../api/note";
 import { useTh } from "../../../theme/hooks/use-th";
 import { css } from "@emotion/react";
 import {
@@ -13,7 +12,6 @@ import {
   Button,
   Container,
   Menu,
-  Popover,
   Title,
   Tooltip,
 } from "@mantine/core";
@@ -24,11 +22,11 @@ import useSafeSave from "../../../utils/use-safe-save";
 import { useMount } from "react-use";
 import useToast from "../../../utils/use-toast";
 import useLoading from "../../../utils/use-loading";
-import useSWR from "swr";
 import { Link } from "../../../components/Link";
 import { Down } from "@icon-park/react";
 import useNote from "../../../api/use-note";
-import { Emoji, Picker } from "emoji-mart-virtualized";
+import EmojiPicker from "../../../components/form/EmojiPicker";
+import useBreadcrumbs from "../../../api/use-breadcrumbs";
 
 const Doc: React.FC = () => {
   const th = useTh();
@@ -37,12 +35,9 @@ const Doc: React.FC = () => {
   const navigate = useNavigate();
   const { id, mode } = useParams<"id" | "mode">();
 
-  // note & params
-  const breadcrumbs = useSWR(["getBreadcrumb", id], async (key, id) => {
-    const entity = await getBreadcrumb(id);
-    return entity.data;
-  });
+  // note & breadcrumbs
   const note = useNote(id);
+  const breadcrumbs = useBreadcrumbs(id);
 
   // editor
   const editor = useRef<Editor>(null);
@@ -65,9 +60,6 @@ const Doc: React.FC = () => {
       );
     }
   );
-
-  // icon
-  const [icon, setIcon] = useState(false);
 
   useMount(() => {
     const item = localStorage.getItem(`doc:${id}`);
@@ -131,7 +123,7 @@ const Doc: React.FC = () => {
               {breadcrumbs.data.workspace.name}
             </Link>
             {breadcrumbs.data.parent.map((item) => (
-              <Link key={item.id} to={`/dashboard/doc/${item.id}/${mode}`}>
+              <Link key={item.id} to={`/doc/${item.id}/${mode}`}>
                 {item.name}
               </Link>
             ))}
@@ -145,7 +137,7 @@ const Doc: React.FC = () => {
               {breadcrumbs.data.children.map((item) => (
                 <Menu.Item
                   key={item.id}
-                  onClick={() => navigate(`/dashboard/doc/${item.id}/${mode}`)}
+                  onClick={() => navigate(`/doc/${item.id}/${mode}`)}
                 >
                   {item.name}
                 </Menu.Item>
@@ -161,9 +153,9 @@ const Doc: React.FC = () => {
             loading={mode === "edit" && saving.loading}
             onClick={() => {
               if (mode === "edit") {
-                save().then(() => navigate(`/dashboard/doc/${id}/preview`));
+                save().then(() => navigate(`/doc/${id}/preview`));
               } else {
-                navigate(`/dashboard/doc/${id}/edit`);
+                navigate(`/doc/${id}/edit`);
               }
             }}
           >
@@ -183,37 +175,13 @@ const Doc: React.FC = () => {
           margin-bottom: ${th.spacing(10)};
         `}
       >
-        <Popover
-          opened={icon}
-          onClose={() => setIcon(false)}
-          withArrow
-          spacing={0}
-          target={
-            <ActionIcon
-              size={th.theme.fontSizes.base * 4}
-              onClick={() => setIcon(!icon)}
-            >
-              <Emoji
-                set="twitter"
-                size={th.theme.fontSizes.base * 3}
-                emoji={note.data?.icon || "spiral_note_pad"}
-              />
-            </ActionIcon>
-          }
-          styles={{
-            target: {
-              display: "inline-block",
-            },
+        <EmojiPicker
+          size={[th.theme.fontSizes.base * 3, th.theme.fontSizes.base * 4]}
+          emoji={note.data?.icon || "spiral_note_pad"}
+          onSelect={async (emoji) => {
+            await note.$updateNote({ icon: emoji.id });
           }}
-        >
-          <Picker
-            set="twitter"
-            style={{ border: "none" }}
-            onSelect={(emoji) => {
-              note.$updateNote({ icon: emoji.id }).then(() => setIcon(false));
-            }}
-          />
-        </Popover>
+        />
         <Title
           order={1}
           css={css`

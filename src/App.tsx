@@ -37,17 +37,25 @@ const App: React.FC = () => {
     <div className="App">
       <BrowserRouter history={history}>
         <Routes>
+          {/* Index */}
           <Route index element={<Index />} />
+          {/* Auth */}
           <AnonymousRoute path="/login" element={<Login />} />
           <AnonymousRoute path="/register" element={<Register />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/users/:username" element={<UserInfo />} />
+          {/* Dashboard */}
           <AuthorizeRoute path="/dashboard" element={<Dashboard />}>
             <Route index element={<Navigate to="home" />} />
             <AuthorizeRoute path="home" roles={["ME"]} element={<Home />} />
             <AuthorizeRoute path="files" roles={["FILE"]} element={<File />} />
-            <AuthorizeRoute path="doc/:id/:mode" element={<Doc />} />
           </AuthorizeRoute>
+          {/* Document */}
+          <AuthorizeRoute path="/doc" element={<Dashboard />}>
+            <AuthorizeRoute path=":id" element={<Navigate to="preview" />} />
+            <AuthorizeRoute path=":id/:mode" element={<Doc />} />
+          </AuthorizeRoute>
+          {/* Setting */}
           <AuthorizeRoute path="/settings" element={<Settings />}>
             <AuthorizeRoute index roles={["ME"]} element={<Info />} />
             <AuthorizeRoute

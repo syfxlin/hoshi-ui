@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   Badge,
   Button,
@@ -14,59 +14,29 @@ import { css } from "@emotion/react";
 import ColorModeButton from "../../../components/header/ColorModeButton";
 import { HStack, VStack } from "../../../components/layout/Stack";
 import Box from "../../../components/layout/Box";
-import { useTh } from "../../../theme/hooks/use-th";
-import useSWR from "swr";
-import {
-  adminAddUser,
-  adminDeleteUser,
-  adminListRoles,
-  adminListUsers,
-  adminUpdateUser,
-  adminUpdateUserRole,
-  UpdateUserView,
-} from "../../../api/admin";
+import { AddUserView, UpdateUserView } from "../../../api/admin";
 import { UserView } from "../../../api/ums";
-import BaseTable, {
-  AutoResizer,
-  ColumnShape,
-  SortOrder,
-} from "react-base-table";
+import BaseTable, { AutoResizer, ColumnShape } from "react-base-table";
 import useToast from "../../../utils/use-toast";
 import AuthorizeView from "../../../router/AuthorizeView";
 import useForm from "../../../utils/use-form";
 import Panel from "../../../components/Panel";
 import { wrap } from "../../../utils/react";
 import { Search } from "@icon-park/react";
-import { useDebouncedValue } from "@mantine/hooks";
 import AppShellContainer from "../../../components/app-shell/AppShellContainer";
 import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 import Form from "../../../components/form/Form";
 import { useModals } from "@mantine/modals";
+import useUsers from "../../../api/use-users";
+import useRoles from "../../../api/use-roles";
 
 const Users: React.FC = () => {
-  const th = useTh();
   const toast = useToast();
-  // query params
-  const [page, setPage] = useState(1);
-  const [sort, setSort] = useState<Record<React.Key, SortOrder>>({});
-  const [search, setSearch] = useState("");
-  const [debounced] = useDebouncedValue(search, 1000);
-  // query & data
-  const query = useSWR(
-    ["adminListUsers", page, sort, debounced],
-    (key, page, sort, search) =>
-      adminListUsers(
-        {
-          page,
-          sort,
-        },
-        search === "" ? undefined : search
-      )
-  );
-  const data = useMemo(() => query.data?.data, [query.data]);
-  const roles = useSWR(["adminListRoles"], () => adminListRoles());
+  // users & data
+  const users = useUsers();
+  const roles = useRoles();
   // edit form
-  const edit = useForm({
+  const edit = useForm<UpdateUserView>({
     initial: {
       id: 0,
       username: "",
@@ -75,33 +45,16 @@ const Users: React.FC = () => {
       email: "",
     },
     handleSubmit: (values, loading) => {
-      const user: UpdateUserView = {};
-      if (values.username !== "") {
-        user.username = values.username;
-      }
-      if (values.password !== "") {
-        user.password = values.password;
-      }
-      if (values.nickname !== "") {
-        user.nickname = values.nickname;
-      }
-      if (values.email !== "") {
-        user.email = values.email;
-      }
       loading(
-        adminUpdateUser(values.id, user)
-          .then(
-            toast.api.success({
-              title: "修改成功",
-            })
-          )
-          .then(() => query.mutate())
-          .then(() => edit.reset())
-          .catch(
-            toast.api.error({
-              title: "修改失败",
-            })
-          )
+        users
+          .$updateUser({
+            id: values.id,
+            username: values.username || undefined,
+            password: values.password || undefined,
+            nickname: values.nickname || undefined,
+            email: values.email || undefined,
+          })
+          .then(() => edit.close())
       );
     },
   });
@@ -112,25 +65,14 @@ const Users: React.FC = () => {
     },
     handleSubmit: (values, loading) => {
       loading(
-        adminUpdateUserRole(values.id, values.roles)
-          .then(
-            toast.api.success({
-              title: "修改成功",
-            })
-          )
-          .then(() => query.mutate())
-          .then(() => assignRole.reset())
-          .catch(
-            toast.api.error({
-              title: "修改失败",
-            })
-          )
+        users
+          .$updateUserRole(values.id, values.roles)
+          .then(() => assignRole.close())
       );
     },
   });
-  const add = useForm({
+  const add = useForm<AddUserView>({
     initial: {
-      opened: false,
       username: "",
       password: "",
       email: "",
@@ -146,23 +88,8 @@ const Users: React.FC = () => {
         ) || "请输入正确的邮箱",
       nickname: (value) => value.length > 0 || "昵称必须不为空",
     },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    handleSubmit: ({ opened, ...user }, loading) => {
-      loading(
-        adminAddUser(user)
-          .then(
-            toast.api.success({
-              title: "新增成功",
-            })
-          )
-          .then(() => query.mutate())
-          .then(() => add.reset())
-          .catch(
-            toast.api.error({
-              title: "新增失败",
-            })
-          )
-      );
+    handleSubmit: (values, loading) => {
+      loading(users.$addUser(values).then(() => add.close()));
     },
   });
   // users table
@@ -241,18 +168,10 @@ const Users: React.FC = () => {
                       size="xs"
                       disabled={!!user && user.id === rowData.id}
                       onClick={() => {
-                        adminUpdateUser(rowData.id, { status: !rowData.status })
-                          .then(
-                            toast.api.success({
-                              title: "操作成功",
-                            })
-                          )
-                          .then(() => query.mutate())
-                          .catch(
-                            toast.api.error({
-                              title: "操作失败",
-                            })
-                          );
+                        users.$updateUser({
+                          id: rowData.id,
+                          status: !rowData.status,
+                        });
                       }}
                     >
                       {rowData.status ? "禁用" : "启用"}
@@ -260,7 +179,7 @@ const Users: React.FC = () => {
                     <Button
                       size="xs"
                       onClick={() =>
-                        edit.setValues({
+                        edit.open({
                           id: rowData.id,
                           username: rowData.username,
                           password: "",
@@ -274,7 +193,7 @@ const Users: React.FC = () => {
                     <Button
                       size="xs"
                       onClick={() =>
-                        assignRole.setValues({
+                        assignRole.open({
                           id: rowData.id,
                           roles: rowData.roles.map((role) => role.name),
                         })
@@ -297,18 +216,7 @@ const Users: React.FC = () => {
                             color: "red",
                           },
                           onConfirm: () => {
-                            adminDeleteUser(rowData.id)
-                              .then(
-                                toast.api.success({
-                                  title: "删除成功",
-                                })
-                              )
-                              .then(() => query.mutate())
-                              .catch(
-                                toast.api.error({
-                                  title: "删除失败",
-                                })
-                              );
+                            users.$deleteUser(rowData.id);
                           },
                         });
                       }}
@@ -323,7 +231,7 @@ const Users: React.FC = () => {
         }),
       },
     ],
-    [toast, query, edit, assignRole]
+    [toast, users, edit, assignRole]
   );
   return (
     <AppShellContainer>
@@ -335,13 +243,13 @@ const Users: React.FC = () => {
             placeholder="搜索用户"
             size="xs"
             icon={<Search />}
-            value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
+            value={users.search}
+            onChange={(e) => users.setSearch(e.currentTarget.value)}
             rightSection={
-              !query.error && !query.data ? <Loader size="xs" /> : <div />
+              !users.error && !users.data ? <Loader size="xs" /> : <div />
             }
           />
-          <Button size="xs" onClick={() => add.setValue("opened", true)}>
+          <Button size="xs" onClick={() => add.open()}>
             新增用户
           </Button>
           <ColorModeButton />
@@ -361,38 +269,34 @@ const Users: React.FC = () => {
                   width={size.width}
                   height={size.height}
                   columns={columns}
-                  data={data?.records}
-                  sortState={sort}
+                  data={users.values()}
+                  sortState={users.sort}
                   onColumnSort={({ key, order }) => {
                     const newSort = {
-                      ...sort,
+                      ...users.sort,
                       [key]: order,
                     };
-                    if (sort?.[key] === "desc") {
+                    if (users.sort?.[key] === "desc") {
                       delete newSort[key];
                     }
-                    setSort(newSort);
-                    query.mutate();
+                    users.setSort(newSort);
+                    users.mutate();
                   }}
                 />
               )}
             </AutoResizer>
           </Box>
-          {data && (
+          {users.data && (
             <Pagination
-              total={data.pages}
-              page={page}
-              onChange={setPage}
+              total={users.data.pages}
+              page={users.page}
+              onChange={users.setPage}
               position="center"
             />
           )}
         </VStack>
       </Panel>
-      <Modal
-        opened={add.values.opened}
-        onClose={() => add.reset()}
-        title="新增用户"
-      >
+      <Modal opened={add.opened} onClose={() => add.close()} title="新增用户">
         <Form onSubmit={add.onSubmit}>
           <TextInput
             required
@@ -437,8 +341,8 @@ const Users: React.FC = () => {
         </Form>
       </Modal>
       <Modal
-        opened={edit.values.id !== 0}
-        onClose={() => edit.reset()}
+        opened={edit.opened}
+        onClose={() => edit.close()}
         title={`编辑用户: ${edit.values.id}`}
       >
         <Form onSubmit={edit.onSubmit}>
@@ -476,8 +380,8 @@ const Users: React.FC = () => {
         </Form>
       </Modal>
       <Modal
-        opened={assignRole.values.id !== 0}
-        onClose={() => assignRole.reset()}
+        opened={assignRole.opened}
+        onClose={() => assignRole.close()}
         title={`分配角色: ${assignRole.values.id}`}
       >
         <Form onSubmit={assignRole.onSubmit}>
@@ -486,8 +390,7 @@ const Users: React.FC = () => {
             placeholder="选择角色"
             searchable
             data={
-              roles.data?.data?.map((role) => role.name) ??
-              assignRole.values.roles
+              roles.values().map((role) => role.name) ?? assignRole.values.roles
             }
             value={assignRole.values.roles}
             onChange={(value) => assignRole.setValue("roles", value)}

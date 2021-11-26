@@ -1,4 +1,4 @@
-import { ApiEntity, request } from "./request";
+import { ApiEntity, omit, request } from "./request";
 
 export type WorkspaceView = {
   id: string;
@@ -52,6 +52,7 @@ export type AddWorkspaceView = {
 };
 
 export type UpdateWorkspaceView = {
+  id: string;
   name?: string;
   description?: string;
   domain?: string;
@@ -60,11 +61,14 @@ export type UpdateWorkspaceView = {
 };
 
 export type AddNoteView = {
+  workspace: string;
+  parent?: string;
   name: string;
-  icon?: string | null;
+  icon?: string;
 };
 
 export type UpdateNoteView = {
+  id: string;
   parent?: string | "null";
   workspace?: string;
   name?: string;
@@ -99,9 +103,12 @@ export const addWorkspace = (workspace: AddWorkspaceView) =>
     .post<ApiEntity<WorkspaceView>>(`/hoshi-note/workspaces`, workspace)
     .then((response) => response.data);
 
-export const updateWorkspace = (id: string, workspace: UpdateWorkspaceView) =>
+export const updateWorkspace = (workspace: UpdateWorkspaceView) =>
   request
-    .put<ApiEntity<WorkspaceView>>(`/hoshi-note/workspaces/${id}`, workspace)
+    .put<ApiEntity<WorkspaceView>>(
+      `/hoshi-note/workspaces/${workspace.id}`,
+      omit(workspace, ["id"])
+    )
     .then((response) => response.data);
 
 export const deleteWorkspace = (id: string) =>
@@ -109,12 +116,12 @@ export const deleteWorkspace = (id: string) =>
     .delete<ApiEntity>(`/hoshi-note/workspaces/${id}`)
     .then((response) => response.data);
 
-export const listNotes = (workspaceId: string, parentId?: string) =>
+export const listNotes = (workspace: string, parent?: string) =>
   request
     .get<ApiEntity<ListNoteView[]>>(
-      parentId
-        ? `/hoshi-note/notes/list/${workspaceId}/${parentId}`
-        : `/hoshi-note/notes/list/${workspaceId}`
+      parent
+        ? `/hoshi-note/notes/list/${workspace}/${parent}`
+        : `/hoshi-note/notes/list/${workspace}`
     )
     .then((response) => response.data);
 
@@ -123,21 +130,22 @@ export const getNote = (id: string) =>
     .get<ApiEntity<NoteView>>(`/hoshi-note/notes/${id}`)
     .then((response) => response.data);
 
-export const addNote = (
-  note: AddNoteView,
-  workspaceId: string,
-  parentId?: string
-) =>
+export const addNote = (note: AddNoteView) =>
   request
     .post<ApiEntity<NoteView>>(
-      `/hoshi-note/notes/${workspaceId}${parentId ? `/${parentId}` : ""}`,
-      note
+      `/hoshi-note/notes/${note.workspace}${
+        note.parent ? `/${note.parent}` : ""
+      }`,
+      omit(note, ["workspace", "parent"])
     )
     .then((response) => response.data);
 
-export const updateNote = (id: string, note: UpdateNoteView) =>
+export const updateNote = (note: UpdateNoteView) =>
   request
-    .put<ApiEntity<NoteView>>(`/hoshi-note/notes/${id}`, note)
+    .put<ApiEntity<NoteView>>(
+      `/hoshi-note/notes/${note.id}`,
+      omit(note, ["id"])
+    )
     .then((response) => response.data);
 
 export const deleteNote = (id: string) =>
