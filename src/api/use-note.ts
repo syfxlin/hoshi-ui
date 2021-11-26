@@ -9,14 +9,23 @@ const useNote = (id?: string) => {
 
   const workspaces = useWorkspaces();
 
-  const query = useSWRValue(["note", id], async (key, id) => {
-    const item = localStorage.getItem(`doc:${id}`);
-    if (item) {
-      return JSON.parse(item).data as NoteView;
+  const query = useSWRValue<NoteView>(
+    ["note", id],
+    async (key, id) => {
+      const item = localStorage.getItem(`doc:${id}`);
+      if (item) {
+        return JSON.parse(item).data as NoteView;
+      }
+      const entity = await getNote(id);
+      return entity.data as NoteView;
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshWhenHidden: false,
+      refreshWhenOffline: false,
     }
-    const entity = await getNote(id);
-    return entity.data as NoteView;
-  });
+  );
 
   const $updateNote = (note: Omit<UpdateNoteView, "id">) =>
     updateNote({

@@ -6,13 +6,7 @@ const useSWRValue = <V = any, E = any>(
   fetcher: Fetcher<V>,
   options?: SWRConfiguration<V, E>
 ) => {
-  const query = useSWR(key, fetcher, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    refreshWhenHidden: false,
-    refreshWhenOffline: false,
-    ...options,
-  });
+  const query = useSWR<V, E>(key, fetcher, options);
 
   const set = useCallback(
     async (value: (prev: V) => V) => {

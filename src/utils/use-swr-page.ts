@@ -14,13 +14,7 @@ const useSWRPage = <K = any, V = any, E = any>(
   fetcher: Fetcher<SWRPage<K, V>>,
   options?: SWRConfiguration<SWRPage<K, V>, E>
 ) => {
-  const query = useSWR<SWRPage<K, V>, E>(key, fetcher, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    refreshWhenHidden: false,
-    refreshWhenOffline: false,
-    ...options,
-  });
+  const query = useSWR<SWRPage<K, V>, E>(key, fetcher, options);
 
   const set = useCallback(
     async (key: K, value: (prev: V) => V) => {

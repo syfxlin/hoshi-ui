@@ -9,10 +9,10 @@ import useToast from "../../../utils/use-toast";
 import useForm from "../../../utils/use-form";
 import {
   sendUpdateEmailCode,
-  updateEmail,
-  updateName,
-  updatePassword,
-  updateUserInfo,
+  UpdateEmailView,
+  UpdateNameView,
+  UpdatePasswordView,
+  UpdateUserInfoView,
 } from "../../../api/ums";
 import {
   Avatar,
@@ -28,11 +28,14 @@ import Form from "../../../components/form/Form";
 import VerifyCodeInput from "../../../components/form/VerifyCodeInput";
 import { Link } from "../../../components/Link";
 import { Dropzone } from "@mantine/dropzone";
-import { uploadFile } from "../../../api/file";
 import { mod } from "../../../api/url";
+import useMe from "../../../api/use-me";
+import useFiles from "../../../api/use-files";
 
 const Info: React.FC = () => {
   const toast = useToast();
+  const me = useMe();
+  const files = useFiles();
   return (
     <AppShellContainer>
       <AppShellHeader>
@@ -47,28 +50,16 @@ const Info: React.FC = () => {
             if (!user) {
               return null;
             }
-            const name = useForm({
+            const name = useForm<UpdateNameView>({
               initial: {
                 username: user.username,
                 nickname: user.nickname,
               },
               handleSubmit: (values, loading) => {
-                loading(
-                  updateName(values)
-                    .then(
-                      toast.api.success({
-                        title: "修改成功",
-                      })
-                    )
-                    .catch(
-                      toast.api.error({
-                        title: "修改失败",
-                      })
-                    )
-                );
+                loading(me.$updateName(values));
               },
             });
-            const email = useForm({
+            const email = useForm<UpdateEmailView>({
               initial: {
                 code: "",
                 email: user.email,
@@ -78,22 +69,10 @@ const Info: React.FC = () => {
                 code: (value) => value.length > 0 || "请先获取验证码",
               },
               handleSubmit: (values, loading) => {
-                loading(
-                  updateEmail(values)
-                    .then(
-                      toast.api.success({
-                        title: "修改成功",
-                      })
-                    )
-                    .catch(
-                      toast.api.error({
-                        title: "修改失败",
-                      })
-                    )
-                );
+                loading(me.$updateEmail(values));
               },
             });
-            const password = useForm({
+            const password = useForm<UpdatePasswordView>({
               initial: {
                 oldPassword: "",
                 newPassword: "",
@@ -103,39 +82,15 @@ const Info: React.FC = () => {
                 newPassword: (value) => value.length > 0 || "新密码必须不为空",
               },
               handleSubmit: (values, loading) => {
-                loading(
-                  updatePassword(values)
-                    .then(
-                      toast.api.success({
-                        title: "修改成功",
-                      })
-                    )
-                    .catch(
-                      toast.api.error({
-                        title: "修改失败",
-                      })
-                    )
-                );
+                loading(me.$updatePassword(values));
               },
             });
-            const info = useForm({
+            const info = useForm<UpdateUserInfoView>({
               initial: {
                 ...user.info,
               },
               handleSubmit: (values, loading) => {
-                loading(
-                  updateUserInfo(values)
-                    .then(
-                      toast.api.success({
-                        title: "修改成功",
-                      })
-                    )
-                    .catch(
-                      toast.api.error({
-                        title: "修改失败",
-                      })
-                    )
-                );
+                loading(me.$updateUserInfo(values));
               },
             });
             return (
@@ -145,28 +100,16 @@ const Info: React.FC = () => {
                     <InputWrapper label="头像" error={info.errors.avatar}>
                       <HStack>
                         <Dropzone
-                          onDrop={(files) => {
+                          onDrop={(_files) => {
                             info.wrapLoading(
-                              uploadFile(files[0])
-                                .then((res) => {
-                                  if (res.data) {
-                                    info.setValue(
-                                      "avatar",
-                                      mod("hoshi-file", res.data.url)
-                                    );
-                                  }
-                                  return res;
-                                })
-                                .then(
-                                  toast.api.success({
-                                    title: "上传成功",
-                                  })
-                                )
-                                .catch(
-                                  toast.api.error({
-                                    title: "上传失败",
-                                  })
-                                )
+                              files.$uploadFile(_files[0]).then((res) => {
+                                if (res.data) {
+                                  info.setValue(
+                                    "avatar",
+                                    mod("hoshi-file", res.data.url)
+                                  );
+                                }
+                              })
                             );
                           }}
                           multiple={false}

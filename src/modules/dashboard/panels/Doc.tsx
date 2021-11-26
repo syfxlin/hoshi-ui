@@ -12,10 +12,10 @@ import {
   Button,
   Container,
   Menu,
+  Skeleton,
   Title,
   Tooltip,
 } from "@mantine/core";
-import ContentEditable from "../../../components/form/ContentEditable";
 import Tiptap from "../../../components/form/Tiptap";
 import { Editor } from "@tiptap/react";
 import useSafeSave from "../../../utils/use-safe-save";
@@ -27,6 +27,7 @@ import { Down } from "@icon-park/react";
 import useNote from "../../../api/use-note";
 import EmojiPicker from "../../../components/form/EmojiPicker";
 import useBreadcrumbs from "../../../api/use-breadcrumbs";
+import ContentEditable from "../../../components/form/ContentEditable";
 
 const Doc: React.FC = () => {
   const th = useTh();
@@ -145,7 +146,7 @@ const Doc: React.FC = () => {
             </Menu>
           </Breadcrumbs>
         ) : (
-          <div />
+          <Skeleton height={th.fontSize("lg")} width={th.fontSize(7)} />
         )}
         <HStack spacing="xs" align="center">
           <Button
@@ -189,24 +190,28 @@ const Doc: React.FC = () => {
             margin-bottom: ${th.spacing(4)};
           `}
         >
-          <ContentEditable
-            editable={mode === "edit"}
-            placeholder="从撰写一个标题开始..."
-            value={note.data?.name ?? ""}
-            onChange={(value) =>
-              note.set((prev) => ({
-                ...prev,
-                name: value,
-              }))
-            }
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                e.stopPropagation();
-                editor.current?.commands.focus();
+          {note.data ? (
+            <ContentEditable
+              editable={mode === "edit"}
+              placeholder="从撰写一个标题开始..."
+              value={note.data?.name ?? ""}
+              onChange={(value) =>
+                note.set((prev) => ({
+                  ...prev,
+                  name: value,
+                }))
               }
-            }}
-          />
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  editor.current?.commands.focus();
+                }
+              }}
+            />
+          ) : (
+            <Skeleton height={th.fontSize("h1")} />
+          )}
         </Title>
         <Tiptap
           ref={editor}

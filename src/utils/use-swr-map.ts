@@ -6,13 +6,7 @@ const useSWRMap = <K = any, V = any, E = any>(
   fetcher: Fetcher<Map<K, V>>,
   options?: SWRConfiguration<Map<K, V>, E>
 ) => {
-  const query = useSWR<Map<K, V>, E>(key, fetcher, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    refreshWhenHidden: false,
-    refreshWhenOffline: false,
-    ...options,
-  });
+  const query = useSWR<Map<K, V>, E>(key, fetcher, options);
 
   const add = useCallback(
     async (key: K, value: V) => {

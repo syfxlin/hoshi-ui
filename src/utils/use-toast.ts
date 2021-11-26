@@ -59,7 +59,7 @@ const useToast = () => {
           ...props,
           message: err.response?.data.message ?? props.message ?? "未知错误",
         });
-        return err;
+        return Promise.reject(err);
       },
   };
 

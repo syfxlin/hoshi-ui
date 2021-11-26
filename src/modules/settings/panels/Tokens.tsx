@@ -4,8 +4,6 @@ import { HStack, VStack } from "../../../components/layout/Stack";
 import ColorModeButton from "../../../components/header/ColorModeButton";
 import Panel from "../../../components/Panel";
 import AppShellContainer from "../../../components/app-shell/AppShellContainer";
-import useSWR from "swr";
-import { addToken, listTokens, revokeToken } from "../../../api/ums";
 import Async from "../../../components/Async";
 import {
   Button,
@@ -17,39 +15,23 @@ import {
   TextInput,
 } from "@mantine/core";
 import { css } from "@emotion/react";
-import useToast from "../../../utils/use-toast";
 import useLoading from "../../../utils/use-loading";
 import useForm from "../../../utils/use-form";
 import Form from "../../../components/form/Form";
+import useTokens from "../../../api/use-tokens";
 
 const Tokens: React.FC = () => {
-  const query = useSWR(["listTokens"], () => listTokens());
-  const toast = useToast();
+  const tokens = useTokens();
   const loading = useLoading();
-  const add = useForm({
+  const add = useForm<{ name: string }>({
     initial: {
-      opened: false,
       name: "",
     },
     validate: {
       name: (value) => value.length > 0 || "令牌名称必须不为空",
     },
     handleSubmit: (values, loading) => {
-      loading(
-        addToken(values.name)
-          .then(
-            toast.api.success({
-              title: "新增成功",
-            })
-          )
-          .then(() => query.mutate())
-          .then(() => add.reset())
-          .catch(
-            toast.api.error({
-              title: "新增失败",
-            })
-          )
-      );
+      loading(tokens.$addToken(values.name).then(() => add.close()));
     },
   });
   return (
@@ -57,7 +39,7 @@ const Tokens: React.FC = () => {
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">
-          <Button size="xs" onClick={() => add.setValue("opened", true)}>
+          <Button size="xs" onClick={() => add.open()}>
             新增令牌
           </Button>
           <ColorModeButton />
@@ -66,24 +48,11 @@ const Tokens: React.FC = () => {
       <Panel title="API 令牌">
         <Tabs tabPadding="md">
           <Tab label="令牌">
-            <Async query={query}>
+            <Async query={tokens}>
               <VStack divider={<Divider />}>
-                {query.data?.data?.map((token) => {
+                {tokens.values()?.map((token) => {
                   const onRevoke = () => {
-                    loading.wrap(
-                      revokeToken(token.token)
-                        .then(
-                          toast.api.success({
-                            title: "撤销成功",
-                          })
-                        )
-                        .then(() => query.mutate())
-                        .catch(
-                          toast.api.error({
-                            title: "撤销失败",
-                          })
-                        )
-                    );
+                    loading.wrap(tokens.$revokeToken(token.token));
                   };
                   return (
                     <HStack
@@ -119,11 +88,7 @@ const Tokens: React.FC = () => {
           </Tab>
         </Tabs>
       </Panel>
-      <Modal
-        opened={add.values.opened}
-        onClose={() => add.reset()}
-        title="新增令牌"
-      >
+      <Modal opened={add.opened} onClose={() => add.close()} title="新增令牌">
         <Form onSubmit={add.onSubmit}>
           <TextInput
             label="令牌名称"

@@ -9,11 +9,16 @@ import MantineProvider from "./theme/MantineProvider";
 import { ModalsProvider } from "@mantine/modals";
 import { SWRConfig } from "swr";
 import { SWROutside } from "./utils/swr-outside";
+import { dequal } from "dequal";
 
 const Root: React.FC = () => {
   return (
     <React.StrictMode>
-      <SWRConfig>
+      <SWRConfig
+        value={{
+          compare: dequal,
+        }}
+      >
         <SWROutside />
         <MantineProvider theme={theme}>
           <ModalsProvider>

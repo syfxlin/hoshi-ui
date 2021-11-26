@@ -22,7 +22,7 @@ const useUsers = () => {
   const [search, setSearch] = useState("");
   const [debounced] = useDebouncedValue(search, 1000);
 
-  const query = useSWRPage(
+  const query = useSWRPage<number, UserView>(
     ["admin/users", page, sort, debounced],
     async (key, page, sort, search) => {
       const entity = await adminListUsers(

@@ -4,7 +4,6 @@ import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 import { HStack, VStack } from "../../../components/layout/Stack";
 import ColorModeButton from "../../../components/header/ColorModeButton";
 import Panel from "../../../components/Panel";
-import AuthorizeView from "../../../router/AuthorizeView";
 import {
   Anchor,
   Button,
@@ -27,7 +26,6 @@ import { useTh } from "../../../theme/hooks/use-th";
 import { Dropzone } from "@mantine/dropzone";
 import { FileAdditionOne, FileQuestion, Search } from "@icon-park/react";
 import { UpdateFileView } from "../../../api/file";
-import useToast from "../../../utils/use-toast";
 import useLoading from "../../../utils/use-loading";
 import Async from "../../../components/Async";
 import { mod } from "../../../api/url";
@@ -39,7 +37,6 @@ import useFiles from "../../../api/use-files";
 const File: React.FC = () => {
   // tool
   const th = useTh();
-  const toast = useToast();
   // upload
   const [upload, setUpload] = useState(false);
   const uploadLoading = useLoading();
@@ -111,114 +108,105 @@ const File: React.FC = () => {
       <Panel title="文件管理">
         <Tabs tabPadding="md">
           <Tab label="文件列表">
-            <AuthorizeView>
-              {(user) => {
-                if (!user) {
-                  return null;
-                }
-                return (
-                  <Async query={files}>
-                    <Grid>
-                      {files.values().map((item) => (
-                        <Col key={item.id} span={2}>
-                          <Card withBorder padding="sm">
-                            <Card.Section>
-                              <AspectRatio ratio={4 / 3}>
-                                {item.contentType?.startsWith("image") ? (
-                                  <Image
-                                    src={mod("hoshi-file", item.url)}
-                                    alt={item.name}
-                                    css={css`
-                                      .mantine-Image-figure {
-                                        height: 100%;
-                                      }
-                                    `}
-                                  />
-                                ) : (
-                                  <Box
-                                    css={css`
-                                      background-color: ${th.color(
-                                        "gray.1",
-                                        "gray.8"
-                                      )};
-                                    `}
-                                  >
-                                    <FileQuestion size="30%" />
-                                  </Box>
-                                )}
-                              </AspectRatio>
-                            </Card.Section>
-                            <VStack
-                              spacing={1}
+            <Async query={files}>
+              <Grid>
+                {files.values().map((item) => (
+                  <Col key={item.id} span={2}>
+                    <Card withBorder padding="sm">
+                      <Card.Section>
+                        <AspectRatio ratio={4 / 3}>
+                          {item.contentType?.startsWith("image") ? (
+                            <Image
+                              src={mod("hoshi-file", item.url)}
+                              alt={item.name}
                               css={css`
-                                margin-top: ${th.spacing(1)};
-                                cursor: pointer;
-
-                                .mantine-Text-root {
-                                  white-space: nowrap;
-                                  text-overflow: ellipsis;
-                                  overflow-x: hidden;
+                                .mantine-Image-figure {
+                                  height: 100%;
                                 }
                               `}
+                            />
+                          ) : (
+                            <Box
+                              css={css`
+                                background-color: ${th.color(
+                                  "gray.1",
+                                  "gray.8"
+                                )};
+                              `}
                             >
-                              <Text weight={500} title={item.name}>
-                                {item.name}
-                              </Text>
-                              <Text color="dimmed" size="xs">
-                                {item.contentType ?? "Unknown"} - {item.size}
-                              </Text>
-                              <HStack spacing={2}>
-                                <Anchor
-                                  size="sm"
-                                  onClick={() =>
-                                    window.open(
-                                      mod("hoshi-file", item.url, "download")
-                                    )
-                                  }
-                                >
-                                  下载
-                                </Anchor>
-                                <Anchor
-                                  size="sm"
-                                  onClick={() => {
-                                    edit.open({
-                                      id: item.id,
-                                      name: item.name,
-                                      description: item.description ?? "",
-                                    });
-                                  }}
-                                >
-                                  编辑
-                                </Anchor>
-                                <Anchor
-                                  size="sm"
-                                  color="red"
-                                  onClick={() => files.$deleteFile(item.id)}
-                                >
-                                  删除
-                                </Anchor>
-                              </HStack>
-                            </VStack>
-                          </Card>
-                        </Col>
-                      ))}
-                    </Grid>
-                    {files.data && (
-                      <Pagination
-                        total={files.data.pages}
-                        page={files.page}
-                        onChange={files.setPage}
-                        position="center"
+                              <FileQuestion size="30%" />
+                            </Box>
+                          )}
+                        </AspectRatio>
+                      </Card.Section>
+                      <VStack
+                        spacing={1}
                         css={css`
-                          margin-top: ${th.spacing(2)};
-                          margin-bottom: ${th.spacing(4)};
+                          margin-top: ${th.spacing(1)};
+                          cursor: pointer;
+
+                          .mantine-Text-root {
+                            white-space: nowrap;
+                            text-overflow: ellipsis;
+                            overflow-x: hidden;
+                          }
                         `}
-                      />
-                    )}
-                  </Async>
-                );
-              }}
-            </AuthorizeView>
+                      >
+                        <Text weight={500} title={item.name}>
+                          {item.name}
+                        </Text>
+                        <Text color="dimmed" size="xs">
+                          {item.contentType ?? "Unknown"} - {item.size}
+                        </Text>
+                        <HStack spacing={2}>
+                          <Anchor
+                            size="sm"
+                            onClick={() =>
+                              window.open(
+                                mod("hoshi-file", item.url, "download")
+                              )
+                            }
+                          >
+                            下载
+                          </Anchor>
+                          <Anchor
+                            size="sm"
+                            onClick={() => {
+                              edit.open({
+                                id: item.id,
+                                name: item.name,
+                                description: item.description ?? "",
+                              });
+                            }}
+                          >
+                            编辑
+                          </Anchor>
+                          <Anchor
+                            size="sm"
+                            color="red"
+                            onClick={() => files.$deleteFile(item.id)}
+                          >
+                            删除
+                          </Anchor>
+                        </HStack>
+                      </VStack>
+                    </Card>
+                  </Col>
+                ))}
+              </Grid>
+              {files.data && (
+                <Pagination
+                  total={files.data.pages}
+                  page={files.page}
+                  onChange={files.setPage}
+                  position="center"
+                  css={css`
+                    margin-top: ${th.spacing(2)};
+                    margin-bottom: ${th.spacing(4)};
+                  `}
+                />
+              )}
+            </Async>
           </Tab>
         </Tabs>
       </Panel>

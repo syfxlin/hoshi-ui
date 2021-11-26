@@ -1,13 +1,15 @@
 import React from "react";
 import { logout, UserView } from "../../api/ums";
 import { BLink } from "../Link";
-import AuthorizeView from "../../router/AuthorizeView";
 import { Avatar, Divider, Menu, Text } from "@mantine/core";
 import { Logout } from "@icon-park/react";
 import Stack from "../layout/Stack";
 import { css } from "@emotion/react";
+import useMe from "../../api/use-me";
 
 const AuthButton: React.FC = () => {
+  const me = useMe();
+
   const anonymous = (
     <>
       <Stack spacing="xs">
@@ -58,11 +60,8 @@ const AuthButton: React.FC = () => {
       </>
     );
   };
-  return (
-    <AuthorizeView>
-      {(user) => (user ? authorize(user) : anonymous)}
-    </AuthorizeView>
-  );
+
+  return me.data ? authorize(me.data) : anonymous;
 };
 
 export default AuthButton;

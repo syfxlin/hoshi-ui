@@ -27,22 +27,31 @@ export const useWorkspaces = () => {
   const query = useSWRMap<
     string | number,
     NodeModel<WorkspaceView | ListNoteView>
-  >("workspaces", async () => {
-    const entity = await listWorkspaces();
-    return new Map(
-      entity.data?.map<[string, NodeModel<WorkspaceView>]>((w) => [
-        w.id,
-        {
-          id: w.id,
-          parent: 0,
-          text: w.name,
-          droppable: true,
-          loaded: false,
-          data: w,
-        },
-      ])
-    );
-  });
+  >(
+    "workspaces",
+    async () => {
+      const entity = await listWorkspaces();
+      return new Map(
+        entity.data?.map<[string, NodeModel<WorkspaceView>]>((w) => [
+          w.id,
+          {
+            id: w.id,
+            parent: 0,
+            text: w.name,
+            droppable: true,
+            loaded: false,
+            data: w,
+          },
+        ])
+      );
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshWhenHidden: false,
+      refreshWhenOffline: false,
+    }
+  );
 
   const $addWorkspace = (workspace: AddWorkspaceView) =>
     addWorkspace(workspace)

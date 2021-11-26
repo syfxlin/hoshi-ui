@@ -1,16 +1,11 @@
 import React from "react";
-import AuthorizeView from "../router/AuthorizeView";
 import Main from "../components/Main";
 import { Navigate } from "react-router-dom";
+import useMe from "../api/use-me";
 
 const Index: React.FC = () => {
-  return (
-    <Main>
-      <AuthorizeView>
-        {(user) => (user ? <Navigate to="/dashboard" /> : "Index")}
-      </AuthorizeView>
-    </Main>
-  );
+  const me = useMe();
+  return <Main>{me.data && <Navigate to="/dashboard" />}</Main>;
 };
 
 export default Index;

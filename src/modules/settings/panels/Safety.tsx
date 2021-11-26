@@ -4,8 +4,6 @@ import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 import { HStack, VStack } from "../../../components/layout/Stack";
 import ColorModeButton from "../../../components/header/ColorModeButton";
 import Panel from "../../../components/Panel";
-import useSWR from "swr";
-import { excludeLogged, listLogged } from "../../../api/ums";
 import Async from "../../../components/Async";
 import { Button, Divider, Tab, Tabs, Text, ThemeIcon } from "@mantine/core";
 import {
@@ -20,14 +18,11 @@ import {
 import UAParser from "ua-parser-js";
 import { css } from "@emotion/react";
 import useLoading from "../../../utils/use-loading";
-import useToast from "../../../utils/use-toast";
-import { useTh } from "../../../theme/hooks/use-th";
+import useLogged from "../../../api/use-logged";
 
 const Safety: React.FC = () => {
-  const query = useSWR(["listLogged"], () => listLogged());
+  const logged = useLogged();
   const loading = useLoading();
-  const toast = useToast();
-  const th = useTh();
   return (
     <AppShellContainer>
       <AppShellHeader>
@@ -39,10 +34,10 @@ const Safety: React.FC = () => {
       <Panel title="账号安全">
         <Tabs tabPadding="md">
           <Tab label="已登录的设备">
-            <Async query={query}>
+            <Async query={logged}>
               <VStack divider={<Divider />}>
-                {query.data?.data?.map((logged) => {
-                  const ua = UAParser(logged.userAgent);
+                {logged.values()?.map((item) => {
+                  const ua = UAParser(item.userAgent);
                   const icons = {
                     console: <Terminal />,
                     mobile: <Iphone />,
@@ -52,25 +47,9 @@ const Safety: React.FC = () => {
                     embedded: <Cpu />,
                     desktop: <Computer />,
                   } as Record<string, React.ReactElement>;
-                  const onDelete = () => {
-                    loading.wrap(
-                      excludeLogged(logged.sessionId)
-                        .then(
-                          toast.api.success({
-                            title: "删除成功",
-                          })
-                        )
-                        .then(() => query.mutate())
-                        .catch(
-                          toast.api.error({
-                            title: "删除失败",
-                          })
-                        )
-                    );
-                  };
                   return (
                     <HStack
-                      key={logged.sessionId}
+                      key={item.sessionId}
                       wrapChildren={false}
                       css={css`
                         width: 100%;
@@ -87,7 +66,7 @@ const Safety: React.FC = () => {
                         `}
                       >
                         <Text weight={500}>
-                          {logged.address} - {logged.sessionId}
+                          {item.address} - {item.sessionId}
                         </Text>
                         <Text color="dimmed" size="xs">
                           <span>
@@ -98,19 +77,21 @@ const Safety: React.FC = () => {
                           </span>
                           <span>
                             登录时间：
-                            {new Date(logged.creationTime).toLocaleString()}，
+                            {new Date(item.creationTime).toLocaleString()}，
                           </span>
                           <span>
                             最后访问时间：
-                            {new Date(logged.lastAccessedTime).toLocaleString()}
+                            {new Date(item.lastAccessedTime).toLocaleString()}
                           </span>
                         </Text>
                       </VStack>
                       <Button
                         variant="light"
-                        disabled={logged.current}
+                        disabled={item.current}
                         loading={loading.loading}
-                        onClick={onDelete}
+                        onClick={() =>
+                          loading.wrap(logged.$exclude(item.sessionId))
+                        }
                       >
                         删除
                       </Button>

@@ -25,6 +25,7 @@ import Form from "../../../components/form/Form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useWorkspaces } from "../../../api/use-workspace";
 import EmojiPicker from "../../../components/form/EmojiPicker";
+import Async from "../../../components/Async";
 
 const WorkspaceTree: React.FC = () => {
   const th = useTh();
@@ -85,125 +86,127 @@ const WorkspaceTree: React.FC = () => {
   });
   return (
     <>
-      <Tree
-        tree={workspaces.values()}
-        rootId={0}
-        canDrag={(node) => node?.parent !== 0}
-        onDrop={(data, options) => {
-          if (options.dragSource && options.dropTarget) {
-            const note = options.dragSource.data as ListNoteView;
-            const target = options.dropTarget.data;
-            const isWorkspace = options.dropTarget.parent === 0;
-            workspaces.$moveNote(
-              note.id,
-              isWorkspace ? target.id : target.workspace,
-              isWorkspace ? "null" : target.id
-            );
-          }
-        }}
-        render={TreeItem<ListNoteView | WorkspaceView>({
-          isActive: (node) => id === node.data?.id,
-          onClick: (node) => {
-            if (node.parent !== 0) {
-              navigate(`/doc/${node.data?.id}/preview`);
+      <Async query={workspaces}>
+        <Tree
+          tree={workspaces.values()}
+          rootId={0}
+          canDrag={(node) => node?.parent !== 0}
+          onDrop={(data, options) => {
+            if (options.dragSource && options.dropTarget) {
+              const note = options.dragSource.data as ListNoteView;
+              const target = options.dropTarget.data;
+              const isWorkspace = options.dropTarget.parent === 0;
+              workspaces.$moveNote(
+                note.id,
+                isWorkspace ? target.id : target.workspace,
+                isWorkspace ? "null" : target.id
+              );
             }
-          },
-          onLoad: async (node) => {
-            if (node.parent === 0) {
-              const data = node.data as WorkspaceView;
-              await workspaces.$loadNotes(data.id);
-            } else {
-              const data = node.data as ListNoteView;
-              await workspaces.$loadNotes(data.workspace, data.id);
-            }
-          },
-          left: (node) => {
-            return (
-              <EmojiPicker
-                size={[th.theme.fontSizes.base, "xs"]}
-                emoji={
-                  node.data?.icon ||
-                  (node.parent === 0 ? "file_folder" : "spiral_note_pad")
-                }
-                onSelect={async (emoji) => {
-                  const update =
-                    node.parent === 0
-                      ? workspaces.$updateWorkspace
-                      : workspaces.$updateNote;
-                  const data = node.data as WorkspaceView | ListNoteView;
-                  await update({
-                    id: data.id,
-                    icon: emoji.id,
-                  });
-                }}
-              />
-            );
-          },
-          text: (node) => node.text,
-          right: (node) => (
-            <ActionIcon
-              size="xs"
-              onClick={() => {
-                if (node.parent === 0) {
-                  const data = node.data as WorkspaceView;
-                  workspaces.$addNote({ workspace: data.id, name: "新页面" });
-                } else {
-                  const data = node.data as ListNoteView;
-                  workspaces.$addNote({
-                    workspace: data.workspace,
-                    parent: data.id,
-                    name: "新页面",
-                  });
-                }
-              }}
-            >
-              <Plus />
-            </ActionIcon>
-          ),
-          menu: (node) => (
-            <>
-              <Menu.Item icon={<Facebook />}>Settings</Menu.Item>
-              <Menu.Item
-                icon={<Editor />}
-                onClick={() => {
-                  if (node.parent === 0) {
-                    const data = node.data as WorkspaceView;
-                    edit.open({
+          }}
+          render={TreeItem<ListNoteView | WorkspaceView>({
+            isActive: (node) => id === node.data?.id,
+            onClick: (node) => {
+              if (node.parent !== 0) {
+                navigate(`/doc/${node.data?.id}/preview`);
+              }
+            },
+            onLoad: async (node) => {
+              if (node.parent === 0) {
+                const data = node.data as WorkspaceView;
+                await workspaces.$loadNotes(data.id);
+              } else {
+                const data = node.data as ListNoteView;
+                await workspaces.$loadNotes(data.workspace, data.id);
+              }
+            },
+            left: (node) => {
+              return (
+                <EmojiPicker
+                  size={[th.theme.fontSizes.base, "xs"]}
+                  emoji={
+                    node.data?.icon ||
+                    (node.parent === 0 ? "file_folder" : "spiral_note_pad")
+                  }
+                  onSelect={async (emoji) => {
+                    const update =
+                      node.parent === 0
+                        ? workspaces.$updateWorkspace
+                        : workspaces.$updateNote;
+                    const data = node.data as WorkspaceView | ListNoteView;
+                    await update({
                       id: data.id,
-                      name: data.name,
-                      description: data.description || "",
-                      domain: data.domain || "",
-                      icon: data.icon || "",
-                      disclose: data.disclose,
+                      icon: emoji.id,
                     });
-                  } else {
-                    const data = node.data as ListNoteView;
-                    navigate(`/doc/${data.id}/edit`);
-                  }
-                }}
-              >
-                编辑
-              </Menu.Item>
-              <Divider />
-              <Menu.Item
-                icon={<Delete />}
-                color="red"
+                  }}
+                />
+              );
+            },
+            text: (node) => node.text,
+            right: (node) => (
+              <ActionIcon
+                size="xs"
                 onClick={() => {
                   if (node.parent === 0) {
                     const data = node.data as WorkspaceView;
-                    workspaces.$deleteWorkspace(data.id);
+                    workspaces.$addNote({ workspace: data.id, name: "新页面" });
                   } else {
                     const data = node.data as ListNoteView;
-                    workspaces.$deleteNote(data.id);
+                    workspaces.$addNote({
+                      workspace: data.workspace,
+                      parent: data.id,
+                      name: "新页面",
+                    });
                   }
                 }}
               >
-                删除
-              </Menu.Item>
-            </>
-          ),
-        })}
-      />
+                <Plus />
+              </ActionIcon>
+            ),
+            menu: (node) => (
+              <>
+                <Menu.Item icon={<Facebook />}>Settings</Menu.Item>
+                <Menu.Item
+                  icon={<Editor />}
+                  onClick={() => {
+                    if (node.parent === 0) {
+                      const data = node.data as WorkspaceView;
+                      edit.open({
+                        id: data.id,
+                        name: data.name,
+                        description: data.description || "",
+                        domain: data.domain || "",
+                        icon: data.icon || "",
+                        disclose: data.disclose,
+                      });
+                    } else {
+                      const data = node.data as ListNoteView;
+                      navigate(`/doc/${data.id}/edit`);
+                    }
+                  }}
+                >
+                  编辑
+                </Menu.Item>
+                <Divider />
+                <Menu.Item
+                  icon={<Delete />}
+                  color="red"
+                  onClick={() => {
+                    if (node.parent === 0) {
+                      const data = node.data as WorkspaceView;
+                      workspaces.$deleteWorkspace(data.id);
+                    } else {
+                      const data = node.data as ListNoteView;
+                      workspaces.$deleteNote(data.id);
+                    }
+                  }}
+                >
+                  删除
+                </Menu.Item>
+              </>
+            ),
+          })}
+        />
+      </Async>
       <TreeButton icon={<Plus />} onClick={() => add.open()}>
         增加工作区
       </TreeButton>
