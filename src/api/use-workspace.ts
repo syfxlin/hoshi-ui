@@ -20,7 +20,7 @@ import useSWRMap from "../utils/use-swr-map";
 import useToast from "../utils/use-toast";
 import { useModals } from "@mantine/modals";
 
-export const useWorkspaces = () => {
+export const useWorkspaces = (revalidateOnMount?: boolean) => {
   const toast = useToast();
   const modals = useModals();
 
@@ -50,6 +50,7 @@ export const useWorkspaces = () => {
       revalidateOnReconnect: false,
       refreshWhenHidden: false,
       refreshWhenOffline: false,
+      revalidateOnMount: revalidateOnMount ?? true,
     }
   );
 

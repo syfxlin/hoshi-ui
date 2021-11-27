@@ -10,6 +10,7 @@ interface ImportMetaEnv {
   SSR: boolean;
   // custom
   VITE_SERVER_URL: string;
+  PEXELS_TOKEN: string;
 }
 
 declare module "emoji-mart-virtualized" {

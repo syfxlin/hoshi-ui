@@ -28,6 +28,11 @@ export const permissions: SelectItem[] = [
     label: "文件管理",
     group: "File",
   },
+  {
+    value: "PEXELS",
+    label: "Pexels 图库",
+    group: "File",
+  },
   // Note
   {
     value: "WORKSPACE",

@@ -3,6 +3,7 @@ import { ActionIcon, Popover } from "@mantine/core";
 import { Emoji, Picker } from "emoji-mart-virtualized";
 import { EmojiData } from "emoji-mart";
 import { MantineNumberSize } from "@mantine/styles";
+import { useColorScheme } from "../../theme/EmotionSystemProvider";
 
 type EmojiPickerProps = {
   size: [number, MantineNumberSize];
@@ -17,6 +18,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
   ...props
 }) => {
   const [opened, setOpened] = useState(false);
+  const [colorMode] = useColorScheme();
   return (
     <Popover
       zIndex={1001}
@@ -33,6 +35,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
         root: {
           display: "inline-flex",
           alignItems: "center",
+          width: size[1],
         },
         target: {
           display: "inline-block",
@@ -42,6 +45,10 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
     >
       <Picker
         set="twitter"
+        showPreview={false}
+        showSkinTones={false}
+        emojiTooltip={true}
+        theme={colorMode}
         style={{ border: "none" }}
         onSelect={(emoji) => {
           onSelect(emoji).then(() => setOpened(false));

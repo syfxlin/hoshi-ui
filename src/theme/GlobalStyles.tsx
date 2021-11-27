@@ -94,7 +94,7 @@ const GlobalStyles: React.FC = () => {
         }
 
         .i-icon {
-          display: flex;
+          display: inline-flex;
           justify-content: center;
           align-items: center;
         }

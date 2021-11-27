@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import AppShellContainer from "../../../components/app-shell/AppShellContainer";
 import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 import { HStack } from "../../../components/layout/Stack";
@@ -12,6 +12,7 @@ import {
   Button,
   Container,
   Menu,
+  Popover,
   Skeleton,
   Title,
   Tooltip,
@@ -23,11 +24,13 @@ import { useMount } from "react-use";
 import useToast from "../../../utils/use-toast";
 import useLoading from "../../../utils/use-loading";
 import { Link } from "../../../components/Link";
-import { Down } from "@icon-park/react";
+import { Down, Pic } from "@icon-park/react";
 import useNote from "../../../api/use-note";
 import EmojiPicker from "../../../components/form/EmojiPicker";
 import useBreadcrumbs from "../../../api/use-breadcrumbs";
 import ContentEditable from "../../../components/form/ContentEditable";
+import Flex from "../../../components/layout/Flex";
+import PhotoPicker from "../../../components/form/PhotoPicker";
 
 const Doc: React.FC = () => {
   const th = useTh();
@@ -61,6 +64,9 @@ const Doc: React.FC = () => {
       );
     }
   );
+
+  // cover
+  const [selectCover, setSelectCover] = useState(false);
 
   useMount(() => {
     const item = localStorage.getItem(`doc:${id}`);
@@ -165,6 +171,95 @@ const Doc: React.FC = () => {
           <ColorModeButton />
         </HStack>
       </AppShellHeader>
+      {note.attributes.cover ? (
+        <Flex
+          css={css`
+            position: relative;
+            height: ${th.spacing(80)};
+            background-image: url(${note.attributes.cover as string});
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: 50%;
+
+            > * {
+              opacity: 0;
+              transition: opacity 150ms;
+            }
+
+            &:hover > * {
+              opacity: 1;
+            }
+          `}
+        >
+          <HStack
+            spacing={1}
+            css={css`
+              position: absolute;
+              bottom: ${th.spacing(4)};
+              right: 25%;
+            `}
+          >
+            <Popover
+              opened={selectCover}
+              onClose={() => setSelectCover(false)}
+              position="bottom"
+              spacing={0}
+              withArrow
+              target={
+                <Button
+                  variant="light"
+                  size="xs"
+                  compact
+                  onClick={() => setSelectCover(true)}
+                >
+                  更换
+                </Button>
+              }
+            >
+              <PhotoPicker
+                onSelect={(p) => {
+                  note.$updateAttribute("cover", p?.url ?? null);
+                  setSelectCover(false);
+                }}
+              />
+            </Popover>
+            <Button
+              variant="light"
+              size="xs"
+              compact
+              onClick={() => note.$updateAttribute("cover", null)}
+            >
+              移除
+            </Button>
+          </HStack>
+        </Flex>
+      ) : (
+        <Flex
+          justify="center"
+          align="center"
+          css={css`
+            height: ${th.spacing(20)};
+            border-bottom: 1px dashed ${th.color("gray.3", "gray.7")};
+            opacity: 0;
+            transition: opacity 150ms;
+
+            &:hover {
+              opacity: 1;
+            }
+          `}
+        >
+          <Button
+            variant="light"
+            compact
+            leftIcon={<Pic />}
+            onClick={() =>
+              note.$updateAttribute("cover", "https://ixk.me/bg.jpg")
+            }
+          >
+            添加题头图
+          </Button>
+        </Flex>
+      )}
       <Container
         size="lg"
         css={css`
@@ -172,7 +267,7 @@ const Doc: React.FC = () => {
           display: flex;
           flex-direction: column;
           flex-grow: 1;
-          margin-top: ${th.spacing(10)};
+          margin-top: ${th.fontSize(-2)};
           margin-bottom: ${th.spacing(10)};
         `}
       >

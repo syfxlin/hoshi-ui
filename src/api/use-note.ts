@@ -2,12 +2,10 @@ import useSWRValue from "../utils/use-swr-value";
 import { getNote, NoteView, updateNote, UpdateNoteView } from "./note";
 import useToast from "../utils/use-toast";
 import { useWorkspaces } from "./use-workspace";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 const useNote = (id?: string) => {
   const toast = useToast();
-
-  const workspaces = useWorkspaces();
 
   const query = useSWRValue<NoteView>(
     ["note", id],
@@ -26,6 +24,32 @@ const useNote = (id?: string) => {
       refreshWhenOffline: false,
     }
   );
+
+  // sync workspaces tree data
+  const workspaces = useWorkspaces(false);
+  useEffect(() => {
+    const data = query.data;
+    if (data) {
+      workspaces.set(data.id, (prev) => ({
+        ...prev,
+        id: data.id,
+        parent: data.parent ?? data.workspace,
+        text: data.name,
+        data,
+      }));
+    }
+  }, [query.data]);
+
+  // attributes
+  const attributes = useMemo<
+    Record<string, number | string | boolean | null>
+  >(() => {
+    const attrs = query.data?.attributes;
+    if (!attrs) {
+      return {};
+    }
+    return JSON.parse(attrs);
+  }, [query.data]);
 
   const $updateNote = (note: Omit<UpdateNoteView, "id">) =>
     updateNote({
@@ -53,23 +77,22 @@ const useNote = (id?: string) => {
         })
       );
 
-  // sync workspaces tree data
-  useEffect(() => {
-    const data = query.data;
-    if (data) {
-      workspaces.set(data.id, (prev) => ({
-        ...prev,
-        id: data.id,
-        parent: data.parent ?? data.workspace,
-        text: data.name,
-        data,
-      }));
-    }
-  }, [query.data]);
+  const $updateAttribute = (
+    key: string,
+    value: number | string | boolean | null
+  ) =>
+    $updateNote({
+      attributes: JSON.stringify({
+        ...attributes,
+        [key]: value,
+      }),
+    });
 
   return {
     ...query,
+    attributes,
     $updateNote,
+    $updateAttribute,
   };
 };
 
