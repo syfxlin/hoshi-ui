@@ -47,12 +47,18 @@ const Sidebar: React.FC = () => {
         搜索
       </SidebarItem>
       <SidebarItem to="/dashboard/files" icon={<Search />}>
-        文件管理
+        文件
       </SidebarItem>
       <SidebarItem to="/settings" icon={<Search />}>
         设置
       </SidebarItem>
       <WorkspaceTree />
+      <SidebarItem to="/archive" icon={<Search />}>
+        归档
+      </SidebarItem>
+      <SidebarItem to="/trash" icon={<Search />}>
+        回收站
+      </SidebarItem>
     </CSidebar>
   );
 };

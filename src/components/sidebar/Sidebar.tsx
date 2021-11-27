@@ -15,7 +15,7 @@ const Sidebar: UIComponent<"div", BoxProps> = forwardRef((props, ref) => {
         flex-direction: column;
         width: 100%;
         flex-grow: 1;
-        background-color: ${th.color("gray.1", "gray.9")};
+        background-color: ${th.color("gray.1", "dark.5")};
       `}
     />
   );

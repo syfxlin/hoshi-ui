@@ -1,4 +1,11 @@
-import { ApiEntity, omit, request } from "./request";
+import {
+  ApiEntity,
+  ApiPage,
+  omit,
+  pageable,
+  Pageable,
+  request,
+} from "./request";
 
 export type WorkspaceView = {
   id: string;
@@ -13,7 +20,6 @@ export type WorkspaceView = {
 
 export enum NoteStatus {
   NORMAL = "NORMAL",
-  LOCKED = "LOCKED",
   ARCHIVE = "ARCHIVE",
   DELETED = "DELETED",
 }
@@ -116,12 +122,12 @@ export const deleteWorkspace = (id: string) =>
     .delete<ApiEntity>(`/hoshi-note/workspaces/${id}`)
     .then((response) => response.data);
 
-export const listNotes = (workspace: string, parent?: string) =>
+export const treeNotes = (workspace: string, parent?: string) =>
   request
     .get<ApiEntity<ListNoteView[]>>(
       parent
-        ? `/hoshi-note/notes/list/${workspace}/${parent}`
-        : `/hoshi-note/notes/list/${workspace}`
+        ? `/hoshi-note/notes/tree/${workspace}/${parent}`
+        : `/hoshi-note/notes/tree/${workspace}`
     )
     .then((response) => response.data);
 
@@ -156,4 +162,39 @@ export const deleteNote = (id: string) =>
 export const getBreadcrumb = (id: string) =>
   request
     .get<ApiEntity<BreadcrumbView>>(`/hoshi-note/notes/${id}/breadcrumb`)
+    .then((response) => response.data);
+
+export const getTrash = (page: Pageable, search?: string) =>
+  request
+    .get<ApiEntity<ApiPage<ListNoteView>>>(`/hoshi-note/notes/deleted`, {
+      params: {
+        ...pageable(page),
+        ...(search ? { search } : {}),
+      },
+    })
+    .then((response) => response.data);
+
+export const getArchive = (page: Pageable, search?: string) =>
+  request
+    .get<ApiEntity<ApiPage<ListNoteView>>>(`/hoshi-note/notes/archived`, {
+      params: {
+        ...pageable(page),
+        ...(search ? { search } : {}),
+      },
+    })
+    .then((response) => response.data);
+
+export const restoreNote = (id: string) =>
+  request
+    .put<ApiEntity>(`/hoshi-note/notes/${id}/restore`)
+    .then((response) => response.data);
+
+export const archiveNote = (id: string) =>
+  request
+    .delete<ApiEntity>(`/hoshi-note/notes/${id}/archive`)
+    .then((response) => response.data);
+
+export const forceDeleteNote = (id: string) =>
+  request
+    .delete<ApiEntity>(`/hoshi-note/notes/${id}/force`)
     .then((response) => response.data);

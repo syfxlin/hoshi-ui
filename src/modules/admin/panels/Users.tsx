@@ -20,7 +20,7 @@ import BaseTable, { AutoResizer, ColumnShape } from "react-base-table";
 import useToast from "../../../utils/use-toast";
 import AuthorizeView from "../../../router/AuthorizeView";
 import useForm from "../../../utils/use-form";
-import Panel from "../../../components/Panel";
+import Panel from "../../../components/panel/Panel";
 import { wrap } from "../../../utils/react";
 import { Search } from "@icon-park/react";
 import AppShellContainer from "../../../components/app-shell/AppShellContainer";

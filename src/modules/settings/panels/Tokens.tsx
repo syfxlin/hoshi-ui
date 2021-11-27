@@ -2,7 +2,7 @@ import React from "react";
 import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 import { HStack, VStack } from "../../../components/layout/Stack";
 import ColorModeButton from "../../../components/header/ColorModeButton";
-import Panel from "../../../components/Panel";
+import Panel from "../../../components/panel/Panel";
 import AppShellContainer from "../../../components/app-shell/AppShellContainer";
 import Async from "../../../components/Async";
 import {

@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { HStack } from "../../../components/layout/Stack";
 import ColorModeButton from "../../../components/header/ColorModeButton";
-import Panel from "../../../components/Panel";
+import Panel from "../../../components/panel/Panel";
 import Box from "../../../components/layout/Box";
 import { css } from "@emotion/react";
 import useForm from "../../../utils/use-form";

@@ -21,6 +21,8 @@ const Settings = loadable(() => import("./modules/settings/Settings"));
 const Home = loadable(() => import("./modules/dashboard/panels/Home"));
 const File = loadable(() => import("./modules/dashboard/panels/File"));
 const Doc = loadable(() => import("./modules/dashboard/panels/Doc"));
+const Trash = loadable(() => import("./modules/dashboard/panels/Trash"));
+const Archive = loadable(() => import("./modules/dashboard/panels/Archive"));
 
 // Settings
 const Info = loadable(() => import("./modules/settings/panels/Info"));
@@ -54,6 +56,14 @@ const App: React.FC = () => {
           <AuthorizeRoute path="/doc" element={<Dashboard />}>
             <AuthorizeRoute path=":id" element={<Navigate to="preview" />} />
             <AuthorizeRoute path=":id/:mode" element={<Doc />} />
+          </AuthorizeRoute>
+          {/* Trash */}
+          <AuthorizeRoute path="/trash" element={<Dashboard />}>
+            <AuthorizeRoute index element={<Trash />} />
+          </AuthorizeRoute>
+          {/* Archive */}
+          <AuthorizeRoute path="/archive" element={<Dashboard />}>
+            <AuthorizeRoute index element={<Archive />} />
           </AuthorizeRoute>
           {/* Setting */}
           <AuthorizeRoute path="/settings" element={<Settings />}>

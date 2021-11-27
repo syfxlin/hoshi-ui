@@ -3,7 +3,7 @@ import AppShellContainer from "../../../components/app-shell/AppShellContainer";
 import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 import { HStack, VStack } from "../../../components/layout/Stack";
 import ColorModeButton from "../../../components/header/ColorModeButton";
-import Panel from "../../../components/Panel";
+import Panel from "../../../components/panel/Panel";
 import {
   Anchor,
   Button,
@@ -105,7 +105,7 @@ const File: React.FC = () => {
           <ColorModeButton />
         </HStack>
       </AppShellHeader>
-      <Panel title="文件管理">
+      <Panel title="文件">
         <Tabs tabPadding="md">
           <Tab label="文件列表">
             <Async query={files}>

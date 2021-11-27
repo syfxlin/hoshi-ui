@@ -5,7 +5,13 @@ import {
   UpdateWorkspaceView,
   WorkspaceView,
 } from "../../../api/note";
-import { Delete, Editor, Facebook, Plus } from "@icon-park/react";
+import {
+  Box as BoxIcon,
+  Delete,
+  Editor,
+  Facebook,
+  Plus,
+} from "@icon-park/react";
 import TreeButton from "../../../components/tree/TreeButton";
 import TreeItem from "../../../components/tree/TreeItem";
 import {
@@ -187,6 +193,18 @@ const WorkspaceTree: React.FC = () => {
                   编辑
                 </Menu.Item>
                 <Divider />
+                {node.parent !== 0 && (
+                  <Menu.Item
+                    icon={<BoxIcon />}
+                    color="orange"
+                    onClick={() => {
+                      const data = node.data as ListNoteView;
+                      workspaces.$archiveNote(data.id);
+                    }}
+                  >
+                    归档
+                  </Menu.Item>
+                )}
                 <Menu.Item
                   icon={<Delete />}
                   color="red"

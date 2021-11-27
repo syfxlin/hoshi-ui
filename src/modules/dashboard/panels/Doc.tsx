@@ -8,9 +8,11 @@ import { useTh } from "../../../theme/hooks/use-th";
 import { css } from "@emotion/react";
 import {
   ActionIcon,
+  Alert,
   Breadcrumbs,
   Button,
   Container,
+  Divider,
   Menu,
   Popover,
   Skeleton,
@@ -24,13 +26,14 @@ import { useMount } from "react-use";
 import useToast from "../../../utils/use-toast";
 import useLoading from "../../../utils/use-loading";
 import { Link } from "../../../components/Link";
-import { Down, Pic } from "@icon-park/react";
+import { Down, More, Pic } from "@icon-park/react";
 import useNote from "../../../api/use-note";
 import EmojiPicker from "../../../components/form/EmojiPicker";
 import useBreadcrumbs from "../../../api/use-breadcrumbs";
 import ContentEditable from "../../../components/form/ContentEditable";
 import Flex from "../../../components/layout/Flex";
 import PhotoPicker from "../../../components/form/PhotoPicker";
+import { NoteStatus } from "../../../api/note";
 
 const Doc: React.FC = () => {
   const th = useTh();
@@ -168,9 +171,59 @@ const Doc: React.FC = () => {
           >
             {mode === "edit" ? "保存" : "编辑"}
           </Button>
+          <Menu
+            withArrow
+            placement="end"
+            control={
+              <ActionIcon variant="light" color={th.primaryColor}>
+                <More />
+              </ActionIcon>
+            }
+          >
+            <Menu.Item>123</Menu.Item>
+            <Divider />
+            <Menu.Item color="red">删除</Menu.Item>
+            <Divider />
+            <Menu.Label>
+              最后修改时间：
+              <br />
+              {note.data && new Date(note.data.updatedTime).toLocaleString()}
+            </Menu.Label>
+            <Menu.Label>
+              创建时间：
+              <br />
+              {note.data && new Date(note.data.createdTime).toLocaleString()}
+            </Menu.Label>
+          </Menu>
           <ColorModeButton />
         </HStack>
       </AppShellHeader>
+      {note.data?.status === NoteStatus.DELETED && (
+        <Alert color="red">
+          <HStack justify="center" align="center" spacing={2}>
+            <span>此笔记位于回收站中</span>
+            <Button size="xs" variant="outline">
+              还原笔记
+            </Button>
+            <Button size="xs" variant="outline" color="red">
+              永久删除
+            </Button>
+          </HStack>
+        </Alert>
+      )}
+      {note.data?.status === NoteStatus.ARCHIVE && (
+        <Alert color="orange">
+          <HStack justify="center" align="center" spacing={2}>
+            <span>此笔记已归档</span>
+            <Button size="xs" variant="outline">
+              还原笔记
+            </Button>
+            <Button size="xs" variant="outline" color="red">
+              删除
+            </Button>
+          </HStack>
+        </Alert>
+      )}
       {note.attributes.cover ? (
         <Flex
           css={css`

@@ -3,7 +3,7 @@ import AppShellContainer from "../../../components/app-shell/AppShellContainer";
 import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 import { HStack } from "../../../components/layout/Stack";
 import ColorModeButton from "../../../components/header/ColorModeButton";
-import Panel from "../../../components/Panel";
+import Panel from "../../../components/panel/Panel";
 import AuthorizeView from "../../../router/AuthorizeView";
 import useToast from "../../../utils/use-toast";
 import useForm from "../../../utils/use-form";

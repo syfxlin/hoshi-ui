@@ -1,8 +1,8 @@
 import React, { forwardRef } from "react";
 import { Container, Title } from "@mantine/core";
 import { css } from "@emotion/react";
-import { useTh } from "../theme/hooks/use-th";
-import { Styles, UIComponent } from "../utils/types";
+import { useTh } from "../../theme/hooks/use-th";
+import { Styles, UIComponent } from "../../utils/types";
 
 type PanelProps = {
   title: React.ReactNode;
@@ -29,7 +29,7 @@ const Panel: UIComponent<"div", PanelProps> = forwardRef(
           order={1}
           css={css`
             font-weight: 500;
-            margin-bottom: ${th.spacing(4)};
+            margin-bottom: ${th.spacing(2)};
             ${styles?.title}
           `}
         >

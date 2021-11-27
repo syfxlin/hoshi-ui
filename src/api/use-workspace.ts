@@ -4,12 +4,13 @@ import {
   AddNoteView,
   addWorkspace,
   AddWorkspaceView,
+  archiveNote,
   deleteNote,
   deleteWorkspace,
-  listNotes,
   ListNoteView,
   listWorkspaces,
   NoteView,
+  treeNotes,
   updateNote,
   UpdateNoteView,
   updateWorkspace,
@@ -85,7 +86,7 @@ export const useWorkspaces = (revalidateOnMount?: boolean) => {
       ...prev,
       loaded: "loading",
     }));
-    const entity = await listNotes(workspace, parent);
+    const entity = await treeNotes(workspace, parent);
     await query.addAll(
       entity.data?.map((n) => [
         n.id,
@@ -213,9 +214,26 @@ export const useWorkspaces = (revalidateOnMount?: boolean) => {
         })
       );
 
+  const $archiveNote = (id: string) =>
+    archiveNote(id)
+      .then(
+        toast.api.success({
+          title: "归档成功",
+        })
+      )
+      .then((res) => {
+        query.remove(id);
+        return res;
+      })
+      .catch(
+        toast.api.error({
+          title: "归档失败",
+        })
+      );
+
   const $deleteNote = (id: string) =>
     modals.openConfirmModal({
-      title: "确认删除该工笔记？",
+      title: "确认删除该笔记？",
       labels: {
         confirm: "确认删除",
         cancel: "取消删除",
@@ -250,6 +268,7 @@ export const useWorkspaces = (revalidateOnMount?: boolean) => {
     $updateNote,
     $addNote,
     $deleteWorkspace,
+    $archiveNote,
     $deleteNote,
   };
 };
