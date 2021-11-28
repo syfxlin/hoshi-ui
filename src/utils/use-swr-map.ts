@@ -1,5 +1,5 @@
 import useSWR, { Fetcher, Key, SWRConfiguration } from "swr";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 const useSWRMap = <K = any, V = any, E = any>(
   key: Key,
@@ -64,12 +64,9 @@ const useSWRMap = <K = any, V = any, E = any>(
     [query.mutate]
   );
 
-  const keys = useCallback(() => [...(query.data?.keys() ?? [])], [query.data]);
+  const keys = useMemo(() => [...(query.data?.keys() ?? [])], [query.data]);
 
-  const values = useCallback(
-    () => [...(query.data?.values() ?? [])],
-    [query.data]
-  );
+  const values = useMemo(() => [...(query.data?.values() ?? [])], [query.data]);
 
   return {
     ...query,

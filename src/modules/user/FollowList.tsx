@@ -57,7 +57,7 @@ const FollowList: React.FC<FollowListProps> = ({ user, type }) => {
             margin-bottom: ${th.spacing(4)};
           `}
         >
-          {follow.values().map((user) => (
+          {follow.values.map((user) => (
             <Flex
               key={user.id}
               css={css`

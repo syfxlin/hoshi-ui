@@ -3,10 +3,11 @@ import { Assign, UIComponent } from "../../utils/types";
 import { HStack, StackProps, VStack } from "../layout/Stack";
 import { ListNoteView } from "../../api/note";
 import { css } from "@emotion/react";
-import { Text, ThemeIcon } from "@mantine/core";
+import { ThemeIcon } from "@mantine/core";
 import { Emoji } from "emoji-mart-virtualized";
 import { useTh } from "../../theme/hooks/use-th";
 import { useWorkspaces } from "../../api/use-workspace";
+import Ellipsis from "../Ellipsis";
 
 type NoteCardProps = Assign<
   StackProps,
@@ -48,10 +49,11 @@ const NoteCard: UIComponent<"div", NoteCardProps> = forwardRef(
           spacing={1}
           css={css`
             flex-grow: 1;
+            overflow-x: hidden;
           `}
         >
-          <Text weight={500}>{note.name}</Text>
-          <Text color="dimmed" size="xs">
+          <Ellipsis weight={500}>{note.name}</Ellipsis>
+          <Ellipsis color="dimmed" size="xs">
             <strong>工作区：</strong>
             <span>{workspaces.data?.get(note.workspace)?.data?.name}</span>
             <span>，</span>
@@ -63,7 +65,7 @@ const NoteCard: UIComponent<"div", NoteCardProps> = forwardRef(
             <span>，</span>
             <strong>状态：</strong>
             <span>{note.status}</span>
-          </Text>
+          </Ellipsis>
         </VStack>
         {children}
       </HStack>

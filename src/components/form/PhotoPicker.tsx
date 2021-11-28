@@ -21,6 +21,7 @@ import { HStack, VStack } from "../layout/Stack";
 import { FileAdditionOne } from "@icon-park/react";
 import useLoading from "../../utils/use-loading";
 import { FileView } from "../../api/file";
+import Ellipsis from "../Ellipsis";
 
 type PhotoPickerProps = {
   onSelect: (photo?: { name: string; url: string }) => void;
@@ -62,9 +63,8 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({ onSelect }) => {
             }
           />
           <Grid gutter="xs">
-            {files
-              .values()
-              ?.filter((item) => item.contentType?.startsWith("image"))
+            {files.values
+              .filter((item) => item.contentType?.startsWith("image"))
               .map((item) => (
                 <Col key={item.id} span={3}>
                   <AspectRatio ratio={16 / 9}>
@@ -94,17 +94,9 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({ onSelect }) => {
                       }}
                     />
                   </AspectRatio>
-                  <Text
-                    size="xs"
-                    color="dimmed"
-                    css={css`
-                      white-space: nowrap;
-                      overflow-x: hidden;
-                      text-overflow: ellipsis;
-                    `}
-                  >
+                  <Ellipsis size="xs" color="dimmed">
                     {item.name}
-                  </Text>
+                  </Ellipsis>
                 </Col>
               ))}
           </Grid>
@@ -231,15 +223,7 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({ onSelect }) => {
                     }}
                   />
                 </AspectRatio>
-                <Text
-                  size="xs"
-                  color="dimmed"
-                  css={css`
-                    white-space: nowrap;
-                    overflow-x: hidden;
-                    text-overflow: ellipsis;
-                  `}
-                >
+                <Ellipsis size="xs" color="dimmed">
                   by{" "}
                   <Anchor
                     color="dimmed"
@@ -248,7 +232,7 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({ onSelect }) => {
                   >
                     {photo.photographer}
                   </Anchor>
-                </Text>
+                </Ellipsis>
               </Col>
             ))}
           </Grid>

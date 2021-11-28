@@ -5,7 +5,7 @@ import { HStack, VStack } from "../../../components/layout/Stack";
 import ColorModeButton from "../../../components/header/ColorModeButton";
 import Panel from "../../../components/panel/Panel";
 import Async from "../../../components/Async";
-import { Button, Divider, Tab, Tabs, Text, ThemeIcon } from "@mantine/core";
+import { Button, Divider, Tab, Tabs, ThemeIcon } from "@mantine/core";
 import {
   Computer,
   Cpu,
@@ -19,6 +19,7 @@ import UAParser from "ua-parser-js";
 import { css } from "@emotion/react";
 import useLoading from "../../../utils/use-loading";
 import useLogged from "../../../api/use-logged";
+import Ellipsis from "../../../components/Ellipsis";
 
 const Safety: React.FC = () => {
   const logged = useLogged();
@@ -36,7 +37,7 @@ const Safety: React.FC = () => {
           <Tab label="已登录的设备">
             <Async query={logged}>
               <VStack divider={<Divider />}>
-                {logged.values()?.map((item) => {
+                {logged.values.map((item) => {
                   const ua = UAParser(item.userAgent);
                   const icons = {
                     console: <Terminal />,
@@ -63,27 +64,29 @@ const Safety: React.FC = () => {
                         spacing={1}
                         css={css`
                           flex-grow: 1;
+                          overflow-x: hidden;
                         `}
                       >
-                        <Text weight={500}>
+                        <Ellipsis weight={500}>
                           {item.address} - {item.sessionId}
-                        </Text>
-                        <Text color="dimmed" size="xs">
+                        </Ellipsis>
+                        <Ellipsis color="dimmed" size="xs">
                           <span>
                             {ua.browser.name && ua.os.name
                               ? `${ua.browser.name} on ${ua.os.name}`
                               : "未知设备"}
-                            ，
                           </span>
+                          <span>，</span>
                           <span>
                             登录时间：
-                            {new Date(item.creationTime).toLocaleString()}，
+                            {new Date(item.creationTime).toLocaleString()}
                           </span>
+                          <span>，</span>
                           <span>
                             最后访问时间：
                             {new Date(item.lastAccessedTime).toLocaleString()}
                           </span>
-                        </Text>
+                        </Ellipsis>
                       </VStack>
                       <Button
                         variant="light"

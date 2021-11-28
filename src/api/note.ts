@@ -198,3 +198,51 @@ export const forceDeleteNote = (id: string) =>
   request
     .delete<ApiEntity>(`/hoshi-note/notes/${id}/force`)
     .then((response) => response.data);
+
+export type SearchNoteFiltersView = {
+  onlyName?: boolean;
+  workspace?: string;
+  status?: string;
+  createdTimeStart?: string;
+  createdTimeEnd?: string;
+  updatedTimeStart?: string;
+  updatedTimeEnd?: string;
+};
+
+export const searchNote = (
+  search: string,
+  page: Pageable,
+  filters?: SearchNoteFiltersView
+) => {
+  const _filters: string[] = [];
+  if (filters?.onlyName) {
+    _filters.push("onlyName");
+  }
+  if (filters?.workspace) {
+    _filters.push(`workspace,${filters.workspace}`);
+  }
+  if (filters?.status) {
+    _filters.push(`status,${filters.status}`);
+  }
+  if (filters?.createdTimeStart) {
+    _filters.push(`createdTimeStart,${filters.createdTimeStart}`);
+  }
+  if (filters?.createdTimeEnd) {
+    _filters.push(`createdTimeEnd,${filters.createdTimeEnd}`);
+  }
+  if (filters?.updatedTimeStart) {
+    _filters.push(`updatedTimeStart,${filters.updatedTimeStart}`);
+  }
+  if (filters?.updatedTimeEnd) {
+    _filters.push(`updatedTimeEnd,${filters.updatedTimeEnd}`);
+  }
+  return request
+    .get<ApiEntity<ApiPage<ListNoteView>>>(`/hoshi-note/notes/search`, {
+      params: {
+        search,
+        ...pageable(page),
+        ...(_filters.length > 0 ? { filters: _filters } : {}),
+      },
+    })
+    .then((response) => response.data);
+};

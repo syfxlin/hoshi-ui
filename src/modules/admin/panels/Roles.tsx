@@ -221,7 +221,7 @@ const Roles: React.FC = () => {
                 width={size.width}
                 height={size.height}
                 columns={columns}
-                data={roles.values()}
+                data={roles.values}
                 rowKey="name"
               />
             )}

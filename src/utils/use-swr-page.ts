@@ -1,5 +1,5 @@
 import useSWR, { Fetcher, Key, SWRConfiguration } from "swr";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 export type SWRPage<K = any, V = any> = {
   page: number;
@@ -36,12 +36,12 @@ const useSWRPage = <K = any, V = any, E = any>(
     [query.mutate]
   );
 
-  const keys = useCallback(
+  const keys = useMemo(
     () => [...(query.data?.records.keys() ?? [])],
     [query.data]
   );
 
-  const values = useCallback(
+  const values = useMemo(
     () => [...(query.data?.records.values() ?? [])],
     [query.data]
   );

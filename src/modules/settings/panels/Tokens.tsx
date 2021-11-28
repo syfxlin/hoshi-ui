@@ -5,20 +5,13 @@ import ColorModeButton from "../../../components/header/ColorModeButton";
 import Panel from "../../../components/panel/Panel";
 import AppShellContainer from "../../../components/app-shell/AppShellContainer";
 import Async from "../../../components/Async";
-import {
-  Button,
-  Divider,
-  Modal,
-  Tab,
-  Tabs,
-  Text,
-  TextInput,
-} from "@mantine/core";
+import { Button, Divider, Modal, Tab, Tabs, TextInput } from "@mantine/core";
 import { css } from "@emotion/react";
 import useLoading from "../../../utils/use-loading";
 import useForm from "../../../utils/use-form";
 import Form from "../../../components/form/Form";
 import useTokens from "../../../api/use-tokens";
+import Ellipsis from "../../../components/Ellipsis";
 
 const Tokens: React.FC = () => {
   const tokens = useTokens();
@@ -50,7 +43,7 @@ const Tokens: React.FC = () => {
           <Tab label="令牌">
             <Async query={tokens}>
               <VStack divider={<Divider />}>
-                {tokens.values()?.map((token) => {
+                {tokens.values.map((token) => {
                   const onRevoke = () => {
                     loading.wrap(tokens.$revokeToken(token.token));
                   };
@@ -65,13 +58,15 @@ const Tokens: React.FC = () => {
                     >
                       <HStack
                         spacing={1}
+                        wrapChildren={false}
                         css={css`
                           flex-grow: 1;
+                          overflow-x: hidden;
                         `}
                       >
-                        <Text weight={500}>{token.name}</Text>
-                        <Text>-</Text>
-                        <Text>{token.token}</Text>
+                        <Ellipsis weight={500}>{token.name}</Ellipsis>
+                        <span>-</span>
+                        <Ellipsis>{token.token}</Ellipsis>
                       </HStack>
                       <Button
                         variant="light"

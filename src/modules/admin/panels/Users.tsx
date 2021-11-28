@@ -269,7 +269,7 @@ const Users: React.FC = () => {
                   width={size.width}
                   height={size.height}
                   columns={columns}
-                  data={users.values()}
+                  data={users.values}
                   sortState={users.sort}
                   onColumnSort={({ key, order }) => {
                     const newSort = {
@@ -390,7 +390,7 @@ const Users: React.FC = () => {
             placeholder="选择角色"
             searchable
             data={
-              roles.values().map((role) => role.name) ?? assignRole.values.roles
+              roles.values.map((role) => role.name) ?? assignRole.values.roles
             }
             value={assignRole.values.roles}
             onChange={(value) => assignRole.setValue("roles", value)}

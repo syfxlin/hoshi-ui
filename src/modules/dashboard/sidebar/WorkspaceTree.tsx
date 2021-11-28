@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   AddWorkspaceView,
   ListNoteView,
@@ -11,6 +11,7 @@ import {
   Editor,
   Facebook,
   Plus,
+  Refresh,
 } from "@icon-park/react";
 import TreeButton from "../../../components/tree/TreeButton";
 import TreeItem from "../../../components/tree/TreeItem";
@@ -32,6 +33,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useWorkspaces } from "../../../api/use-workspace";
 import EmojiPicker from "../../../components/form/EmojiPicker";
 import Async from "../../../components/Async";
+import { TreeMethods } from "@minoru/react-dnd-treeview";
+import { css } from "@emotion/react";
+import Box from "../../../components/layout/Box";
 
 const WorkspaceTree: React.FC = () => {
   const th = useTh();
@@ -40,6 +44,8 @@ const WorkspaceTree: React.FC = () => {
   const { id } = useParams<"id">();
   // workspaces
   const workspaces = useWorkspaces();
+  // tree
+  const tree = useRef<TreeMethods>(null);
   // form
   const add = useForm<AddWorkspaceView>({
     initial: {
@@ -91,11 +97,17 @@ const WorkspaceTree: React.FC = () => {
     },
   });
   return (
-    <>
+    <Box
+      css={css`
+        flex-grow: 1;
+        overflow-y: auto;
+      `}
+    >
       <Async query={workspaces}>
         <Tree
-          tree={workspaces.values()}
+          tree={workspaces.values}
           rootId={0}
+          treeRef={tree}
           canDrag={(node) => node?.parent !== 0}
           onDrop={(data, options) => {
             if (options.dragSource && options.dropTarget) {
@@ -228,6 +240,15 @@ const WorkspaceTree: React.FC = () => {
       <TreeButton icon={<Plus />} onClick={() => add.open()}>
         增加工作区
       </TreeButton>
+      <TreeButton
+        icon={<Refresh />}
+        onClick={() => {
+          tree.current?.closeAll();
+          workspaces.mutate();
+        }}
+      >
+        刷新
+      </TreeButton>
       <Modal opened={add.opened} onClose={() => add.close()} title="新增工作区">
         <Form onSubmit={add.onSubmit}>
           <TextInput
@@ -320,7 +341,7 @@ const WorkspaceTree: React.FC = () => {
           </Button>
         </Form>
       </Modal>
-    </>
+    </Box>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { forwardRef } from "react";
-import { Avatar, Text, UnstyledButton } from "@mantine/core";
+import { Avatar, UnstyledButton } from "@mantine/core";
 import Stack from "../layout/Stack";
 import { css } from "@emotion/react";
 import Box from "../layout/Box";
@@ -8,6 +8,7 @@ import AuthorizeView from "../../router/AuthorizeView";
 import { useTh } from "../../theme/hooks/use-th";
 import { UnstyledButtonProps } from "@mantine/core/lib/src/components/Button/UnstyledButton/UnstyledButton";
 import { Assign } from "../../utils/types";
+import Ellipsis from "../Ellipsis";
 
 type SidebarControlProps = Assign<
   UnstyledButtonProps,
@@ -57,26 +58,10 @@ const SidebarControl = forwardRef<HTMLButtonElement, SidebarControlProps>(
                     min-width: 0;
                   `}
                 >
-                  <Text
-                    css={css`
-                      white-space: nowrap;
-                      text-overflow: ellipsis;
-                      overflow-x: hidden;
-                    `}
-                  >
-                    {user.nickname}
-                  </Text>
-                  <Text
-                    size="xs"
-                    color="dimmed"
-                    css={css`
-                      white-space: nowrap;
-                      text-overflow: ellipsis;
-                      overflow-x: hidden;
-                    `}
-                  >
+                  <Ellipsis>{user.nickname}</Ellipsis>
+                  <Ellipsis size="xs" color="dimmed">
                     {text ?? user.username}
-                  </Text>
+                  </Ellipsis>
                 </Box>
                 {icon ?? <Down />}
               </Stack>

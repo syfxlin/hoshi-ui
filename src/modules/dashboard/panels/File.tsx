@@ -33,6 +33,7 @@ import Box from "../../../components/layout/Box";
 import useForm from "../../../utils/use-form";
 import Form from "../../../components/form/Form";
 import useFiles from "../../../api/use-files";
+import Ellipsis from "../../../components/Ellipsis";
 
 const File: React.FC = () => {
   // tool
@@ -110,7 +111,7 @@ const File: React.FC = () => {
           <Tab label="文件列表">
             <Async query={files}>
               <Grid>
-                {files.values().map((item) => (
+                {files.values.map((item) => (
                   <Col key={item.id} span={2}>
                     <Card withBorder padding="sm">
                       <Card.Section>
@@ -144,20 +145,14 @@ const File: React.FC = () => {
                         css={css`
                           margin-top: ${th.spacing(1)};
                           cursor: pointer;
-
-                          .mantine-Text-root {
-                            white-space: nowrap;
-                            text-overflow: ellipsis;
-                            overflow-x: hidden;
-                          }
                         `}
                       >
-                        <Text weight={500} title={item.name}>
+                        <Ellipsis weight={500} title={item.name}>
                           {item.name}
-                        </Text>
-                        <Text color="dimmed" size="xs">
+                        </Ellipsis>
+                        <Ellipsis color="dimmed" size="xs">
                           {item.contentType ?? "Unknown"} - {item.size}
-                        </Text>
+                        </Ellipsis>
                         <HStack spacing={2}>
                           <Anchor
                             size="sm"

@@ -1,20 +1,24 @@
 import { Assign } from "../../utils/types";
-import { Link, LinkProps } from "../Link";
 import React from "react";
 import { useTh } from "../../theme/hooks/use-th";
 import { css } from "@emotion/react";
 import Box from "../layout/Box";
-import { Badge, ThemeIcon } from "@mantine/core";
+import {
+  Badge,
+  ThemeIcon,
+  UnstyledButton,
+  UnstyledButtonProps,
+} from "@mantine/core";
 
-type SidebarItemProps = Assign<
-  LinkProps,
+type SidebarButtonProps = Assign<
+  UnstyledButtonProps,
   {
     icon?: React.ReactNode;
     badge?: React.ReactNode;
   }
 >;
 
-const SidebarItem: React.FC<SidebarItemProps> = ({
+const SidebarButton: React.FC<SidebarButtonProps> = ({
   icon,
   badge,
   children,
@@ -22,10 +26,8 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
 }) => {
   const th = useTh();
   return (
-    <Link
+    <UnstyledButton
       {...props}
-      className={({ isActive }) => (isActive ? "active" : "")}
-      end
       css={css`
         display: flex;
         align-items: center;
@@ -64,8 +66,8 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
         {children}
       </Box>
       {badge && <Badge size="xs">{badge}</Badge>}
-    </Link>
+    </UnstyledButton>
   );
 };
 
-export default SidebarItem;
+export default SidebarButton;

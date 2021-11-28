@@ -34,6 +34,7 @@
     "react-router-dom": "^6.0.2",
     "react-split-pane": "^0.1.92",
     "react-use": "^17.3.1",
+    "smooth-scroll-into-view-if-needed": "^1.1.32",
     "swr": "^1.0.1",
     "ua-parser-js": "^1.0.2"
   },

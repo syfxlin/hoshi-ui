@@ -72,7 +72,7 @@ const Trash: React.FC = () => {
           <Tabs tabPadding="md">
             <Tab label="笔记">
               <VStack spacing={0}>
-                {trash.values()?.map((item) => {
+                {trash.values.map((item) => {
                   return (
                     <NoteCard
                       note={item}

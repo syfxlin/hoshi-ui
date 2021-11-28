@@ -1,21 +1,28 @@
 import CSidebar from "../../components/sidebar/Sidebar";
 import React from "react";
 import SidebarMenu from "../../components/sidebar/SidebarMenu";
-import { Divider, Menu, Text } from "@mantine/core";
+import { Divider, Menu, Space, Text } from "@mantine/core";
 import {
+  Box as BoxIcon,
+  Delete,
   Facebook,
+  FolderClose,
   Github,
   Gitlab,
   Home,
   Logout,
   Search,
+  Setting,
   Twitter,
 } from "@icon-park/react";
 import { logout } from "../../api/ums";
 import SidebarItem from "../../components/sidebar/SidebarItem";
 import WorkspaceTree from "./sidebar/WorkspaceTree";
+import SidebarButton from "../../components/sidebar/SidebarButton";
+import { useSearchModal } from "./panels/Search";
 
 const Sidebar: React.FC = () => {
+  const [, setSearch] = useSearchModal();
   return (
     <CSidebar>
       <SidebarMenu>
@@ -43,22 +50,23 @@ const Sidebar: React.FC = () => {
       <SidebarItem to="/dashboard/home" icon={<Home />}>
         主页
       </SidebarItem>
-      <SidebarItem to="/dashboard/search" icon={<Search />}>
+      <SidebarButton icon={<Search />} onClick={() => setSearch(true)}>
         搜索
-      </SidebarItem>
-      <SidebarItem to="/dashboard/files" icon={<Search />}>
+      </SidebarButton>
+      <SidebarItem to="/dashboard/files" icon={<FolderClose />}>
         文件
       </SidebarItem>
-      <SidebarItem to="/settings" icon={<Search />}>
-        设置
-      </SidebarItem>
       <WorkspaceTree />
-      <SidebarItem to="/archive" icon={<Search />}>
+      <SidebarItem to="/archive" icon={<BoxIcon />}>
         归档
       </SidebarItem>
-      <SidebarItem to="/trash" icon={<Search />}>
+      <SidebarItem to="/trash" icon={<Delete />}>
         回收站
       </SidebarItem>
+      <SidebarItem to="/settings" icon={<Setting />}>
+        设置
+      </SidebarItem>
+      <Space h="xs" />
     </CSidebar>
   );
 };
