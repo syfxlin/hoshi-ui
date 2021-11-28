@@ -22,11 +22,11 @@ import { HStack, VStack } from "../layout/Stack";
 import { DatePicker } from "@mantine/dates";
 import { Emoji } from "emoji-mart-virtualized";
 import Ellipsis from "../Ellipsis";
-import { useHotkeys } from "@mantine/hooks";
 import { ListNoteView } from "../../api/note";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { Assign } from "../../utils/types";
 import { Link } from "../Link";
+import { useHotkeys } from "@mantine/hooks";
 
 type OmnibarProps = Assign<
   ModalProps,
@@ -48,22 +48,26 @@ const Omnibar: React.FC<OmnibarProps> = ({
   const [filter, setFilter] = useState(false);
   const [selected, setSelected] = useState(0);
 
-  useHotkeys([
-    [
-      "ArrowUp",
-      () =>
-        props.opened &&
-        setSelected((v) => (v - 1 < 0 ? search.values.length - 1 : v - 1)),
-    ],
-    [
-      "ArrowDown",
-      () =>
-        props.opened &&
-        setSelected((v) => (v + 1 >= search.values.length ? 0 : v + 1)),
-    ],
-    ["Enter", () => props.opened && onSelect(search.values[selected])],
-    ["Escape", () => props.opened && props.onClose()],
-  ]);
+  useHotkeys(
+    props.opened
+      ? [
+          [
+            "ArrowUp",
+            () =>
+              setSelected((v) =>
+                v - 1 < 0 ? search.values.length - 1 : v - 1
+              ),
+          ],
+          [
+            "ArrowDown",
+            () =>
+              setSelected((v) => (v + 1 >= search.values.length ? 0 : v + 1)),
+          ],
+          ["Enter", () => onSelect(search.values[selected])],
+          ["Escape", () => props.onClose()],
+        ]
+      : []
+  );
 
   return (
     <Modal {...props} hideCloseButton size="lg" padding={0}>

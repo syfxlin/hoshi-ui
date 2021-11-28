@@ -2,7 +2,7 @@ import useSWRValue from "../utils/use-swr-value";
 import { getNote, NoteView, updateNote, UpdateNoteView } from "./note";
 import useToast from "../utils/use-toast";
 import { useWorkspaces } from "./use-workspaces";
-import { useEffect, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const useNote = (id?: string) => {
@@ -29,18 +29,18 @@ const useNote = (id?: string) => {
 
   // sync workspaces tree data
   const workspaces = useWorkspaces(false);
-  useEffect(() => {
-    const data = query.data;
-    if (data) {
-      workspaces.set(data.id, (prev) => ({
-        ...prev,
-        id: data.id,
-        parent: data.parent ?? data.workspace,
-        text: data.name,
-        data,
-      }));
-    }
-  }, [query.data]);
+  // useEffect(() => {
+  //   const data = query.data;
+  //   if (data) {
+  //     workspaces.set(data.id, (prev) => ({
+  //       ...prev,
+  //       id: data.id,
+  //       parent: data.parent ?? data.workspace,
+  //       text: data.name,
+  //       data,
+  //     }));
+  //   }
+  // }, [query.data]);
 
   // attributes
   const attributes = useMemo<
@@ -52,6 +52,9 @@ const useNote = (id?: string) => {
     }
     return JSON.parse(attrs);
   }, [query.data]);
+
+  // content
+  const [content, setContent] = useState(query.data?.content);
 
   const $updateNote = (note: Omit<UpdateNoteView, "id">) =>
     updateNote({
@@ -119,6 +122,8 @@ const useNote = (id?: string) => {
 
   return {
     ...query,
+    content,
+    setContent,
     attributes,
     $updateNote,
     $updateAttribute,

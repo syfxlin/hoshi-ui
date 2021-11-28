@@ -60,11 +60,15 @@ const Doc: React.FC = () => {
         return Promise.resolve();
       }
       return saving.wrap(
-        note.$updateNote({
-          name: data.name,
-          content: data.content ?? undefined,
-          attributes: data.attributes ?? undefined,
-        })
+        note
+          .$updateNote({
+            name: data.name,
+            content: data.content ?? undefined,
+            attributes: data.attributes ?? undefined,
+          })
+          .then(() => {
+            enable.current = false;
+          })
       );
     }
   );
@@ -167,8 +171,6 @@ const Doc: React.FC = () => {
               </ActionIcon>
             }
           >
-            <Menu.Item>123</Menu.Item>
-            <Divider />
             <Menu.Item icon={<Move />} onClick={() => setMove(true)}>
               移动
             </Menu.Item>
@@ -273,6 +275,7 @@ const Doc: React.FC = () => {
             background-repeat: no-repeat;
             background-size: cover;
             background-position: 50%;
+            flex: 0 0 ${th.spacing(80)};
 
             > * {
               opacity: 0;

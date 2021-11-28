@@ -1,48 +1,64 @@
 import CSidebar from "../../components/sidebar/Sidebar";
 import React from "react";
 import SidebarMenu from "../../components/sidebar/SidebarMenu";
-import { Divider, Menu, Space, Text } from "@mantine/core";
+import { Divider, Menu, Space } from "@mantine/core";
 import {
   Box as BoxIcon,
+  Bug,
+  DarkMode,
   Delete,
-  Facebook,
+  Drone,
   FolderClose,
   Github,
-  Gitlab,
   Home,
   Logout,
   Search,
   Setting,
-  Twitter,
 } from "@icon-park/react";
 import { logout } from "../../api/ums";
 import SidebarItem from "../../components/sidebar/SidebarItem";
 import SidebarButton from "../../components/sidebar/SidebarButton";
 import { useSearchModal } from "./panels/Search";
 import WorkspaceTree from "./sidebar/WorkspaceTree";
+import { useColorScheme } from "../../theme/EmotionSystemProvider";
+import { useNavigate } from "react-router-dom";
+import useMe from "../../api/use-me";
 
 const Sidebar: React.FC = () => {
+  const navigate = useNavigate();
+  const [, toggleColorScheme] = useColorScheme();
   const [, setSearch] = useSearchModal();
+  const me = useMe();
   return (
     <CSidebar>
       <SidebarMenu>
-        <Menu.Label>Application</Menu.Label>
-        <Menu.Item icon={<Facebook />}>Settings</Menu.Item>
-        <Menu.Item icon={<Facebook />}>Messages</Menu.Item>
-        <Menu.Item icon={<Github />}>Gallery</Menu.Item>
-        <Menu.Item
-          icon={<Gitlab />}
-          rightSection={
-            <Text size="xs" color="gray">
-              ⌘K
-            </Text>
-          }
-        >
-          Search
+        <Menu.Item icon={<Setting />} onClick={() => navigate(`/settings`)}>
+          设置
         </Menu.Item>
         <Divider />
-        <Menu.Label>Danger zone</Menu.Label>
-        <Menu.Item icon={<Twitter />}>Transfer my data</Menu.Item>,
+        <Menu.Item
+          icon={<Github />}
+          onClick={() => window.open("https://github.com/syfxlin/hoshi-note")}
+        >
+          Github
+        </Menu.Item>
+        <Menu.Item
+          icon={<Bug />}
+          onClick={() =>
+            window.open("https://github.com/syfxlin/hoshi-note/issues")
+          }
+        >
+          提交 Bug
+        </Menu.Item>
+        {me.data?.roles.find(({ name }) => name === "ADMIN") && (
+          <Menu.Item icon={<Drone />} onClick={() => navigate(`/admin/home`)}>
+            管理员
+          </Menu.Item>
+        )}
+        <Menu.Item icon={<DarkMode />} onClick={() => toggleColorScheme()}>
+          切换颜色模式
+        </Menu.Item>
+        <Divider />
         <Menu.Item color="red" icon={<Logout />} onClick={logout}>
           登出
         </Menu.Item>

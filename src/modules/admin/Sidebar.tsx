@@ -1,41 +1,42 @@
 import CSidebar from "../../components/sidebar/Sidebar";
 import React from "react";
 import SidebarMenu from "../../components/sidebar/SidebarMenu";
-import { Divider, Menu, Text } from "@mantine/core";
-import {
-  Facebook,
-  Github,
-  Gitlab,
-  Home,
-  Logout,
-  Search,
-  Twitter,
-} from "@icon-park/react";
+import { Divider, Menu } from "@mantine/core";
+import { Bug, DarkMode, Github, Home, Logout, Search } from "@icon-park/react";
 import { logout } from "../../api/ums";
 import SidebarItem from "../../components/sidebar/SidebarItem";
 import SidebarCollapse from "../../components/sidebar/SidebarCollapse";
+import { useNavigate } from "react-router-dom";
+import { useColorScheme } from "../../theme/EmotionSystemProvider";
 
 const Sidebar: React.FC = () => {
+  const navigate = useNavigate();
+  const [, toggleColorScheme] = useColorScheme();
   return (
     <CSidebar>
       <SidebarMenu>
-        <Menu.Label>Application</Menu.Label>
-        <Menu.Item icon={<Facebook />}>Settings</Menu.Item>
-        <Menu.Item icon={<Facebook />}>Messages</Menu.Item>
-        <Menu.Item icon={<Github />}>Gallery</Menu.Item>
-        <Menu.Item
-          icon={<Gitlab />}
-          rightSection={
-            <Text size="xs" color="gray">
-              ⌘K
-            </Text>
-          }
-        >
-          Search
+        <Menu.Item icon={<Home />} onClick={() => navigate(`/dashboard/home`)}>
+          工作区
         </Menu.Item>
         <Divider />
-        <Menu.Label>Danger zone</Menu.Label>
-        <Menu.Item icon={<Twitter />}>Transfer my data</Menu.Item>,
+        <Menu.Item
+          icon={<Github />}
+          onClick={() => window.open("https://github.com/syfxlin/hoshi-note")}
+        >
+          Github
+        </Menu.Item>
+        <Menu.Item
+          icon={<Bug />}
+          onClick={() =>
+            window.open("https://github.com/syfxlin/hoshi-note/issues")
+          }
+        >
+          提交 Bug
+        </Menu.Item>
+        <Menu.Item icon={<DarkMode />} onClick={() => toggleColorScheme()}>
+          切换颜色模式
+        </Menu.Item>
+        <Divider />
         <Menu.Item color="red" icon={<Logout />} onClick={logout}>
           登出
         </Menu.Item>
