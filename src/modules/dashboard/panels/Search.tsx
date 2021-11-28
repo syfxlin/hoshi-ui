@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import Omnibar from "../../../components/panel/Omnibar";
 import { useHotkeys } from "@mantine/hooks";
+import { useNavigate } from "react-router-dom";
 
 export const SearchModalContext =
   // @ts-ignore
@@ -23,6 +24,7 @@ export const useSearchModal = () => {
 };
 
 export const Search: React.FC = ({ children }) => {
+  const navigate = useNavigate();
   const [opened, setOpened] = useState(false);
 
   useHotkeys([["mod+P", () => setOpened((v) => !v)]]);
@@ -30,7 +32,15 @@ export const Search: React.FC = ({ children }) => {
   return (
     <SearchModalContext.Provider value={[opened, setOpened]}>
       {children}
-      <Omnibar opened={opened} onClose={() => setOpened(false)} />
+      <Omnibar
+        opened={opened}
+        onClose={() => setOpened(false)}
+        placeholder="搜索..."
+        onSelect={(note) => {
+          navigate(`/doc/${note.id}/preview`);
+          setOpened(false);
+        }}
+      />
     </SearchModalContext.Provider>
   );
 };

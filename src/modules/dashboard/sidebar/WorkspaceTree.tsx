@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   AddWorkspaceView,
   ListNoteView,
@@ -7,9 +7,12 @@ import {
 } from "../../../api/note";
 import {
   Box as BoxIcon,
+  Copy,
+  CopyLink,
   Delete,
   Editor,
-  Facebook,
+  Move,
+  OpenDoor,
   Plus,
   Refresh,
 } from "@icon-park/react";
@@ -30,12 +33,14 @@ import { useTh } from "../../../theme/hooks/use-th";
 import useForm from "../../../utils/use-form";
 import Form from "../../../components/form/Form";
 import { useNavigate, useParams } from "react-router-dom";
-import { useWorkspaces } from "../../../api/use-workspace";
+import { useWorkspaces } from "../../../api/use-workspaces";
 import EmojiPicker from "../../../components/form/EmojiPicker";
 import Async from "../../../components/Async";
 import { TreeMethods } from "@minoru/react-dnd-treeview";
 import { css } from "@emotion/react";
 import Box from "../../../components/layout/Box";
+import { link } from "../../../api/url";
+import Omnibar from "../../../components/panel/Omnibar";
 
 const WorkspaceTree: React.FC = () => {
   const th = useTh();
@@ -96,6 +101,8 @@ const WorkspaceTree: React.FC = () => {
       );
     },
   });
+  // move note
+  const [move, setMove] = useState<ListNoteView | null>(null);
   return (
     <Box
       css={css`
@@ -124,7 +131,9 @@ const WorkspaceTree: React.FC = () => {
           render={TreeItem<ListNoteView | WorkspaceView>({
             isActive: (node) => id === node.data?.id,
             onClick: (node) => {
-              if (node.parent !== 0) {
+              if (node.parent === 0) {
+                navigate(`/workspace/${node.data?.id}`);
+              } else {
                 navigate(`/doc/${node.data?.id}/preview`);
               }
             },
@@ -182,7 +191,18 @@ const WorkspaceTree: React.FC = () => {
             ),
             menu: (node) => (
               <>
-                <Menu.Item icon={<Facebook />}>Settings</Menu.Item>
+                <Menu.Item
+                  icon={<OpenDoor />}
+                  onClick={() => {
+                    if (node.parent === 0) {
+                      navigate(`/workspace/${node.data?.id}`);
+                    } else {
+                      navigate(`/doc/${node.data?.id}/preview`);
+                    }
+                  }}
+                >
+                  查看
+                </Menu.Item>
                 <Menu.Item
                   icon={<Editor />}
                   onClick={() => {
@@ -206,16 +226,47 @@ const WorkspaceTree: React.FC = () => {
                 </Menu.Item>
                 <Divider />
                 {node.parent !== 0 && (
-                  <Menu.Item
-                    icon={<BoxIcon />}
-                    color="orange"
-                    onClick={() => {
-                      const data = node.data as ListNoteView;
-                      workspaces.$archiveNote(data.id);
-                    }}
-                  >
-                    归档
-                  </Menu.Item>
+                  <>
+                    <Menu.Item
+                      icon={<Move />}
+                      onClick={() => {
+                        const data = node.data as ListNoteView;
+                        setMove(data);
+                      }}
+                    >
+                      移动
+                    </Menu.Item>
+                    <Divider />
+                    <Menu.Item
+                      icon={<CopyLink />}
+                      onClick={() => {
+                        const data = node.data as ListNoteView;
+                        navigator.clipboard.writeText(link("share", data.id));
+                      }}
+                    >
+                      复制分享链接
+                    </Menu.Item>
+                    <Menu.Item
+                      icon={<Copy />}
+                      onClick={() => {
+                        const data = node.data as ListNoteView;
+                        navigator.clipboard.writeText(data.id);
+                      }}
+                    >
+                      复制页面 ID
+                    </Menu.Item>
+                    <Divider />
+                    <Menu.Item
+                      icon={<BoxIcon />}
+                      color="orange"
+                      onClick={() => {
+                        const data = node.data as ListNoteView;
+                        workspaces.$archiveNote(data.id);
+                      }}
+                    >
+                      归档
+                    </Menu.Item>
+                  </>
                 )}
                 <Menu.Item
                   icon={<Delete />}
@@ -341,6 +392,17 @@ const WorkspaceTree: React.FC = () => {
           </Button>
         </Form>
       </Modal>
+      <Omnibar
+        opened={!!move}
+        onClose={() => setMove(null)}
+        placeholder="移动到..."
+        onSelect={(note) => {
+          if (move) {
+            workspaces.$moveNote(move.id, note.workspace, note.id);
+          }
+          setMove(null);
+        }}
+      />
     </Box>
   );
 };

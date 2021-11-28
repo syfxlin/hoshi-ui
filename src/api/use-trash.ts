@@ -3,7 +3,7 @@ import useSWRPage from "../utils/use-swr-page";
 import { ApiPage } from "./request";
 import { useState } from "react";
 import useToast from "../utils/use-toast";
-import { useWorkspaces } from "./use-workspace";
+import { useWorkspaces } from "./use-workspaces";
 import { useModals } from "@mantine/modals";
 import { useDebouncedValue } from "@mantine/hooks";
 

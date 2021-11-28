@@ -26,7 +26,7 @@ import { useMount } from "react-use";
 import useToast from "../../../utils/use-toast";
 import useLoading from "../../../utils/use-loading";
 import { Link } from "../../../components/Link";
-import { Down, More, Pic } from "@icon-park/react";
+import { Copy, CopyLink, Delete, Down, More, Pic } from "@icon-park/react";
 import useNote from "../../../api/use-note";
 import EmojiPicker from "../../../components/form/EmojiPicker";
 import useBreadcrumbs from "../../../api/use-breadcrumbs";
@@ -34,6 +34,8 @@ import ContentEditable from "../../../components/form/ContentEditable";
 import Flex from "../../../components/layout/Flex";
 import PhotoPicker from "../../../components/form/PhotoPicker";
 import { NoteStatus } from "../../../api/note";
+import { Box as BoxIcon } from "@icon-park/react/lib/map";
+import { link } from "../../../api/url";
 
 const Doc: React.FC = () => {
   const th = useTh();
@@ -182,7 +184,33 @@ const Doc: React.FC = () => {
           >
             <Menu.Item>123</Menu.Item>
             <Divider />
-            <Menu.Item color="red">删除</Menu.Item>
+            <Menu.Item
+              icon={<CopyLink />}
+              onClick={() => {
+                if (note.data) {
+                  navigator.clipboard.writeText(link("share", note.data.id));
+                }
+              }}
+            >
+              复制分享链接
+            </Menu.Item>
+            <Menu.Item
+              icon={<Copy />}
+              onClick={() => {
+                if (note.data) {
+                  navigator.clipboard.writeText(note.data.id);
+                }
+              }}
+            >
+              复制页面 ID
+            </Menu.Item>
+            <Divider />
+            <Menu.Item color="orange" icon={<BoxIcon />}>
+              归档
+            </Menu.Item>
+            <Menu.Item color="red" icon={<Delete />}>
+              删除
+            </Menu.Item>
             <Divider />
             <Menu.Label>
               最后修改时间：

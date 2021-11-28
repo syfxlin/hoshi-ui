@@ -57,6 +57,13 @@ const App: React.FC = () => {
             <AuthorizeRoute path=":id" element={<Navigate to="preview" />} />
             <AuthorizeRoute path=":id/:mode" element={<Doc />} />
           </AuthorizeRoute>
+          <AuthorizeRoute
+            path="/workspace/:workspaceId"
+            element={<Dashboard />}
+          >
+            <AuthorizeRoute path=":id" element={<Navigate to="preview" />} />
+            <AuthorizeRoute path=":id/:mode" element={<Doc />} />
+          </AuthorizeRoute>
           {/* Trash */}
           <AuthorizeRoute path="/trash" element={<Dashboard />}>
             <AuthorizeRoute index element={<Trash />} />

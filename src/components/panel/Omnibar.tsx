@@ -24,11 +24,23 @@ import Ellipsis from "../Ellipsis";
 import { useHotkeys } from "@mantine/hooks";
 import { ListNoteView } from "../../api/note";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { useNavigate } from "react-router-dom";
+import { Assign } from "../../utils/types";
 
-const Omnibar: React.FC<ModalProps> = (props) => {
+type OmnibarProps = Assign<
+  ModalProps,
+  {
+    placeholder: string;
+    onSelect: (note: ListNoteView) => void;
+  }
+>;
+
+const Omnibar: React.FC<OmnibarProps> = ({
+  placeholder,
+  onSelect,
+  children,
+  ...props
+}) => {
   const th = useTh();
-  const navigate = useNavigate();
   const search = useSearch();
 
   const [filter, setFilter] = useState(false);
@@ -37,14 +49,18 @@ const Omnibar: React.FC<ModalProps> = (props) => {
   useHotkeys([
     [
       "ArrowUp",
-      () => setSelected((v) => (v - 1 < 0 ? search.values.length - 1 : v - 1)),
+      () =>
+        props.opened &&
+        setSelected((v) => (v - 1 < 0 ? search.values.length - 1 : v - 1)),
     ],
     [
       "ArrowDown",
-      () => setSelected((v) => (v + 1 >= search.values.length ? 0 : v + 1)),
+      () =>
+        props.opened &&
+        setSelected((v) => (v + 1 >= search.values.length ? 0 : v + 1)),
     ],
-    ["Enter", () => navigate(`/doc/${search.values[selected].id}/preview`)],
-    ["Escape", () => props.onClose()],
+    ["Enter", () => props.opened && onSelect(search.values[selected])],
+    ["Escape", () => props.opened && props.onClose()],
   ]);
 
   return (
@@ -55,7 +71,7 @@ const Omnibar: React.FC<ModalProps> = (props) => {
         `}
       >
         <Input
-          placeholder="搜索..."
+          placeholder={placeholder}
           variant="unstyled"
           size="md"
           icon={<Search />}
@@ -281,60 +297,66 @@ const Omnibar: React.FC<ModalProps> = (props) => {
         `}
       >
         {search.values.map((note, index) => (
-          <NoteItem note={note} active={index === selected} key={note.id} />
+          <NoteItem
+            key={note.id}
+            note={note}
+            active={index === selected}
+            onSelect={onSelect}
+          />
         ))}
       </VStack>
+      {children}
     </Modal>
   );
 };
 
-const NoteItem = React.memo<{ note: ListNoteView; active: boolean }>(
-  ({ note, active }) => {
-    const th = useTh();
+const NoteItem = React.memo<{
+  note: ListNoteView;
+  active: boolean;
+  onSelect: (node: ListNoteView) => void;
+}>(({ note, active, onSelect }) => {
+  const th = useTh();
 
-    const navigate = useNavigate();
+  const ref = useRef<any>();
+  useEffect(() => {
+    if (ref.current && active) {
+      scrollIntoView(ref.current, {
+        scrollMode: "if-needed",
+        block: "center",
+      });
+    }
+  }, [ref, active]);
 
-    const ref = useRef<any>();
-    useEffect(() => {
-      if (ref.current && active) {
-        scrollIntoView(ref.current, {
-          scrollMode: "if-needed",
-          block: "center",
-        });
-      }
-    }, [ref, active]);
+  return (
+    <HStack
+      ref={ref}
+      onClick={() => onSelect(note)}
+      css={css`
+        padding: ${th.spacing(3)} ${th.spacing(4)};
+        border-radius: ${th.radius("sm")};
+        cursor: pointer;
+        transition: background-color 150ms;
 
-    return (
-      <HStack
-        ref={ref}
-        onClick={() => navigate(`/doc/${note.id}/preview`)}
-        css={css`
-          padding: ${th.spacing(3)} ${th.spacing(4)};
-          border-radius: ${th.radius("sm")};
-          cursor: pointer;
-          transition: background-color 150ms;
+        &:hover {
+          background-color: ${th.color("gray.1", "dark.5")};
+        }
 
-          &:hover {
-            background-color: ${th.color("gray.1", "dark.5")};
-          }
-
-          ${active &&
-          css`
-            background-color: ${th.color("gray.1", "dark.5")};
-          `}
+        ${active &&
+        css`
+          background-color: ${th.color("gray.1", "dark.5")};
         `}
-      >
-        <ThemeIcon variant="light" size="md">
-          <Emoji
-            set="twitter"
-            size={th.theme.fontSizes.base}
-            emoji={note.icon || "spiral_note_pad"}
-          />
-        </ThemeIcon>
-        <Ellipsis>{note.name}</Ellipsis>
-      </HStack>
-    );
-  }
-);
+      `}
+    >
+      <ThemeIcon variant="light" size="md">
+        <Emoji
+          set="twitter"
+          size={th.theme.fontSizes.base}
+          emoji={note.icon || "spiral_note_pad"}
+        />
+      </ThemeIcon>
+      <Ellipsis>{note.name}</Ellipsis>
+    </HStack>
+  );
+});
 
 export default Omnibar;

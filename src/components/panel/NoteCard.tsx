@@ -6,7 +6,7 @@ import { css } from "@emotion/react";
 import { ThemeIcon } from "@mantine/core";
 import { Emoji } from "emoji-mart-virtualized";
 import { useTh } from "../../theme/hooks/use-th";
-import { useWorkspaces } from "../../api/use-workspace";
+import { useWorkspaces } from "../../api/use-workspaces";
 import Ellipsis from "../Ellipsis";
 
 type NoteCardProps = Assign<

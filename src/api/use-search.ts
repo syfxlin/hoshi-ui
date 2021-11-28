@@ -3,7 +3,7 @@ import { useDebouncedValue } from "@mantine/hooks";
 import { ListNoteView, searchNote, WorkspaceView } from "./note";
 import useSWRPage from "../utils/use-swr-page";
 import { ApiPage } from "./request";
-import { useWorkspaces } from "./use-workspace";
+import { useWorkspaces } from "./use-workspaces";
 
 const useSearch = () => {
   // page

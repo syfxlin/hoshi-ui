@@ -1,7 +1,7 @@
 import useSWRValue from "../utils/use-swr-value";
 import { getNote, NoteView, updateNote, UpdateNoteView } from "./note";
 import useToast from "../utils/use-toast";
-import { useWorkspaces } from "./use-workspace";
+import { useWorkspaces } from "./use-workspaces";
 import { useEffect, useMemo } from "react";
 
 const useNote = (id?: string) => {

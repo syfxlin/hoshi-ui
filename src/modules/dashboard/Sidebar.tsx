@@ -17,9 +17,9 @@ import {
 } from "@icon-park/react";
 import { logout } from "../../api/ums";
 import SidebarItem from "../../components/sidebar/SidebarItem";
-import WorkspaceTree from "./sidebar/WorkspaceTree";
 import SidebarButton from "../../components/sidebar/SidebarButton";
 import { useSearchModal } from "./panels/Search";
+import WorkspaceTree from "./sidebar/WorkspaceTree";
 
 const Sidebar: React.FC = () => {
   const [, setSearch] = useSearchModal();

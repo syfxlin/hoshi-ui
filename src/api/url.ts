@@ -9,3 +9,7 @@ export const join = (...paths: (string | number)[]) => {
 export const mod = (module: string, ...paths: (string | number)[]) => {
   return join(import.meta.env.VITE_SERVER_URL, module, ...paths);
 };
+
+export const link = (...paths: (string | number)[]) => {
+  return join(`${window.location.protocol}//${window.location.host}`, ...paths);
+};
