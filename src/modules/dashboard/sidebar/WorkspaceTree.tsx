@@ -46,7 +46,7 @@ const WorkspaceTree: React.FC = () => {
   const th = useTh();
   const navigate = useNavigate();
   // params
-  const { id } = useParams<"id">();
+  const { noteId } = useParams<"noteId">();
   // workspaces
   const workspaces = useWorkspaces();
   // tree
@@ -129,7 +129,7 @@ const WorkspaceTree: React.FC = () => {
             }
           }}
           render={TreeItem<ListNoteView | WorkspaceView>({
-            isActive: (node) => id === node.data?.id,
+            isActive: (node) => noteId === node.data?.id,
             onClick: (node) => {
               if (node.parent === 0) {
                 navigate(`/workspace/${node.data?.id}`);

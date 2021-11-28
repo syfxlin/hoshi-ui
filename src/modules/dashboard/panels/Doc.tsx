@@ -26,27 +26,26 @@ import { useMount } from "react-use";
 import useToast from "../../../utils/use-toast";
 import useLoading from "../../../utils/use-loading";
 import { Link } from "../../../components/Link";
-import { Copy, CopyLink, Delete, Down, More, Pic } from "@icon-park/react";
+import { Copy, CopyLink, Delete, More, Move, Pic } from "@icon-park/react";
 import useNote from "../../../api/use-note";
 import EmojiPicker from "../../../components/form/EmojiPicker";
-import useBreadcrumbs from "../../../api/use-breadcrumbs";
 import ContentEditable from "../../../components/form/ContentEditable";
 import Flex from "../../../components/layout/Flex";
 import PhotoPicker from "../../../components/form/PhotoPicker";
 import { NoteStatus } from "../../../api/note";
 import { Box as BoxIcon } from "@icon-park/react/lib/map";
 import { link } from "../../../api/url";
+import Omnibar from "../../../components/panel/Omnibar";
 
 const Doc: React.FC = () => {
   const th = useTh();
   const toast = useToast();
   // route
   const navigate = useNavigate();
-  const { id, mode } = useParams<"id" | "mode">();
+  const { noteId: id, mode } = useParams<"noteId" | "mode">();
 
   // note & breadcrumbs
   const note = useNote(id);
-  const breadcrumbs = useBreadcrumbs(id);
 
   // editor
   const editor = useRef<Editor>(null);
@@ -72,6 +71,8 @@ const Doc: React.FC = () => {
 
   // cover
   const [selectCover, setSelectCover] = useState(false);
+  // move note
+  const [move, setMove] = useState<boolean>(false);
 
   useMount(() => {
     const item = localStorage.getItem(`doc:${id}`);
@@ -129,32 +130,16 @@ const Doc: React.FC = () => {
   return (
     <AppShellContainer>
       <AppShellHeader>
-        {breadcrumbs.data ? (
+        {note.data ? (
           <Breadcrumbs>
-            <Link to={`/dashboard/workspace/${breadcrumbs.data.workspace.id}`}>
-              {breadcrumbs.data.workspace.name}
+            <Link to={`/workspace/${note.data.breadcrumb.workspace.id}`}>
+              {note.data.breadcrumb.workspace.name}
             </Link>
-            {breadcrumbs.data.parent.map((item) => (
+            {note.data.breadcrumb.parent.map((item) => (
               <Link key={item.id} to={`/doc/${item.id}/${mode}`}>
                 {item.name}
               </Link>
             ))}
-            <Menu
-              control={
-                <ActionIcon size="xs">
-                  <Down />
-                </ActionIcon>
-              }
-            >
-              {breadcrumbs.data.children.map((item) => (
-                <Menu.Item
-                  key={item.id}
-                  onClick={() => navigate(`/doc/${item.id}/${mode}`)}
-                >
-                  {item.name}
-                </Menu.Item>
-              ))}
-            </Menu>
           </Breadcrumbs>
         ) : (
           <Skeleton height={th.fontSize("lg")} width={th.fontSize(7)} />
@@ -184,31 +169,40 @@ const Doc: React.FC = () => {
           >
             <Menu.Item>123</Menu.Item>
             <Divider />
+            <Menu.Item icon={<Move />} onClick={() => setMove(true)}>
+              移动
+            </Menu.Item>
+            <Divider />
             <Menu.Item
               icon={<CopyLink />}
-              onClick={() => {
-                if (note.data) {
-                  navigator.clipboard.writeText(link("share", note.data.id));
-                }
-              }}
+              onClick={() =>
+                note.data &&
+                navigator.clipboard.writeText(link("share", note.data.id))
+              }
             >
               复制分享链接
             </Menu.Item>
             <Menu.Item
               icon={<Copy />}
-              onClick={() => {
-                if (note.data) {
-                  navigator.clipboard.writeText(note.data.id);
-                }
-              }}
+              onClick={() =>
+                note.data && navigator.clipboard.writeText(note.data.id)
+              }
             >
               复制页面 ID
             </Menu.Item>
             <Divider />
-            <Menu.Item color="orange" icon={<BoxIcon />}>
+            <Menu.Item
+              color="orange"
+              icon={<BoxIcon />}
+              onClick={() => note.$archiveNote()}
+            >
               归档
             </Menu.Item>
-            <Menu.Item color="red" icon={<Delete />}>
+            <Menu.Item
+              color="red"
+              icon={<Delete />}
+              onClick={() => note.$deleteNote()}
+            >
               删除
             </Menu.Item>
             <Divider />
@@ -226,28 +220,46 @@ const Doc: React.FC = () => {
           <ColorModeButton />
         </HStack>
       </AppShellHeader>
-      {note.data?.status === NoteStatus.DELETED && (
-        <Alert color="red">
-          <HStack justify="center" align="center" spacing={2}>
-            <span>此笔记位于回收站中</span>
-            <Button size="xs" variant="outline">
-              还原笔记
-            </Button>
-            <Button size="xs" variant="outline" color="red">
-              永久删除
-            </Button>
-          </HStack>
-        </Alert>
-      )}
       {note.data?.status === NoteStatus.ARCHIVE && (
         <Alert color="orange">
           <HStack justify="center" align="center" spacing={2}>
             <span>此笔记已归档</span>
-            <Button size="xs" variant="outline">
+            <Button
+              size="xs"
+              variant="outline"
+              onClick={() => note.$restoreNote()}
+            >
               还原笔记
             </Button>
-            <Button size="xs" variant="outline" color="red">
+            <Button
+              size="xs"
+              variant="outline"
+              color="red"
+              onClick={() => note.$deleteNote()}
+            >
               删除
+            </Button>
+          </HStack>
+        </Alert>
+      )}
+      {note.data?.status === NoteStatus.DELETED && (
+        <Alert color="red">
+          <HStack justify="center" align="center" spacing={2}>
+            <span>此笔记位于回收站中</span>
+            <Button
+              size="xs"
+              variant="outline"
+              onClick={() => note.$restoreNote()}
+            >
+              还原笔记
+            </Button>
+            <Button
+              size="xs"
+              variant="outline"
+              color="red"
+              onClick={() => note.$forceDeleteNote()}
+            >
+              永久删除
             </Button>
           </HStack>
         </Alert>
@@ -403,12 +415,21 @@ const Doc: React.FC = () => {
           }}
         />
       </Container>
+      <Omnibar
+        opened={move}
+        onClose={() => setMove(false)}
+        placeholder="移动到..."
+        onSelect={(parent) => {
+          note.$moveNote(parent.workspace, parent.id);
+          setMove(false);
+        }}
+      />
     </AppShellContainer>
   );
 };
 
 export default function DocRemount() {
   // if id change, remount
-  const { id } = useParams<"id">();
-  return <Doc key={`doc:${id}`} />;
+  const { noteId } = useParams<"noteId">();
+  return <Doc key={`doc:${noteId}`} />;
 }

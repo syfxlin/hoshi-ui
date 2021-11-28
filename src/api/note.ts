@@ -36,6 +36,7 @@ export type NoteView = {
   attributes?: string | null;
   createdTime: string;
   updatedTime: string;
+  breadcrumb: BreadcrumbView;
 };
 
 export type ListNoteView = {
@@ -47,6 +48,7 @@ export type ListNoteView = {
   status: NoteStatus;
   createdTime: string;
   updatedTime: string;
+  breadcrumb: BreadcrumbView;
 };
 
 export type AddWorkspaceView = {
@@ -90,10 +92,6 @@ export type BreadcrumbView = {
     name: string;
   };
   parent: {
-    id: string;
-    name: string;
-  }[];
-  children: {
     id: string;
     name: string;
   }[];
@@ -159,9 +157,14 @@ export const deleteNote = (id: string) =>
     .delete<ApiEntity>(`/hoshi-note/notes/${id}`)
     .then((response) => response.data);
 
-export const getBreadcrumb = (id: string) =>
+export const listNotes = (id: string, page: Pageable, search?: string) =>
   request
-    .get<ApiEntity<BreadcrumbView>>(`/hoshi-note/notes/${id}/breadcrumb`)
+    .get<ApiEntity<ApiPage<ListNoteView>>>(`/hoshi-note/notes/list/${id}`, {
+      params: {
+        ...pageable(page),
+        ...(search ? { search } : {}),
+      },
+    })
     .then((response) => response.data);
 
 export const getTrash = (page: Pageable, search?: string) =>

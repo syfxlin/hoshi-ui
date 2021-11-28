@@ -3,11 +3,11 @@ import { Assign, UIComponent } from "../../utils/types";
 import { HStack, StackProps, VStack } from "../layout/Stack";
 import { ListNoteView } from "../../api/note";
 import { css } from "@emotion/react";
-import { ThemeIcon } from "@mantine/core";
+import { Breadcrumbs, ThemeIcon } from "@mantine/core";
 import { Emoji } from "emoji-mart-virtualized";
 import { useTh } from "../../theme/hooks/use-th";
-import { useWorkspaces } from "../../api/use-workspaces";
 import Ellipsis from "../Ellipsis";
+import { Link } from "../Link";
 
 type NoteCardProps = Assign<
   StackProps,
@@ -19,7 +19,6 @@ type NoteCardProps = Assign<
 const NoteCard: UIComponent<"div", NoteCardProps> = forwardRef(
   ({ note, children, ...props }, ref) => {
     const th = useTh();
-    const workspaces = useWorkspaces(false);
     return (
       <HStack
         wrapChildren={false}
@@ -53,19 +52,48 @@ const NoteCard: UIComponent<"div", NoteCardProps> = forwardRef(
           `}
         >
           <Ellipsis weight={500}>{note.name}</Ellipsis>
-          <Ellipsis color="dimmed" size="xs">
-            <strong>工作区：</strong>
-            <span>{workspaces.data?.get(note.workspace)?.data?.name}</span>
-            <span>，</span>
-            <strong>最后修改时间：</strong>
-            <span>{new Date(note.updatedTime).toLocaleString()}</span>
-            <span>，</span>
-            <strong>创建时间：</strong>
-            <span>{new Date(note.createdTime).toLocaleString()}</span>
-            <span>，</span>
-            <strong>状态：</strong>
-            <span>{note.status}</span>
-          </Ellipsis>
+          <HStack
+            justify="space-between"
+            wrapChildren={false}
+            align="center"
+            css={css`
+              width: 100%;
+              overflow-x: hidden;
+            `}
+          >
+            <Ellipsis color="dimmed" size="xs">
+              <strong>最后修改时间：</strong>
+              <span>{new Date(note.updatedTime).toLocaleString()}</span>
+              <span>，</span>
+              <strong>创建时间：</strong>
+              <span>{new Date(note.createdTime).toLocaleString()}</span>
+            </Ellipsis>
+            <Breadcrumbs
+              styles={{
+                root: {
+                  maxWidth: "50%",
+                },
+              }}
+            >
+              <Ellipsis
+                as={Link}
+                size="xs"
+                to={`/workspace/${note.breadcrumb.workspace.id}`}
+              >
+                {note.breadcrumb.workspace.name}
+              </Ellipsis>
+              {note.breadcrumb.parent.map((item) => (
+                <Ellipsis
+                  key={item.id}
+                  as={Link}
+                  size="xs"
+                  to={`/doc/${item.id}/preview`}
+                >
+                  {item.name}
+                </Ellipsis>
+              ))}
+            </Breadcrumbs>
+          </HStack>
         </VStack>
         {children}
       </HStack>

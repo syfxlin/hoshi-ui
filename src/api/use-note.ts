@@ -3,9 +3,11 @@ import { getNote, NoteView, updateNote, UpdateNoteView } from "./note";
 import useToast from "../utils/use-toast";
 import { useWorkspaces } from "./use-workspaces";
 import { useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 const useNote = (id?: string) => {
   const toast = useToast();
+  const navigate = useNavigate();
 
   const query = useSWRValue<NoteView>(
     ["note", id],
@@ -88,11 +90,43 @@ const useNote = (id?: string) => {
       }),
     });
 
+  const $moveNote = (workspace: string, parent?: string) =>
+    workspaces.$moveNote(query.data?.id as string, workspace, parent);
+
+  const $restoreNote = () =>
+    workspaces.$restoreNote(query.data?.id as string).then((res) => {
+      query.mutate();
+      return res;
+    });
+
+  const $archiveNote = () =>
+    workspaces.$archiveNote(query.data?.id as string).then((res) => {
+      query.mutate();
+      return res;
+    });
+
+  const $deleteNote = () =>
+    workspaces.$deleteNote(query.data?.id as string).then((res) => {
+      query.mutate();
+      return res;
+    });
+
+  const $forceDeleteNote = () =>
+    workspaces.$forceDeleteNote(query.data?.id as string).then((res) => {
+      navigate(`/dashboard/home`);
+      return res;
+    });
+
   return {
     ...query,
     attributes,
     $updateNote,
     $updateAttribute,
+    $moveNote,
+    $archiveNote,
+    $deleteNote,
+    $restoreNote,
+    $forceDeleteNote,
   };
 };
 

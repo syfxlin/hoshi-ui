@@ -22,6 +22,8 @@ const AppShellHeader: UIComponent<"header", BoxProps> = forwardRef(
           padding-right: ${th.spacing(4)};
           position: sticky;
           top: 0;
+          backdrop-filter: blur(30px);
+          z-index: 500;
         `}
       />
     );

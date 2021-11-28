@@ -5,6 +5,7 @@ import Box from "../layout/Box";
 import { css } from "@emotion/react";
 import {
   ActionIcon,
+  Breadcrumbs,
   Button,
   Col,
   Collapse,
@@ -25,6 +26,7 @@ import { useHotkeys } from "@mantine/hooks";
 import { ListNoteView } from "../../api/note";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { Assign } from "../../utils/types";
+import { Link } from "../Link";
 
 type OmnibarProps = Assign<
   ModalProps,
@@ -331,7 +333,9 @@ const NoteItem = React.memo<{
     <HStack
       ref={ref}
       onClick={() => onSelect(note)}
+      wrapChildren={false}
       css={css`
+        width: 100%;
         padding: ${th.spacing(3)} ${th.spacing(4)};
         border-radius: ${th.radius("sm")};
         cursor: pointer;
@@ -354,7 +358,42 @@ const NoteItem = React.memo<{
           emoji={note.icon || "spiral_note_pad"}
         />
       </ThemeIcon>
-      <Ellipsis>{note.name}</Ellipsis>
+      <HStack
+        justify="space-between"
+        align="center"
+        wrapChildren={false}
+        css={css`
+          width: 100%;
+          overflow-x: hidden;
+        `}
+      >
+        <Ellipsis>{note.name}</Ellipsis>
+        <Breadcrumbs
+          styles={{
+            root: {
+              maxWidth: "50%",
+            },
+          }}
+        >
+          <Ellipsis
+            as={Link}
+            size="sm"
+            to={`/workspace/${note.breadcrumb.workspace.id}`}
+          >
+            {note.breadcrumb.workspace.name}
+          </Ellipsis>
+          {note.breadcrumb.parent.map((item) => (
+            <Ellipsis
+              key={item.id}
+              as={Link}
+              size="sm"
+              to={`/doc/${item.id}/preview`}
+            >
+              {item.name}
+            </Ellipsis>
+          ))}
+        </Breadcrumbs>
+      </HStack>
     </HStack>
   );
 });

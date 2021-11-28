@@ -23,6 +23,9 @@ const File = loadable(() => import("./modules/dashboard/panels/File"));
 const Doc = loadable(() => import("./modules/dashboard/panels/Doc"));
 const Trash = loadable(() => import("./modules/dashboard/panels/Trash"));
 const Archive = loadable(() => import("./modules/dashboard/panels/Archive"));
+const Workspace = loadable(
+  () => import("./modules/dashboard/panels/Workspace")
+);
 
 // Settings
 const Info = loadable(() => import("./modules/settings/panels/Info"));
@@ -53,16 +56,16 @@ const App: React.FC = () => {
             <AuthorizeRoute path="files" roles={["FILE"]} element={<File />} />
           </AuthorizeRoute>
           {/* Document */}
-          <AuthorizeRoute path="/doc" element={<Dashboard />}>
-            <AuthorizeRoute path=":id" element={<Navigate to="preview" />} />
-            <AuthorizeRoute path=":id/:mode" element={<Doc />} />
+          <AuthorizeRoute path="/doc/:noteId" element={<Dashboard />}>
+            <AuthorizeRoute index element={<Navigate to="preview" />} />
+            <AuthorizeRoute path=":mode" element={<Doc />} />
           </AuthorizeRoute>
+          {/* Workspace */}
           <AuthorizeRoute
             path="/workspace/:workspaceId"
             element={<Dashboard />}
           >
-            <AuthorizeRoute path=":id" element={<Navigate to="preview" />} />
-            <AuthorizeRoute path=":id/:mode" element={<Doc />} />
+            <AuthorizeRoute index element={<Workspace />} />
           </AuthorizeRoute>
           {/* Trash */}
           <AuthorizeRoute path="/trash" element={<Dashboard />}>

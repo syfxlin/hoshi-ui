@@ -1,4 +1,4 @@
-import { forceDeleteNote, getTrash, ListNoteView, restoreNote } from "./note";
+import { getTrash, ListNoteView } from "./note";
 import useSWRPage from "../utils/use-swr-page";
 import { ApiPage } from "./request";
 import { useState } from "react";
@@ -42,50 +42,15 @@ const useTrash = () => {
   );
 
   const $restoreNote = (id: string) =>
-    restoreNote(id)
-      .then(
-        toast.api.success({
-          title: "恢复成功",
-        })
-      )
-      .then((res) => {
-        query.mutate();
-        workspaces.mutate();
-        return res;
-      })
-      .catch(
-        toast.api.error({
-          title: "恢复失败",
-        })
-      );
+    workspaces.$restoreNote(id).then((res) => {
+      query.mutate();
+      return res;
+    });
 
   const $forceDeleteNote = (id: string) =>
-    modals.openConfirmModal({
-      title: "确认永久删除该笔记？",
-      labels: {
-        confirm: "确认删除",
-        cancel: "取消删除",
-      },
-      confirmProps: {
-        color: "red",
-      },
-      onConfirm: () => {
-        forceDeleteNote(id)
-          .then(
-            toast.api.success({
-              title: "永久删除成功",
-            })
-          )
-          .then((res) => {
-            query.mutate();
-            return res;
-          })
-          .catch(
-            toast.api.error({
-              title: "永久删除失败",
-            })
-          );
-      },
+    workspaces.$forceDeleteNote(id).then((res) => {
+      query.mutate();
+      return res;
     });
 
   return {

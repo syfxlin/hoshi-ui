@@ -11,7 +11,7 @@ const Ellipsis: UIComponent<typeof Text> = forwardRef((props, ref) => {
       {...props}
       ref={ref}
       css={css`
-        overflow-x: hidden;
+        overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       `}

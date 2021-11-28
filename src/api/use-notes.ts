@@ -1,13 +1,11 @@
-import { getArchive, ListNoteView } from "./note";
-import useSWRPage from "../utils/use-swr-page";
-import { ApiPage } from "./request";
-import { useState } from "react";
-import { useWorkspaces } from "./use-workspaces";
+import { useMemo, useState } from "react";
 import { useDebouncedValue } from "@mantine/hooks";
+import useSWRPage from "../utils/use-swr-page";
+import { AddNoteView, listNotes, ListNoteView } from "./note";
+import { ApiPage } from "./request";
+import { useWorkspaces } from "./use-workspaces";
 
-const useArchive = () => {
-  const workspaces = useWorkspaces(false);
-
+const useNotes = (id?: string) => {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<[string, "asc" | "desc"]>([
     "updatedTime",
@@ -17,9 +15,10 @@ const useArchive = () => {
   const [debounced] = useDebouncedValue(search, 1000);
 
   const query = useSWRPage<string, ListNoteView>(
-    ["archive", page, sort, debounced],
-    async (key, page, sort, search) => {
-      const entity = await getArchive(
+    ["list", id, page, sort, debounced],
+    async (key, id, page, sort, search) => {
+      const entity = await listNotes(
+        id,
         {
           page,
           sort: {
@@ -36,8 +35,25 @@ const useArchive = () => {
     }
   );
 
-  const $restoreNote = (id: string) =>
-    workspaces.$restoreNote(id).then((res) => {
+  const workspaces = useWorkspaces(false);
+  const workspace = useMemo(
+    () => workspaces.data?.get(id as string)?.data,
+    [id, workspaces.data]
+  );
+
+  const $addNote = (note: Omit<AddNoteView, "workspace">) =>
+    workspaces
+      .$addNote({
+        ...note,
+        workspace: id as string,
+      })
+      .then((res) => {
+        query.mutate();
+        return res;
+      });
+
+  const $archiveNote = (id: string) =>
+    workspaces.$archiveNote(id).then((res) => {
       query.mutate();
       return res;
     });
@@ -48,17 +64,23 @@ const useArchive = () => {
       return res;
     });
 
+  const $moveNote = (id: string, workspace: string, parent?: string) =>
+    workspaces.$moveNote(id, workspace, parent);
+
   return {
     ...query,
+    workspace,
     page,
     setPage,
     sort,
     setSort,
     search,
     setSearch,
-    $restoreNote,
+    $addNote,
+    $archiveNote,
     $deleteNote,
+    $moveNote,
   };
 };
 
-export default useArchive;
+export default useNotes;

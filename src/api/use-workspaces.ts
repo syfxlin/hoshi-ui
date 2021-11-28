@@ -7,9 +7,11 @@ import {
   archiveNote,
   deleteNote,
   deleteWorkspace,
+  forceDeleteNote,
   ListNoteView,
   listWorkspaces,
   NoteView,
+  restoreNote,
   treeNotes,
   updateNote,
   UpdateNoteView,
@@ -20,10 +22,13 @@ import {
 import useSWRMap from "../utils/use-swr-map";
 import useToast from "../utils/use-toast";
 import { useModals } from "@mantine/modals";
+import { ApiEntity } from "./request";
+import { useNavigate } from "react-router-dom";
 
 export const useWorkspaces = (revalidateOnMount?: boolean) => {
   const toast = useToast();
   const modals = useModals();
+  const navigate = useNavigate();
 
   const query = useSWRMap<
     string | number,
@@ -72,6 +77,7 @@ export const useWorkspaces = (revalidateOnMount?: boolean) => {
           loaded: false,
           data,
         });
+        navigate(`/workspace/${data.id}`);
         return res;
       })
       .catch(
@@ -125,31 +131,35 @@ export const useWorkspaces = (revalidateOnMount?: boolean) => {
       );
 
   const $deleteWorkspace = (id: string) =>
-    modals.openConfirmModal({
-      title: "确认删除该工作区？",
-      labels: {
-        confirm: "确认删除",
-        cancel: "取消删除",
-      },
-      confirmProps: {
-        color: "red",
-      },
-      onConfirm: () => {
-        deleteWorkspace(id)
-          .then(
-            toast.api.success({
-              title: "删除成功",
+    new Promise((resolve, reject) => {
+      modals.openConfirmModal({
+        title: "确认删除该工作区？",
+        labels: {
+          confirm: "确认删除",
+          cancel: "取消删除",
+        },
+        confirmProps: {
+          color: "red",
+        },
+        onConfirm: () => {
+          deleteWorkspace(id)
+            .then(
+              toast.api.success({
+                title: "删除成功",
+              })
+            )
+            .then((res) => {
+              query.remove(id);
+              resolve(res);
             })
-          )
-          .then(() => {
-            query.remove(id);
-          })
-          .catch(
-            toast.api.error({
-              title: "删除失败",
-            })
-          );
-      },
+            .catch(
+              toast.api.error({
+                title: "删除失败",
+              })
+            )
+            .catch((err) => reject(err));
+        },
+      });
     });
 
   const $addNote = (note: AddNoteView) =>
@@ -164,6 +174,7 @@ export const useWorkspaces = (revalidateOnMount?: boolean) => {
           loaded: false,
           data,
         });
+        navigate(`/doc/${data.id}`);
         return res;
       })
       .catch(
@@ -232,31 +243,84 @@ export const useWorkspaces = (revalidateOnMount?: boolean) => {
       );
 
   const $deleteNote = (id: string) =>
-    modals.openConfirmModal({
-      title: "确认删除该笔记？",
-      labels: {
-        confirm: "确认删除",
-        cancel: "取消删除",
-      },
-      confirmProps: {
-        color: "red",
-      },
-      onConfirm: () => {
-        deleteNote(id)
-          .then(
-            toast.api.success({
-              title: "删除成功",
+    new Promise<ApiEntity>((resolve, reject) => {
+      modals.openConfirmModal({
+        title: "确认删除该笔记？",
+        labels: {
+          confirm: "确认删除",
+          cancel: "取消删除",
+        },
+        confirmProps: {
+          color: "red",
+        },
+        onConfirm: () => {
+          deleteNote(id)
+            .then(
+              toast.api.success({
+                title: "删除成功",
+              })
+            )
+            .then((res) => {
+              query.remove(id);
+              resolve(res);
             })
-          )
-          .then(() => {
-            query.remove(id);
-          })
-          .catch(
-            toast.api.error({
-              title: "删除失败",
+            .catch(
+              toast.api.error({
+                title: "删除失败",
+              })
+            )
+            .catch((err) => reject(err));
+        },
+      });
+    });
+
+  const $restoreNote = (id: string) =>
+    restoreNote(id)
+      .then(
+        toast.api.success({
+          title: "恢复成功",
+        })
+      )
+      .then((res) => {
+        query.mutate();
+        return res;
+      })
+      .catch(
+        toast.api.error({
+          title: "恢复失败",
+        })
+      );
+
+  const $forceDeleteNote = (id: string) =>
+    new Promise((resolve, reject) => {
+      modals.openConfirmModal({
+        title: "确认永久删除该笔记？",
+        labels: {
+          confirm: "确认删除",
+          cancel: "取消删除",
+        },
+        confirmProps: {
+          color: "red",
+        },
+        onConfirm: () => {
+          forceDeleteNote(id)
+            .then(
+              toast.api.success({
+                title: "永久删除成功",
+              })
+            )
+            .then((res) => {
+              query.remove(id);
+              resolve(res);
             })
-          );
-      },
+            .catch(
+              toast.api.error({
+                title: "永久删除失败",
+              })
+            )
+            .catch((err) => reject(err));
+        },
+      });
     });
 
   return {
@@ -270,5 +334,7 @@ export const useWorkspaces = (revalidateOnMount?: boolean) => {
     $deleteWorkspace,
     $archiveNote,
     $deleteNote,
+    $restoreNote,
+    $forceDeleteNote,
   };
 };
