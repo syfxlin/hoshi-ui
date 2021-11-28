@@ -20,12 +20,13 @@ const Header: React.FC = ({ children }) => {
         left: 0;
         right: 0;
         height: 60px;
-        z-index: 1;
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding-left: ${th.spacing(4)};
         padding-right: ${th.spacing(4)};
+        backdrop-filter: blur(30px);
+        z-index: 500;
       `}
     >
       <Box
