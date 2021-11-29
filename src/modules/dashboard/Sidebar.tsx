@@ -14,6 +14,7 @@ import {
   Logout,
   Search,
   Setting,
+  Share,
 } from "@icon-park/react";
 import { logout } from "../../api/ums";
 import SidebarItem from "../../components/sidebar/SidebarItem";
@@ -73,6 +74,9 @@ const Sidebar: React.FC = () => {
         文件
       </SidebarItem>
       <WorkspaceTree />
+      <SidebarItem to="/shares" icon={<Share />}>
+        分享
+      </SidebarItem>
       <SidebarItem to="/archive" icon={<BoxIcon />}>
         归档
       </SidebarItem>

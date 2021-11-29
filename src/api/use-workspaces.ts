@@ -12,6 +12,7 @@ import {
   listWorkspaces,
   NoteView,
   restoreNote,
+  shareNote,
   treeNotes,
   updateNote,
   UpdateNoteView,
@@ -323,6 +324,51 @@ export const useWorkspaces = (revalidateOnMount?: boolean) => {
       });
     });
 
+  const $shareNote = (id: string) =>
+    shareNote(id)
+      .then(
+        toast.api.success({
+          title: "恢复成功",
+        })
+      )
+      .then((res) => {
+        const clone = new Map(query.data ?? []);
+        const values = [...clone.values()].filter(
+          (v) => v.parent !== 0
+        ) as NodeModel<ListNoteView>[];
+        const update = (id: string, share: boolean) => {
+          const node = clone.get(id) as NodeModel<ListNoteView>;
+          if (node) {
+            clone.set(id, {
+              ...node,
+              // @ts-ignore
+              data: {
+                ...node.data,
+                share,
+              },
+            });
+          }
+        };
+        const children = (id: string, share: boolean) => {
+          update(id, share);
+          values
+            .filter((v) => v.parent === id)
+            .map((v) => v.data as ListNoteView)
+            .forEach((v) => {
+              children(v.id, share);
+            });
+        };
+        const node = clone.get(id) as NodeModel<ListNoteView>;
+        children(id, !node.data?.share);
+        query.mutate(clone, false);
+        return res;
+      })
+      .catch(
+        toast.api.error({
+          title: "恢复失败",
+        })
+      );
+
   return {
     ...query,
     $addWorkspace,
@@ -336,5 +382,6 @@ export const useWorkspaces = (revalidateOnMount?: boolean) => {
     $deleteNote,
     $restoreNote,
     $forceDeleteNote,
+    $shareNote,
   };
 };

@@ -15,6 +15,7 @@ import {
   OpenDoor,
   Plus,
   Refresh,
+  Share,
 } from "@icon-park/react";
 import TreeButton from "../../../components/tree/TreeButton";
 import TreeItem from "../../../components/tree/TreeItem";
@@ -227,6 +228,15 @@ const WorkspaceTree: React.FC = () => {
                 <Divider />
                 {node.parent !== 0 && (
                   <>
+                    <Menu.Item
+                      icon={<Share />}
+                      onClick={() => {
+                        const data = node.data as ListNoteView;
+                        workspaces.$shareNote(data.id);
+                      }}
+                    >
+                      {(node.data as ListNoteView).share ? "取消分享" : "分享"}
+                    </Menu.Item>
                     <Menu.Item
                       icon={<Move />}
                       onClick={() => {

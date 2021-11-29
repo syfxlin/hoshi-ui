@@ -36,6 +36,7 @@ export type NoteView = {
   attributes?: string | null;
   createdTime: string;
   updatedTime: string;
+  share: boolean;
   breadcrumb: BreadcrumbView;
 };
 
@@ -48,6 +49,7 @@ export type ListNoteView = {
   status: NoteStatus;
   createdTime: string;
   updatedTime: string;
+  share: boolean;
   breadcrumb: BreadcrumbView;
 };
 
@@ -83,6 +85,7 @@ export type UpdateNoteView = {
   content?: string;
   icon?: string;
   status?: NoteStatus;
+  share?: boolean;
   attributes?: string;
 };
 
@@ -200,6 +203,11 @@ export const archiveNote = (id: string) =>
 export const forceDeleteNote = (id: string) =>
   request
     .delete<ApiEntity>(`/hoshi-note/notes/${id}/force`)
+    .then((response) => response.data);
+
+export const shareNote = (id: string) =>
+  request
+    .put<ApiEntity>(`/hoshi-note/notes/${id}/share`)
     .then((response) => response.data);
 
 export type SearchNoteFiltersView = {

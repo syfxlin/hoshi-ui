@@ -16,6 +16,8 @@ const UserInfo = loadable(() => import("./modules/user/UserInfo"));
 const Dashboard = loadable(() => import("./modules/dashboard/Dashboard"));
 const Admin = loadable(() => import("./modules/admin/Admin"));
 const Settings = loadable(() => import("./modules/settings/Settings"));
+const Share = loadable(() => import("./modules/share/Share"));
+const NotFound = loadable(() => import("./modules/NotFound"));
 
 // Dashboard
 const Home = loadable(() => import("./modules/dashboard/panels/Home"));
@@ -23,6 +25,7 @@ const File = loadable(() => import("./modules/dashboard/panels/File"));
 const Doc = loadable(() => import("./modules/dashboard/panels/Doc"));
 const Trash = loadable(() => import("./modules/dashboard/panels/Trash"));
 const Archive = loadable(() => import("./modules/dashboard/panels/Archive"));
+const Shares = loadable(() => import("./modules/dashboard/panels/Shares"));
 const Workspace = loadable(
   () => import("./modules/dashboard/panels/Workspace")
 );
@@ -75,6 +78,11 @@ const App: React.FC = () => {
           <AuthorizeRoute path="/archive" element={<Dashboard />}>
             <AuthorizeRoute index element={<Archive />} />
           </AuthorizeRoute>
+          {/* Shares */}
+          <AuthorizeRoute path="/shares" element={<Dashboard />}>
+            <AuthorizeRoute index element={<Shares />} />
+          </AuthorizeRoute>
+          <AuthorizeRoute path="/share/:noteId" element={<Share />} />
           {/* Setting */}
           <AuthorizeRoute path="/settings" element={<Settings />}>
             <AuthorizeRoute index roles={["ME"]} element={<Info />} />
@@ -96,6 +104,7 @@ const App: React.FC = () => {
             <AuthorizeRoute path="users" element={<AdminUsers />} />
             <AuthorizeRoute path="roles" element={<AdminRoles />} />
           </AuthorizeRoute>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </div>

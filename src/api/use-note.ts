@@ -120,6 +120,12 @@ const useNote = (id?: string) => {
       return res;
     });
 
+  const $shareNote = () =>
+    workspaces.$shareNote(query.data?.id as string).then((res) => {
+      query.mutate();
+      return res;
+    });
+
   return {
     ...query,
     content,
@@ -132,6 +138,7 @@ const useNote = (id?: string) => {
     $deleteNote,
     $restoreNote,
     $forceDeleteNote,
+    $shareNote,
   };
 };
 

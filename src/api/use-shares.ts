@@ -1,11 +1,12 @@
-import { getTrash, ListNoteView } from "./note";
-import useSWRPage from "../utils/use-swr-page";
-import { ApiPage } from "./request";
 import { useState } from "react";
-import { useWorkspaces } from "./use-workspaces";
 import { useDebouncedValue } from "@mantine/hooks";
+import useSWRPage from "../utils/use-swr-page";
+import { ListNoteView } from "./note";
+import { ApiPage } from "./request";
+import { listShares } from "./share";
+import { useWorkspaces } from "./use-workspaces";
 
-const useTrash = () => {
+const useShares = (id?: number) => {
   const workspaces = useWorkspaces(false);
 
   const [page, setPage] = useState(1);
@@ -17,9 +18,10 @@ const useTrash = () => {
   const [debounced] = useDebouncedValue(search, 1000);
 
   const query = useSWRPage<string, ListNoteView>(
-    ["trash", page, sort, debounced],
-    async (key, page, sort, search) => {
-      const entity = await getTrash(
+    ["shares", id, page, sort, debounced],
+    async (key, id, page, sort, search) => {
+      const entity = await listShares(
+        id,
         {
           page,
           sort: {
@@ -36,14 +38,8 @@ const useTrash = () => {
     }
   );
 
-  const $restoreNote = (id: string) =>
-    workspaces.$restoreNote(id).then((res) => {
-      query.mutate();
-      return res;
-    });
-
-  const $forceDeleteNote = (id: string) =>
-    workspaces.$forceDeleteNote(id).then((res) => {
+  const $cancelShare = (id: string) =>
+    workspaces.$shareNote(id).then((res) => {
       query.mutate();
       return res;
     });
@@ -56,9 +52,8 @@ const useTrash = () => {
     setSort,
     search,
     setSearch,
-    $restoreNote,
-    $forceDeleteNote,
+    $cancelShare,
   };
 };
 
-export default useTrash;
+export default useShares;

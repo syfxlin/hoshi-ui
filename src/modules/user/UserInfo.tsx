@@ -9,14 +9,18 @@ import FollowList from "./FollowList";
 import Header from "../../components/header/Header";
 import { css } from "@emotion/react";
 import useUser from "../../api/use-user";
+import { useTh } from "../../theme/hooks/use-th";
+import Overview from "./Overview";
 
 const tabs: Record<string, (user: UserView) => React.ReactNode> = {
-  overview: () => "Text",
+  overview: (user) => <Overview user={user} />,
   followers: (user) => <FollowList user={user} type="followers" />,
   following: (user) => <FollowList user={user} type="following" />,
 };
 
 const UserInfo: React.FC = () => {
+  const th = useTh();
+
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const tab = params.get("tab") ?? "overview";
@@ -28,7 +32,9 @@ const UserInfo: React.FC = () => {
       <Header />
       <Main
         css={css`
-          margin-top: 60px;
+          padding-top: calc(60px + ${th.spacing(4)});
+          padding-bottom: ${th.spacing(20)};
+          background-color: ${th.color("gray.0", "dark.7")};
         `}
       >
         <Async query={user} error="获取用户信息错误">

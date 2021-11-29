@@ -20,21 +20,24 @@ import NoteCard from "../../../components/panel/NoteCard";
 import { useNavigate } from "react-router-dom";
 import { css } from "@emotion/react";
 import { useTh } from "../../../theme/hooks/use-th";
-import { Delete, More, Search, Undo } from "@icon-park/react";
-import useArchive from "../../../api/use-archive";
+import { Copy, CopyLink, More, Search, Undo } from "@icon-park/react";
+import useShares from "../../../api/use-shares";
+import useMe from "../../../api/use-me";
+import { link } from "../../../api/url";
 
-const Archive: React.FC = () => {
+const Shares: React.FC = () => {
   const th = useTh();
-  const archive = useArchive();
   const navigate = useNavigate();
+  const me = useMe();
+  const shares = useShares(me.data?.id as number);
   return (
     <AppShellContainer>
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">
           <SegmentedControl
-            value={archive.sort[0]}
-            onChange={(value) => archive.setSort([value, archive.sort[1]])}
+            value={shares.sort[0]}
+            onChange={(value) => shares.setSort([value, shares.sort[1]])}
             size="xs"
             data={[
               { label: "笔记名称", value: "name" },
@@ -43,9 +46,9 @@ const Archive: React.FC = () => {
             ]}
           />
           <SegmentedControl
-            value={archive.sort[1]}
+            value={shares.sort[1]}
             onChange={(value: "asc" | "desc") =>
-              archive.setSort([archive.sort[0], value])
+              shares.setSort([shares.sort[0], value])
             }
             size="xs"
             data={[
@@ -58,21 +61,21 @@ const Archive: React.FC = () => {
             placeholder="搜索笔记"
             size="xs"
             icon={<Search />}
-            value={archive.search}
-            onChange={(e) => archive.setSearch(e.currentTarget.value)}
+            value={shares.search}
+            onChange={(e) => shares.setSearch(e.currentTarget.value)}
             rightSection={
-              !archive.error && !archive.data ? <Loader size="xs" /> : <div />
+              !shares.error && !shares.data ? <Loader size="xs" /> : <div />
             }
           />
           <ColorModeButton />
         </HStack>
       </AppShellHeader>
-      <Panel title="归档">
-        <Async query={archive}>
+      <Panel title="分享">
+        <Async query={shares}>
           <Tabs tabPadding="md">
             <Tab label="笔记">
               <VStack spacing={0}>
-                {archive.values.map((item) => {
+                {shares.values.map((item) => {
                   return (
                     <NoteCard
                       note={item}
@@ -87,28 +90,37 @@ const Archive: React.FC = () => {
                         }
                       >
                         <Menu.Item
-                          icon={<Undo />}
-                          onClick={() => archive.$restoreNote(item.id)}
+                          icon={<CopyLink />}
+                          onClick={() =>
+                            navigator.clipboard.writeText(
+                              link("share", item.id)
+                            )
+                          }
                         >
-                          还原笔记
+                          复制分享链接
+                        </Menu.Item>
+                        <Menu.Item
+                          icon={<Copy />}
+                          onClick={() => navigator.clipboard.writeText(item.id)}
+                        >
+                          复制页面 ID
                         </Menu.Item>
                         <Divider />
                         <Menu.Item
-                          color="red"
-                          icon={<Delete />}
-                          onClick={() => archive.$deleteNote(item.id)}
+                          icon={<Undo />}
+                          onClick={() => shares.$cancelShare(item.id)}
                         >
-                          删除
+                          取消分享
                         </Menu.Item>
                       </Menu>
                     </NoteCard>
                   );
                 })}
-                {archive.data && (
+                {shares.data && (
                   <Pagination
-                    total={archive.data.pages}
-                    page={archive.page}
-                    onChange={archive.setPage}
+                    total={shares.data.pages}
+                    page={shares.page}
+                    onChange={shares.setPage}
                     position="center"
                     css={css`
                       margin-top: ${th.spacing(2)};
@@ -125,4 +137,4 @@ const Archive: React.FC = () => {
   );
 };
 
-export default Archive;
+export default Shares;

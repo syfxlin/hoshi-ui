@@ -1,15 +1,17 @@
 import React from "react";
 import { logout, UserView } from "../../api/ums";
 import { BLink } from "../Link";
-import { Avatar, Divider, Menu, Text } from "@mantine/core";
-import { Logout } from "@icon-park/react";
+import { Avatar, Divider, Menu } from "@mantine/core";
+import { Home, Logout } from "@icon-park/react";
 import Stack from "../layout/Stack";
 import { css } from "@emotion/react";
 import useMe from "../../api/use-me";
+import Box from "../layout/Box";
+import { useNavigate } from "react-router-dom";
 
 const AuthButton: React.FC = () => {
+  const navigate = useNavigate();
   const me = useMe();
-
   const anonymous = (
     <>
       <Stack spacing="xs">
@@ -24,10 +26,18 @@ const AuthButton: React.FC = () => {
   );
   const authorize = (user: UserView) => {
     return (
-      <>
+      <Box
+        css={css`
+          display: flex;
+          align-items: center;
+        `}
+      >
         <Menu
+          withArrow
+          placement="end"
           control={
             <Avatar
+              size="sm"
               src={user.info.avatar ?? undefined}
               alt={`${user.nickname}'s avatar`}
               css={css`
@@ -35,29 +45,19 @@ const AuthButton: React.FC = () => {
               `}
             />
           }
-          withArrow
         >
-          <Menu.Label>Application</Menu.Label>
-          <Menu.Item>Settings</Menu.Item>
-          <Menu.Item>Messages</Menu.Item>
-          <Menu.Item>Gallery</Menu.Item>
           <Menu.Item
-            rightSection={
-              <Text size="xs" color="gray">
-                ⌘K
-              </Text>
-            }
+            icon={<Home />}
+            onClick={() => navigate(`/dashboard/home`)}
           >
-            Search
+            工作台
           </Menu.Item>
           <Divider />
-          <Menu.Label>Danger zone</Menu.Label>
-          <Menu.Item>Transfer my data</Menu.Item>,
           <Menu.Item color="red" icon={<Logout />} onClick={logout}>
             登出
           </Menu.Item>
         </Menu>
-      </>
+      </Box>
     );
   };
 

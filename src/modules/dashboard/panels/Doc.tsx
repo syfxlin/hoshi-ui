@@ -26,7 +26,15 @@ import { useMount } from "react-use";
 import useToast from "../../../utils/use-toast";
 import useLoading from "../../../utils/use-loading";
 import { Link } from "../../../components/Link";
-import { Copy, CopyLink, Delete, More, Move, Pic } from "@icon-park/react";
+import {
+  Copy,
+  CopyLink,
+  Delete,
+  More,
+  Move,
+  Pic,
+  Share,
+} from "@icon-park/react";
 import useNote from "../../../api/use-note";
 import EmojiPicker from "../../../components/form/EmojiPicker";
 import ContentEditable from "../../../components/form/ContentEditable";
@@ -171,6 +179,9 @@ const Doc: React.FC = () => {
               </ActionIcon>
             }
           >
+            <Menu.Item icon={<Share />} onClick={() => note.$shareNote()}>
+              {note.data?.share ? "取消分享" : "分享"}
+            </Menu.Item>
             <Menu.Item icon={<Move />} onClick={() => setMove(true)}>
               移动
             </Menu.Item>
