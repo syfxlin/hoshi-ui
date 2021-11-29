@@ -222,22 +222,22 @@ export const searchNote = (
     _filters.push("onlyName");
   }
   if (filters?.workspace) {
-    _filters.push(`workspace,${filters.workspace}`);
+    _filters.push(`workspace~${filters.workspace}`);
   }
   if (filters?.status) {
-    _filters.push(`status,${filters.status}`);
+    _filters.push(`status~${filters.status}`);
   }
   if (filters?.createdTimeStart) {
-    _filters.push(`createdTimeStart,${filters.createdTimeStart}`);
+    _filters.push(`createdTimeStart~${filters.createdTimeStart}`);
   }
   if (filters?.createdTimeEnd) {
-    _filters.push(`createdTimeEnd,${filters.createdTimeEnd}`);
+    _filters.push(`createdTimeEnd~${filters.createdTimeEnd}`);
   }
   if (filters?.updatedTimeStart) {
-    _filters.push(`updatedTimeStart,${filters.updatedTimeStart}`);
+    _filters.push(`updatedTimeStart~${filters.updatedTimeStart}`);
   }
   if (filters?.updatedTimeEnd) {
-    _filters.push(`updatedTimeEnd,${filters.updatedTimeEnd}`);
+    _filters.push(`updatedTimeEnd~${filters.updatedTimeEnd}`);
   }
   return request
     .get<ApiEntity<ApiPage<ListNoteView>>>(`/hoshi-note/notes/search`, {

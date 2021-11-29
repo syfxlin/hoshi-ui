@@ -338,6 +338,7 @@ const Doc: React.FC = () => {
             border-bottom: 1px dashed ${th.color("gray.3", "gray.7")};
             opacity: 0;
             transition: opacity 150ms;
+            flex: 0 0 ${th.spacing(20)};
 
             &:hover {
               opacity: 1;
