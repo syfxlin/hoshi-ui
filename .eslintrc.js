@@ -20,5 +20,6 @@ module.exports = {
     "react/jsx-curly-brace-presence": ["error", "never"],
     "react/display-name": "off",
     "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
   },
 };

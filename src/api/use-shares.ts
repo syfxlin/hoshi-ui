@@ -19,7 +19,7 @@ const useShares = (id?: number) => {
 
   const query = useSWRPage<string, ListNoteView>(
     ["shares", id, page, sort, debounced],
-    async (key, id, page, sort, search) => {
+    async (key, id: any, page: any, sort: any, search: any) => {
       const entity = await listShares(
         id,
         {

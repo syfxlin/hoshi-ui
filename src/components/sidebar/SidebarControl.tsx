@@ -1,12 +1,11 @@
 import React, { forwardRef } from "react";
-import { Avatar, UnstyledButton } from "@mantine/core";
+import { Avatar, UnstyledButton, UnstyledButtonProps } from "@mantine/core";
 import Stack from "../layout/Stack";
 import { css } from "@emotion/react";
 import Box from "../layout/Box";
 import { Down } from "@icon-park/react";
 import AuthorizeView from "../../router/AuthorizeView";
 import { useTh } from "../../theme/hooks/use-th";
-import { UnstyledButtonProps } from "@mantine/core/lib/src/components/Button/UnstyledButton/UnstyledButton";
 import { Assign } from "../../utils/types";
 import Ellipsis from "../Ellipsis";
 

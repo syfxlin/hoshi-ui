@@ -11,7 +11,7 @@ const useNote = (id?: string) => {
 
   const query = useSWRValue<NoteView>(
     ["note", id],
-    async (key, id) => {
+    async (key, id: any) => {
       const item = localStorage.getItem(`doc:${id}`);
       if (item) {
         return JSON.parse(item).data as NoteView;

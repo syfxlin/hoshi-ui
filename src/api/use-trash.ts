@@ -18,7 +18,7 @@ const useTrash = () => {
 
   const query = useSWRPage<string, ListNoteView>(
     ["trash", page, sort, debounced],
-    async (key, page, sort, search) => {
+    async (key, page: any, sort: any, search: any) => {
       const entity = await getTrash(
         {
           page,

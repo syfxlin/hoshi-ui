@@ -1,4 +1,4 @@
-import { SelectItem } from "@mantine/core/lib/src/components/Select/types";
+import { SelectItem } from "@mantine/core";
 
 export const permissions: SelectItem[] = [
   // User

@@ -25,7 +25,7 @@ const useFiles = () => {
 
   const query = useSWRPage<number, FileView>(
     ["files", page, sort, debounced],
-    async (key, page, sort, search) => {
+    async (key, page: any, sort: any, search: any) => {
       const entity = await listFiles(
         {
           page,

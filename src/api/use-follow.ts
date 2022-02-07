@@ -11,7 +11,7 @@ export const useFollow = (id: number, type: "followers" | "following") => {
 
   const query = useSWRPage<number, UserView>(
     ["follow", type, id, page],
-    async (key, type, id, page) => {
+    async (key, type: any, id: any, page: any) => {
       const entity = await followByUserId(type, id, page);
       const data = entity.data as ApiPage<UserView>;
       return {

@@ -24,7 +24,7 @@ const useUsers = () => {
 
   const query = useSWRPage<number, UserView>(
     ["admin/users", page, sort, debounced],
-    async (key, page, sort, search) => {
+    async (key, page: any, sort: any, search: any) => {
       const entity = await adminListUsers(
         {
           page,

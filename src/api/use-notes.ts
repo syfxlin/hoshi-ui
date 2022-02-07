@@ -16,7 +16,7 @@ const useNotes = (id?: string) => {
 
   const query = useSWRPage<string, ListNoteView>(
     ["list", id, page, sort, debounced],
-    async (key, id, page, sort, search) => {
+    async (key, id: any, page: any, sort: any, search: any) => {
       const entity = await listNotes(
         id,
         {

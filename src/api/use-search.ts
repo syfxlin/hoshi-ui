@@ -25,7 +25,7 @@ const useSearch = () => {
 
   const query = useSWRPage<string, ListNoteView>(
     ["search", page, sort, debounced, filters],
-    async (key, page, sort, search, filters) => {
+    async (key, page: any, sort: any, search: any, filters: any) => {
       if (!search) {
         return {
           page: 1,

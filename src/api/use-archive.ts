@@ -18,7 +18,7 @@ const useArchive = () => {
 
   const query = useSWRPage<string, ListNoteView>(
     ["archive", page, sort, debounced],
-    async (key, page, sort, search) => {
+    async (key, page: any, sort: any, search: any) => {
       const entity = await getArchive(
         {
           page,

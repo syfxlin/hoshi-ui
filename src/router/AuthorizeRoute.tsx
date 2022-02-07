@@ -1,6 +1,5 @@
 import React from "react";
-import { RouteProps } from "react-router";
-import { Navigate, Route } from "react-router-dom";
+import { Navigate, Route, RouteProps } from "react-router-dom";
 import LoadingBox from "../components/LoadingBox";
 import PermissionsView from "./PermissionsView";
 import Block from "./Block";
