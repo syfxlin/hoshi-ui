@@ -74,6 +74,10 @@ const SidebarCollapse: React.FC<CollapseItemProps> = ({
           > div {
             display: flex;
             flex-direction: column;
+
+            .mantine-UnstyledButton-root {
+              flex: 1;
+            }
           }
         `}
       >

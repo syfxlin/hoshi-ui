@@ -29,7 +29,6 @@ const SidebarButton: React.FC<SidebarButtonProps> = ({
     <UnstyledButton
       {...props}
       css={css`
-        flex: 1;
         display: flex;
         align-items: center;
         margin: 0 ${th.spacing(2)};
