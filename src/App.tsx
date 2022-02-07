@@ -36,7 +36,6 @@ const Safety = loadable(() => import("./modules/settings/panels/Safety"));
 const Tokens = loadable(() => import("./modules/settings/panels/Tokens"));
 
 // Admin
-const AdminHome = loadable(() => import("./modules/admin/panels/Home"));
 const AdminUsers = loadable(() => import("./modules/admin/panels/Users"));
 const AdminRoles = loadable(() => import("./modules/admin/panels/Roles"));
 
@@ -100,7 +99,7 @@ const App: React.FC = () => {
           {/* Admin */}
           <AuthorizeRoute path="/admin" element={<Admin />}>
             <Route index element={<Navigate to="home" />} />
-            <AuthorizeRoute path="home" element={<AdminHome />} />
+            <AuthorizeRoute path="home" element={<Navigate to="../users" />} />
             <AuthorizeRoute path="users" element={<AdminUsers />} />
             <AuthorizeRoute path="roles" element={<AdminRoles />} />
           </AuthorizeRoute>

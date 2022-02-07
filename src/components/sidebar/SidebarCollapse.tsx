@@ -70,6 +70,11 @@ const SidebarCollapse: React.FC<CollapseItemProps> = ({
         in={opened}
         css={css`
           padding-left: ${th.spacing(4)};
+
+          > div {
+            display: flex;
+            flex-direction: column;
+          }
         `}
       >
         {children}
