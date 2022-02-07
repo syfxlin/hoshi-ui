@@ -21,4 +21,4 @@ jobs:
           kubeconfig: "${{ secrets.KUBE_CONFIG }}"
       - name: Update deployment
         run: |
-          kubectl set image deployment/hoshi-ui hoshi-ui=ghcr.io/syfxlin/hoshi-note:ui-${GITHUB_SHA::7} --record
+          kubectl -n hoshi-note set image deployment/hoshi-ui hoshi-ui=ghcr.io/syfxlin/hoshi-note:ui-${GITHUB_SHA::7} --record
