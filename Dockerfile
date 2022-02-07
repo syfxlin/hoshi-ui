@@ -10,18 +10,26 @@ RUN pnpm install --frozen-lockfile
 
 # copy project
 COPY . .
+COPY deploy/.env.production ./.env
 
 # build
-RUN cp config/.env.production ./.env
 RUN pnpm run build
 
+FROM nginx/nginx-prometheus-exporter:latest as exporter
 FROM nginx:alpine
 
 WORKDIR /app
 
-# copy config
-COPY config/nginx.conf /etc/nginx/nginx.conf
+# copy config and exporter
+COPY --from=exporter /usr/bin/exporter /usr/bin/exporter
+COPY deploy/nginx.conf /etc/nginx/nginx.conf
+COPY deploy/supervisord.conf /etc/supervisor/supervisor.conf
+
+RUN apk add --no-cache supervisor
 
 # copy dist
 COPY --from=builder /app/dist ./dist
 RUN chmod 755 -R ./dist
+
+EXPOSE 80 9113
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisor.conf"]

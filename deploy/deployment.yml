@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hoshi-ui
+  namespace: hoshi-note
+  labels:
+    app: hoshi-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hoshi-ui
+  template:
+    metadata:
+      name: hoshi-ui
+      namespace: hoshi-note
+      labels:
+        app: hoshi-ui
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "9113"
+    spec:
+      containers:
+        - name: hoshi-ui
+          image: ghcr.io/syfxlin/hoshi-note:ui
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: hoshi-ui
+              containerPort: 80
+          livenessProbe:
+            httpGet:
+              port: 80
+              path: /index.html
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              port: 80
+              path: /index.html
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 5
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hoshi-ui
+  namespace: hoshi-note
+spec:
+  selector:
+    app: hoshi-ui
+  ports:
+    - name: hoshi-ui
+      port: 80
+  type: ClusterIP
