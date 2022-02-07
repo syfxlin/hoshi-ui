@@ -21,9 +21,9 @@ FROM nginx:alpine
 WORKDIR /app
 
 # copy config and exporter
-COPY --from=exporter /usr/bin/exporter /usr/bin/exporter
+COPY --from=exporter /usr/bin/nginx-prometheus-exporter /usr/bin/nginx-prometheus-exporter
 COPY deploy/nginx.conf /etc/nginx/nginx.conf
-COPY deploy/supervisord.conf /etc/supervisor/supervisor.conf
+COPY deploy/supervisor.conf /etc/supervisor/supervisor.conf
 
 RUN apk add --no-cache supervisor
 
