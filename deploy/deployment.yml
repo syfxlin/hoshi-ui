@@ -28,6 +28,8 @@ spec:
           ports:
             - name: hoshi-ui
               containerPort: 80
+            - name: metrics
+              containerPort: 9113
           livenessProbe:
             httpGet:
               port: 80
@@ -59,4 +61,6 @@ spec:
   ports:
     - name: hoshi-ui
       port: 80
+    - name: hoshi-ui-metrics
+      port: 9113
   type: ClusterIP
