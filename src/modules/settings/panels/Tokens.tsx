@@ -12,6 +12,7 @@ import useForm from "../../../utils/use-form";
 import Form from "../../../components/form/Form";
 import useTokens from "../../../api/use-tokens";
 import Ellipsis from "../../../components/Ellipsis";
+import { Helmet } from "react-helmet";
 
 const Tokens: React.FC = () => {
   const tokens = useTokens();
@@ -29,6 +30,9 @@ const Tokens: React.FC = () => {
   });
   return (
     <AppShellContainer>
+      <Helmet>
+        <title>设置：API 令牌 - Hoshi-Note</title>
+      </Helmet>
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">

@@ -11,6 +11,7 @@ import { css } from "@emotion/react";
 import useUser from "../../api/use-user";
 import { useTh } from "../../theme/hooks/use-th";
 import Overview from "./Overview";
+import { Helmet } from "react-helmet";
 
 const tabs: Record<string, (user: UserView) => React.ReactNode> = {
   overview: (user) => <Overview user={user} />,
@@ -29,6 +30,9 @@ const UserInfo: React.FC = () => {
   const user = useUser(username as string);
   return (
     <>
+      <Helmet>
+        <title>{user.data?.nickname ?? username} - Hoshi-Note</title>
+      </Helmet>
       <Header />
       <Main
         css={css`

@@ -26,6 +26,7 @@ import { Link } from "../../components/Link";
 import { css } from "@emotion/react";
 import Main from "../../components/Main";
 import Ellipsis from "../../components/Ellipsis";
+import { Helmet } from "react-helmet";
 
 const Share: React.FC = () => {
   const th = useTh();
@@ -43,6 +44,9 @@ const Share: React.FC = () => {
     <>
       {(note.error?.code === "400" ||
         note.error?.response?.data.status === 400) && <Navigate to="/404" />}
+      <Helmet>
+        <title>{note.data?.name ?? "无标题"} - Hoshi-Note</title>
+      </Helmet>
       <Main
         css={css`
           position: absolute;

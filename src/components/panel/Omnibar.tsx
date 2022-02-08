@@ -27,6 +27,7 @@ import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { Assign } from "../../utils/types";
 import { Link } from "../Link";
 import { useHotkeys } from "@mantine/hooks";
+import { Helmet } from "react-helmet";
 
 type OmnibarProps = Assign<
   ModalProps,
@@ -71,6 +72,9 @@ const Omnibar: React.FC<OmnibarProps> = ({
 
   return (
     <Modal {...props} hideCloseButton size="lg" padding={0}>
+      <Helmet>
+        <title>搜索 - Hoshi-Note</title>
+      </Helmet>
       <Box
         css={css`
           padding: ${th.spacing(2)} 0;

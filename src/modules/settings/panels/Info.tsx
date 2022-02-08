@@ -31,6 +31,7 @@ import { Dropzone } from "@mantine/dropzone";
 import { mod } from "../../../api/url";
 import useMe from "../../../api/use-me";
 import useFiles from "../../../api/use-files";
+import { Helmet } from "react-helmet";
 
 const Info: React.FC = () => {
   const toast = useToast();
@@ -38,6 +39,9 @@ const Info: React.FC = () => {
   const files = useFiles();
   return (
     <AppShellContainer>
+      <Helmet>
+        <title>设置：基本资料 - Hoshi-Note</title>
+      </Helmet>
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">

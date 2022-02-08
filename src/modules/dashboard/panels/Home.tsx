@@ -21,6 +21,7 @@ import { Emoji } from "emoji-mart-virtualized";
 import Async from "../../../components/Async";
 import Ellipsis from "../../../components/Ellipsis";
 import { Copy, Delete, More, OpenDoor } from "@icon-park/react";
+import { Helmet } from "react-helmet";
 
 const Home: React.FC = () => {
   const th = useTh();
@@ -32,6 +33,9 @@ const Home: React.FC = () => {
 
   return (
     <AppShellContainer>
+      <Helmet>
+        <title>主页 - Hoshi-Note</title>
+      </Helmet>
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">

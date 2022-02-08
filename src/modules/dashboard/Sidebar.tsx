@@ -33,6 +33,12 @@ const Sidebar: React.FC = () => {
   return (
     <CSidebar>
       <SidebarMenu>
+        <Menu.Item
+          icon={<Home />}
+          onClick={() => navigate(`/users/${me?.data?.username}`)}
+        >
+          个人主页
+        </Menu.Item>
         <Menu.Item icon={<Setting />} onClick={() => navigate(`/settings`)}>
           设置
         </Menu.Item>

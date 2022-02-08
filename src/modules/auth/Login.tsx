@@ -5,11 +5,9 @@ import useForm from "../../utils/use-form";
 import useToast from "../../utils/use-toast";
 import Form from "../../components/form/Form";
 import { login } from "../../api/ums";
-import { useTh } from "../../theme/hooks/use-th";
 import FormPage, { LinkGroup } from "./FormPage";
 
 const Login: React.FC = () => {
-  const th = useTh();
   const toast = useToast();
   const form = useForm({
     initial: {

@@ -6,6 +6,7 @@ import { Card, Title } from "@mantine/core";
 import { css } from "@emotion/react";
 import { useTh } from "../../theme/hooks/use-th";
 import Stack, { StackProps } from "../../components/layout/Stack";
+import { Helmet } from "react-helmet";
 
 type FormPageProps = {
   title: React.ReactNode;
@@ -15,6 +16,9 @@ const FormPage: React.FC<FormPageProps> = (props) => {
   const th = useTh();
   return (
     <>
+      <Helmet>
+        <title>{props.title} - Hoshi-Note</title>
+      </Helmet>
       <Header />
       <Main
         css={css`

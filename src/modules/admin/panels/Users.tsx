@@ -29,6 +29,7 @@ import Form from "../../../components/form/Form";
 import { useModals } from "@mantine/modals";
 import useUsers from "../../../api/use-users";
 import useRoles from "../../../api/use-roles";
+import { Helmet } from "react-helmet";
 
 const Users: React.FC = () => {
   const toast = useToast();
@@ -235,6 +236,9 @@ const Users: React.FC = () => {
   );
   return (
     <AppShellContainer>
+      <Helmet>
+        <title>用户列表 - Hoshi-Note 控制台</title>
+      </Helmet>
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">

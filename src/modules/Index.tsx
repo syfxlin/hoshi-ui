@@ -23,6 +23,7 @@ import preview1 from "../assets/preview-1.gif";
 import preview2 from "../assets/preview-2.gif";
 import preview3 from "../assets/preview-3.gif";
 import logo from "../assets/icon.png";
+import { Helmet } from "react-helmet";
 
 const Index: React.FC = () => {
   const th = useTh();
@@ -31,6 +32,9 @@ const Index: React.FC = () => {
   return (
     <>
       {me.data && <Navigate to="/dashboard" />}
+      <Helmet>
+        <title>Hoshi-Note - 你的云端知识管理库</title>
+      </Helmet>
       <Header />
       <Main
         css={css`

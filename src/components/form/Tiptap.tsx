@@ -3,6 +3,9 @@ import { Editor, EditorContent, EditorOptions, useEditor } from "@tiptap/react";
 import { editorCss, StarterKit } from "@syfxlin/tiptap-starter-kit";
 import { css } from "@emotion/react";
 import Box from "../layout/Box";
+import { FileView, uploadFile } from "../../api/file";
+import { mod } from "../../api/url";
+import useToast from "../../utils/use-toast";
 
 type TiptapProps = {
   editable?: boolean;
@@ -12,9 +15,59 @@ type TiptapProps = {
 };
 
 const Tiptap = forwardRef<Editor, TiptapProps>((props, ref) => {
+  const toast = useToast();
+
   const editor = useEditor({
     editable: props.editable !== false,
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit.configure({
+        uploader: {
+          uploader: async (files) => {
+            const items: File[] = [];
+            for (let i = 0; i < files.length; i++) {
+              const file = files.item(i);
+              if (!file) {
+                continue;
+              }
+              items.push(file);
+            }
+            const result = toast.create({
+              color: "cyan",
+              autoClose: false,
+              title: "上传中...",
+              message: `正在上传 ${items.length} 个文件...`,
+            });
+            try {
+              const results = await Promise.all(
+                items.map((item) => uploadFile(item))
+              );
+              result.update({
+                color: "green",
+                autoClose: 3000,
+                title: "上传成功!",
+                message: `上传所有文件成功!`,
+              });
+              return results
+                .map((item) => item.data as FileView)
+                .map((item, index) => ({
+                  type: item.contentType || items[index].type,
+                  name: item.name,
+                  url: mod("hoshi-file", item.url),
+                  size: item.size,
+                }));
+            } catch (e: any) {
+              result.update({
+                color: "red",
+                autoClose: 3000,
+                title: "上传失败!",
+                message: e.response?.data.message ?? "未知错误",
+              });
+              throw e;
+            }
+          },
+        },
+      }),
+    ],
     ...props.options,
   });
 

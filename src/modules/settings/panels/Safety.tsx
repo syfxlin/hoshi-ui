@@ -20,12 +20,16 @@ import { css } from "@emotion/react";
 import useLoading from "../../../utils/use-loading";
 import useLogged from "../../../api/use-logged";
 import Ellipsis from "../../../components/Ellipsis";
+import { Helmet } from "react-helmet";
 
 const Safety: React.FC = () => {
   const logged = useLogged();
   const loading = useLoading();
   return (
     <AppShellContainer>
+      <Helmet>
+        <title>设置：账号安全 - Hoshi-Note</title>
+      </Helmet>
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">

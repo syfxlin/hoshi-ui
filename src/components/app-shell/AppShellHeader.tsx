@@ -23,7 +23,7 @@ const AppShellHeader: UIComponent<"header", BoxProps> = forwardRef(
           position: sticky;
           top: 0;
           backdrop-filter: blur(30px);
-          z-index: 500;
+          z-index: 3;
         `}
       />
     );

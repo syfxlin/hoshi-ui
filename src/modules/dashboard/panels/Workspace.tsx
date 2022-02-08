@@ -41,6 +41,7 @@ import { link } from "../../../api/url";
 import { Box as BoxIcon } from "@icon-park/react/lib/map";
 import Omnibar from "../../../components/panel/Omnibar";
 import Ellipsis from "../../../components/Ellipsis";
+import { Helmet } from "react-helmet";
 
 const Workspace: React.FC = () => {
   const th = useTh();
@@ -55,6 +56,9 @@ const Workspace: React.FC = () => {
 
   return (
     <AppShellContainer>
+      <Helmet>
+        <title>工作区：{notes.workspace?.name ?? "无标题"} - Hoshi-Note</title>
+      </Helmet>
       <AppShellHeader>
         <HStack spacing="xs" align="center">
           <Emoji

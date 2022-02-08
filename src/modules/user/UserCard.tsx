@@ -41,6 +41,13 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
             css={css`
               border-radius: 50%;
               margin: ${th.spacing(6)};
+              width: auto !important;
+              height: auto !important;
+
+              img {
+                width: 100% !important;
+                height: 100% !important;
+              }
             `}
           />
         </AspectRatio>

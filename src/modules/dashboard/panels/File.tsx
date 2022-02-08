@@ -34,6 +34,7 @@ import useForm from "../../../utils/use-form";
 import Form from "../../../components/form/Form";
 import useFiles from "../../../api/use-files";
 import Ellipsis from "../../../components/Ellipsis";
+import { Helmet } from "react-helmet";
 
 const File: React.FC = () => {
   // tool
@@ -64,6 +65,9 @@ const File: React.FC = () => {
   });
   return (
     <AppShellContainer>
+      <Helmet>
+        <title>文件 - Hoshi-Note</title>
+      </Helmet>
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">

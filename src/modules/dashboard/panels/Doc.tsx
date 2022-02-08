@@ -44,6 +44,7 @@ import { NoteStatus } from "../../../api/note";
 import { Box as BoxIcon } from "@icon-park/react/lib/map";
 import { link } from "../../../api/url";
 import Omnibar from "../../../components/panel/Omnibar";
+import { Helmet } from "react-helmet";
 
 const Doc: React.FC = () => {
   const th = useTh();
@@ -141,6 +142,9 @@ const Doc: React.FC = () => {
 
   return (
     <AppShellContainer>
+      <Helmet>
+        <title>{note.data?.name ?? "无标题"} - Hoshi-Note</title>
+      </Helmet>
       <AppShellHeader>
         {note.data ? (
           <Breadcrumbs>

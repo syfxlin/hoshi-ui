@@ -22,6 +22,7 @@ import { css } from "@emotion/react";
 import { useTh } from "../../../theme/hooks/use-th";
 import { Delete, More, Search, Undo } from "@icon-park/react";
 import useArchive from "../../../api/use-archive";
+import { Helmet } from "react-helmet";
 
 const Archive: React.FC = () => {
   const th = useTh();
@@ -29,6 +30,9 @@ const Archive: React.FC = () => {
   const navigate = useNavigate();
   return (
     <AppShellContainer>
+      <Helmet>
+        <title>归档 - Hoshi-Note</title>
+      </Helmet>
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">

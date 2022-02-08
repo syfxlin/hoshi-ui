@@ -24,6 +24,7 @@ import { Copy, CopyLink, More, Search, Undo } from "@icon-park/react";
 import useShares from "../../../api/use-shares";
 import useMe from "../../../api/use-me";
 import { link } from "../../../api/url";
+import { Helmet } from "react-helmet";
 
 const Shares: React.FC = () => {
   const th = useTh();
@@ -32,6 +33,9 @@ const Shares: React.FC = () => {
   const shares = useShares(me.data?.id as number);
   return (
     <AppShellContainer>
+      <Helmet>
+        <title>分享 - Hoshi-Note</title>
+      </Helmet>
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">

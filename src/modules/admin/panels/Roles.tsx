@@ -24,6 +24,7 @@ import AppShellHeader from "../../../components/app-shell/AppShellHeader";
 import Form from "../../../components/form/Form";
 import { useModals } from "@mantine/modals";
 import useRoles from "../../../api/use-roles";
+import { Helmet } from "react-helmet";
 
 const Roles: React.FC = () => {
   const th = useTh();
@@ -198,6 +199,9 @@ const Roles: React.FC = () => {
   );
   return (
     <AppShellContainer>
+      <Helmet>
+        <title>角色列表 - Hoshi-Note 控制台</title>
+      </Helmet>
       <AppShellHeader>
         <div />
         <HStack spacing="xs" align="center">

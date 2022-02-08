@@ -5,10 +5,14 @@ import FluidCenter from "../components/layout/FluidCenter";
 import { HStack } from "../components/layout/Stack";
 import { Divider, Text, Title } from "@mantine/core";
 import { css } from "@emotion/react";
+import { Helmet } from "react-helmet";
 
 const NotFound: React.FC = () => {
   return (
     <>
+      <Helmet>
+        <title>页面未找到 - Hoshi-Note</title>
+      </Helmet>
       <Header />
       <Main>
         <FluidCenter>
