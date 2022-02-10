@@ -59,12 +59,24 @@ const Sidebar: React.FC = () => {
           角色
         </SidebarItem>
       </SidebarCollapse>
-      <SidebarCollapse title="文件管理">
+      <SidebarCollapse title="服务管理">
         <SidebarButton
           icon={<Dashboard />}
           onClick={() => window.open(import.meta.env.VITE_MINIO_URL)}
         >
-          Minio 文件
+          Minio
+        </SidebarButton>
+        <SidebarButton
+          icon={<Dashboard />}
+          onClick={() => window.open(import.meta.env.VITE_TIDB_URL)}
+        >
+          TiDB
+        </SidebarButton>
+        <SidebarButton
+          icon={<Dashboard />}
+          onClick={() => window.open(import.meta.env.VITE_TRAEFIK_URL)}
+        >
+          Treafik
         </SidebarButton>
       </SidebarCollapse>
       <SidebarCollapse title="指标管理">
@@ -79,14 +91,6 @@ const Sidebar: React.FC = () => {
           onClick={() => window.open(import.meta.env.VITE_PROMETHEUS_URL)}
         >
           Prometheus
-        </SidebarButton>
-      </SidebarCollapse>
-      <SidebarCollapse title="服务管理">
-        <SidebarButton
-          icon={<Dashboard />}
-          onClick={() => window.open(import.meta.env.VITE_TRAEFIK_URL)}
-        >
-          Treafik
         </SidebarButton>
       </SidebarCollapse>
     </CSidebar>

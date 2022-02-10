@@ -11,6 +11,7 @@ interface ImportMetaEnv {
   // custom
   VITE_SERVER_URL: string;
   VITE_MINIO_URL: string;
+  VITE_TIDB_URL: string;
   VITE_GRAFANA_URL: string;
   VITE_PROMETHEUS_URL: string;
   VITE_TRAEFIK_URL: string;
