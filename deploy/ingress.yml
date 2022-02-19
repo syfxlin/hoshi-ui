@@ -1,16 +1,23 @@
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
   name: hoshi-ui
   namespace: hoshi-note
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
-  entryPoints:
-    - web
-    - websecure
-  routes:
-    - kind: Rule
-      match: Host(`hoshi-note.ixk.me`)
-      services:
-        - name: hoshi-ui
-          namespace: hoshi-note
-          port: 80
+  tls:
+    - hosts:
+        - hoshi-note.ixk.me
+      secretName: hoshi-note-tls
+  rules:
+    - host: hoshi-note.ixk.me
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hoshi-ui
+                port:
+                  number: 80

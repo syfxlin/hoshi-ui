@@ -7,10 +7,14 @@ import {
   Control,
   DarkMode,
   Dashboard,
+  DatabaseEnter,
+  FileCabinet,
   Github,
   Home,
+  Inbox,
   Logout,
   User,
+  ViewList,
 } from "@icon-park/react";
 import { logout } from "../../api/ums";
 import SidebarItem from "../../components/sidebar/SidebarItem";
@@ -61,22 +65,28 @@ const Sidebar: React.FC = () => {
       </SidebarCollapse>
       <SidebarCollapse title="服务管理">
         <SidebarButton
-          icon={<Dashboard />}
+          icon={<Inbox />}
+          onClick={() => window.open(import.meta.env.VITE_LONGHORN_URL)}
+        >
+          Longhorn
+        </SidebarButton>
+        <SidebarButton
+          icon={<ViewList />}
+          onClick={() => window.open(import.meta.env.VITE_RABBITMQ_URL)}
+        >
+          RabbitMQ
+        </SidebarButton>
+        <SidebarButton
+          icon={<FileCabinet />}
           onClick={() => window.open(import.meta.env.VITE_MINIO_URL)}
         >
           Minio
         </SidebarButton>
         <SidebarButton
-          icon={<Dashboard />}
+          icon={<DatabaseEnter />}
           onClick={() => window.open(import.meta.env.VITE_TIDB_URL)}
         >
           TiDB
-        </SidebarButton>
-        <SidebarButton
-          icon={<Dashboard />}
-          onClick={() => window.open(import.meta.env.VITE_TRAEFIK_URL)}
-        >
-          Treafik
         </SidebarButton>
       </SidebarCollapse>
       <SidebarCollapse title="指标管理">
@@ -85,12 +95,6 @@ const Sidebar: React.FC = () => {
           onClick={() => window.open(import.meta.env.VITE_GRAFANA_URL)}
         >
           Grafana
-        </SidebarButton>
-        <SidebarButton
-          icon={<Dashboard />}
-          onClick={() => window.open(import.meta.env.VITE_PROMETHEUS_URL)}
-        >
-          Prometheus
         </SidebarButton>
       </SidebarCollapse>
     </CSidebar>
