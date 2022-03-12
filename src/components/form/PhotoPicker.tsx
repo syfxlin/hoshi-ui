@@ -118,7 +118,7 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({ onSelect }) => {
                   const data = entity.data as FileView;
                   onSelect({
                     name: data.name,
-                    url: data.url,
+                    url: mod("hoshi-file", data.url),
                   });
                 })
               );
