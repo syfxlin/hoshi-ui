@@ -84,9 +84,9 @@ const Sidebar: React.FC = () => {
         </SidebarButton>
         <SidebarButton
           icon={<DatabaseEnter />}
-          onClick={() => window.open(import.meta.env.VITE_TIDB_URL)}
+          onClick={() => window.open(import.meta.env.VITE_CRDB_URL)}
         >
-          TiDB
+          CockroachDB
         </SidebarButton>
       </SidebarCollapse>
       <SidebarCollapse title="指标管理">

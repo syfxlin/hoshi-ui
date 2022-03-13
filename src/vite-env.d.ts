@@ -14,7 +14,7 @@ interface ImportMetaEnv {
   VITE_LONGHORN_URL: string;
   VITE_RABBITMQ_URL: string;
   VITE_MINIO_URL: string;
-  VITE_TIDB_URL: string;
+  VITE_CRDB_URL: string;
 }
 
 declare module "emoji-mart-virtualized" {
