@@ -23,6 +23,7 @@ const Panel: UIComponent<"div", PanelProps> = forwardRef(
           flex-grow: 1;
           margin-top: ${th.spacing(10)};
           margin-bottom: ${th.spacing(10)};
+          overflow-x: auto;
         `}
       >
         <Title
