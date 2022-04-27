@@ -8,7 +8,6 @@ interface ImportMetaEnv {
   DEV: boolean;
   PROD: boolean;
   SSR: boolean;
-  // custom
   VITE_SERVER_URL: string;
   VITE_GRAFANA_URL: string;
   VITE_LONGHORN_URL: string;
