@@ -1,8 +1,8 @@
-name: Deploy to Kubernetes
+name: Deploy to Kubernetes (Backup)
 on:
   workflow_run:
     workflows:
-      - "Publish Hoshi-UI"
+      - "Publish Hoshi-UI (Backup)"
     types:
       - completed
 jobs:
@@ -18,7 +18,7 @@ jobs:
         uses: azure/k8s-set-context@v1
         with:
           method: kubeconfig
-          kubeconfig: "${{ secrets.KUBE_CONFIG }}"
+          kubeconfig: "${{ secrets.BACKUP_KUBE_CONFIG }}"
       - name: Update deployment
         run: |
-          kubectl -n hoshi-note set image deployment/hoshi-ui hoshi-ui=ghcr.io/syfxlin/hoshi-note:ui-${GITHUB_SHA::7} --record
+          kubectl -n hoshi-note set image deployment/hoshi-ui hoshi-ui=ghcr.io/syfxlin/hoshi-note:ui-backup-${GITHUB_SHA::7} --record

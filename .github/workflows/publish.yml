@@ -1,8 +1,8 @@
-name: Publish Hoshi-UI
+name: Publish Hoshi-UI (Backup)
 on:
   push:
     branches:
-      - master
+      - backup
     paths:
       - src/**
       - package.json
@@ -34,8 +34,8 @@ jobs:
         with:
           images: ghcr.io/syfxlin/hoshi-note
           tags: |
-            type=raw,value=ui
-            type=raw,value=ui-{{sha}}
+            type=raw,value=ui-backup
+            type=raw,value=ui-backup-{{sha}}
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:

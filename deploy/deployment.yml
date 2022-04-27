@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: hoshi-ui
-          image: ghcr.io/syfxlin/hoshi-note:ui
+          image: ghcr.io/syfxlin/hoshi-note:ui-backup
           imagePullPolicy: IfNotPresent
           ports:
             - name: hoshi-ui
