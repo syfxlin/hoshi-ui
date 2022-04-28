@@ -8,10 +8,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - hoshi-note.ixk.me
+        - hoshi.ixk.me
       secretName: hoshi-note-tls
   rules:
-    - host: hoshi-note.ixk.me
+    - host: hoshi.ixk.me
       http:
         paths:
           - path: /
